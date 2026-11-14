@@ -4,9 +4,16 @@ import type { IBookmarkRepository } from '../types';
 export class MockBookmarkRepository implements IBookmarkRepository {
   private storageKey = 'it-daily-bookmarks';
 
-  async getBookmarks(_uid: string): Promise<string[]> {
+  private getStorageKey(uid?: string): string {
+    if (!uid || uid === 'guest-user' || uid === 'default-user') {
+      return this.storageKey;
+    }
+    return `${this.storageKey}-${uid}`;
+  }
+
+  async getBookmarks(uid: string): Promise<string[]> {
     try {
-      const stored = localStorage.getItem(this.storageKey);
+      const stored = localStorage.getItem(this.getStorageKey(uid));
       if (stored) {
         const parsed = JSON.parse(stored);
         const list = parsed.state?.bookmarks || parsed.bookmarks || [];
@@ -31,7 +38,7 @@ export class MockBookmarkRepository implements IBookmarkRepository {
     }
     try {
       localStorage.setItem(
-        this.storageKey,
+        this.getStorageKey(uid),
         JSON.stringify({ state: { bookmarks: Array.from(set) } })
       );
     } catch {

@@ -45,6 +45,27 @@ export interface IProgressRepository {
   resetDaily(uid: string): Promise<void>;
 }
 
+// Generic Pagination & Sorting Contracts
+export interface PaginationParams {
+  page?: number;
+  pageSize?: number;
+  cursor?: string;
+}
+
+export interface PaginatedResult<T> {
+  data: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  hasNextPage: boolean;
+  nextCursor?: string;
+}
+
+export interface SortingParams<T = any> {
+  sortBy: keyof T | string;
+  order: 'asc' | 'desc';
+}
+
 export interface IBookmarkRepository {
   getBookmarks(uid: string): Promise<string[]>;
   toggleBookmark(uid: string, contentId: string): Promise<boolean>;

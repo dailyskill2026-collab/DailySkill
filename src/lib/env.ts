@@ -3,9 +3,16 @@
 // In Vite, import.meta.env is populated from .env files and build environment.
 
 export type BackendMode = 'mock' | 'firebase';
+export type DataProviderType = 'mock' | 'firebase' | 'api';
 
 export const env = {
-  // Backend storage & auth mode: 'mock' (default) | 'firebase'
+  // Centralized Data Provider: 'mock' (default) | 'firebase' | 'api'
+  DATA_PROVIDER: (import.meta.env.VITE_DATA_PROVIDER ?? import.meta.env.VITE_BACKEND_MODE ?? 'mock') as DataProviderType,
+
+  // Future API Base URL (Phase 2 Aiven/Custom API)
+  API_BASE_URL: import.meta.env.VITE_API_BASE_URL ?? '',
+
+  // Backend storage & auth mode: 'mock' (default) | 'firebase' (legacy alias)
   BACKEND_MODE: (import.meta.env.VITE_BACKEND_MODE ?? 'mock') as BackendMode,
 
   // LLM mode: 'mock' (default) or 'live'
