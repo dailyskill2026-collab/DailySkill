@@ -1,0 +1,21 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "publishedContent",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "technology", "order": "ASCENDING" },
+        { "fieldPath": "publishedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "publishingAuditLogs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "contentId", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

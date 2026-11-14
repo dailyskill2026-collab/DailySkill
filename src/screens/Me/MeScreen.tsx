@@ -1,21 +1,44 @@
 import React from 'react';
 import { useBookmarkStore } from '@/store/bookmarkStore';
+import { useThemeStore } from '@/store/themeStore';
 import { exploreContent } from '@/data/exploreContent';
-import { Flame, BookOpen, Target, Award, ChevronRight, Moon, Sun, HelpCircle, FileText, LogOut, Bookmark } from 'lucide-react';
+import { mockUser } from '@/data';
+import Badge from '@/components/common/Badge';
+import ProgressBar from '@/components/common/ProgressBar';
+import { ExploreCard } from '@/components/Explore/ExploreCard';
+import AuthCard from '@/components/auth/AuthCard';
+import {
+  Flame,
+  BookOpen,
+  Target,
+  Award,
+  ChevronRight,
+  Moon,
+  Sun,
+  HelpCircle,
+  FileText,
+  LogOut,
+  Bookmark,
+} from 'lucide-react';
 
 export default function MeScreen() {
   const { theme, toggleTheme } = useThemeStore();
   const isDark = theme === 'dark';
+  const { bookmarks } = useBookmarkStore();
+  const bookmarkedIds = Array.from(bookmarks);
 
   return (
     <div className="pb-safe">
       {/* Header */}
       <div className="px-4 pt-5 pb-4">
         <h1 className="text-2xl font-bold text-primary">Me</h1>
-        <p className="text-sm text-secondary">Your learning profile</p>
+        <p className="text-sm text-secondary">Your learning profile & account</p>
       </div>
 
       <div className="px-4 space-y-5">
+        {/* Authentication & Account Card (Sprint 9) */}
+        <AuthCard />
+
         {/* Profile card */}
         <div className="card gradient-brand p-5 flex items-center gap-4 relative overflow-hidden">
           <div className="absolute -right-8 -bottom-8 w-32 h-32 rounded-full bg-white/10" />
@@ -151,77 +174,47 @@ export default function MeScreen() {
               />
             </button>
           </div>
-
-          {/* Notifications - UI only */}
-          <div className="flex items-center justify-between py-2 opacity-60">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
-                <Bell size={18} className="text-secondary" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-primary">Daily Reminder</p>
-                <p className="text-xs text-secondary">Coming in next sprint</p>
-              </div>
-            </div>
-            <span className="text-2xs font-medium text-muted px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800">Soon</span>
-          </div>
-
-          {/* Premium preview */}
-          <div className="card overflow-hidden">
-            <div className="gradient-brand p-4 flex items-center justify-between">
-              <div>
-                <p className="text-xs text-brand-200 font-medium">Coming Soon</p>
-                <p className="text-base font-bold text-white">IT Daily Premium</p>
-                <p className="text-xs text-brand-200 mt-0.5">Unlimited paths · AI hints · Certificates</p>
-              </div>
-              <button className="px-4 py-2 rounded-xl bg-white text-brand-700 font-semibold text-sm active:opacity-90">
-                Learn More
-              </button>
-            </div>
-          </div>
-
-          {/* Bookmarks Section */}
-          <div className="card p-4 mt-4">
-            <h2 className="text-sm font-semibold text-primary mb-3">Saved Articles</h2>
-            {bookmarkedIds.length === 0 ? (
-              <p className="text-xs text-gray-500">No bookmarks yet.</p>
-            ) : (
-              <div className="space-y-3">
-                {bookmarkedIds.map(id => {
-                  const content = exploreContent.find(c => c.id === id);
-                  return content ? <ExploreCard key={id} content={content as any} /> : null;
-                })}
-              </div>
-            )}
-          </div>
-
-          <div className="card divide-y divide-border-light dark:divide-border-dark">
-            {[
-              { icon: Bookmark, label: 'Saved Articles', sub: 'Your bookmarks' },
-              { icon: HelpCircle, label: 'Help & FAQ', sub: 'Get support' },
-              { icon: FileText, label: 'Terms & Privacy', sub: 'Legal information' },
-              { icon: LogOut, label: 'Sign Out', sub: 'Coming in Sprint 2', disabled: true },
-            ].map((item) => (
-              <button
-                key={item.label}
-                disabled={item.disabled}
-                className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label={item.label}
-              >
-                <div className="w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
-                  <item.icon size={18} className="text-secondary" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-primary">{item.label}</p>
-                  <p className="text-xs text-secondary">{item.sub}</p>
-                </div>
-                <ChevronRight size={16} className="text-muted" />
-              </button>
-            ))}
-          </div>
-
-          <p className="text-center text-2xs text-muted pb-2">IT Daily Upskilling v0.1.0 · Sprint 1</p>
         </div>
+
+        {/* Bookmarks Section */}
+        <div className="card p-4">
+          <h2 className="text-sm font-semibold text-primary mb-3">Saved Articles</h2>
+          {bookmarkedIds.length === 0 ? (
+            <p className="text-xs text-gray-500">No bookmarks yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {bookmarkedIds.map(id => {
+                const content = exploreContent.find(c => c.id === id);
+                return content ? <ExploreCard key={id} content={content as any} /> : null;
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Navigation & Help Links */}
+        <div className="card divide-y divide-border-light dark:divide-border-dark">
+          {[
+            { icon: Bookmark, label: 'Saved Articles', sub: 'Your bookmarks' },
+            { icon: HelpCircle, label: 'Help & FAQ', sub: 'Get support' },
+            { icon: FileText, label: 'Terms & Privacy', sub: 'Legal information' },
+          ].map((item) => (
+            <div
+              key={item.label}
+              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+            >
+              <div className="w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
+                <item.icon size={18} className="text-secondary" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-primary">{item.label}</p>
+                <p className="text-xs text-secondary">{item.sub}</p>
+              </div>
+              <ChevronRight size={16} className="text-muted" />
+            </div>
+          ))}
+        </div>
+
+        <p className="text-center text-2xs text-muted pb-2">IT Daily Upskilling v0.9.0 · Sprint 9 (Dual-Mode)</p>
       </div>
     </div>
   );

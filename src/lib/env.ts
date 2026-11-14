@@ -1,8 +1,13 @@
 // src/lib/env.ts
-// Simple environment helper exposing needed variables with defaults.
-// In a Vite+React project, import.meta.env is populated from .env files.
+// Environment configuration with dual-mode support (mock vs firebase).
+// In Vite, import.meta.env is populated from .env files and build environment.
+
+export type BackendMode = 'mock' | 'firebase';
 
 export const env = {
+  // Backend storage & auth mode: 'mock' (default) | 'firebase'
+  BACKEND_MODE: (import.meta.env.VITE_BACKEND_MODE ?? 'mock') as BackendMode,
+
   // LLM mode: 'mock' (default) or 'live'
   LLM_MODE: (import.meta.env.VITE_LLM_MODE ?? 'mock') as 'mock' | 'live',
   // OpenAI key for live mode
@@ -13,4 +18,13 @@ export const env = {
   USE_SUPABASE_DRAFTS: import.meta.env.VITE_USE_SUPABASE_DRAFTS ?? 'false',
   // Simple dev‑only admin guard (set to "true" to restrict admin UI to dev builds)
   ADMIN_ONLY_DEV: import.meta.env.VITE_ADMIN_ONLY_DEV ?? 'true',
+
+  // Firebase Configuration (Project: dailyskill-9fed1)
+  FIREBASE_API_KEY: import.meta.env.VITE_FIREBASE_API_KEY ?? '',
+  FIREBASE_AUTH_DOMAIN: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN ?? 'dailyskill-9fed1.firebaseapp.com',
+  FIREBASE_PROJECT_ID: import.meta.env.VITE_FIREBASE_PROJECT_ID ?? 'dailyskill-9fed1',
+  FIREBASE_STORAGE_BUCKET: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET ?? 'dailyskill-9fed1.appspot.com',
+  FIREBASE_MESSAGING_SENDER_ID: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID ?? '',
+  FIREBASE_APP_ID: import.meta.env.VITE_FIREBASE_APP_ID ?? '',
+  USE_FIREBASE_EMULATOR: import.meta.env.VITE_USE_FIREBASE_EMULATOR === 'true',
 };

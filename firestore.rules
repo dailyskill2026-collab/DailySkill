@@ -1,0 +1,57 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Default deny all access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.admin == true;
+    }
+
+    // User profile documents and user-scoped subcollections
+    match /users/{userId} {
+      allow read, write: if isOwner(userId) || isAdmin();
+
+      // Learning progress, bookmarks, and spaced repetition revisions
+      match /{subcollection}/{docId} {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
+    }
+
+    // Published microlearning content (read-only for all users, write-restricted to admins)
+    match /publishedContent/{contentId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // AI generated drafts and verification work-in-progress (strictly admin only)
+    match /generatedDrafts/{draftId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Source documents and evidence mappings (reference materials)
+    match /sourceDocuments/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Append-only publishing audit logs (read-restricted to admins; update/delete strictly forbidden)
+    match /publishingAuditLogs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin();
+      allow update, delete: if false; // Immutable audit trail
+    }
+  }
+}

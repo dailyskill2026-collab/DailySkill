@@ -71,3 +71,5 @@ export const ExploreCard: React.FC<ExploreCardProps> = ({ content }) => {
     </div>
   );
 };
+
+export default ExploreCard;

@@ -1,15 +1,16 @@
-import React, { Suspense, lazy } from 'react'
-import { Routes, Route } from 'react-router-dom'
-import AppShell from '@/components/layout/AppShell'
-import ErrorBoundary from '@/components/common/ErrorBoundary'
+import React, { Suspense, lazy } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import AppShell from '@/components/layout/AppShell';
+import ErrorBoundary from '@/components/common/ErrorBoundary';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 // Lazy-loaded screens for code splitting
-const TodayScreen   = lazy(() => import('@/screens/Today/TodayScreen'))
-const ExploreScreen = lazy(() => import('@/screens/Explore/ExploreScreen'))
-const DetailScreen = lazy(() => import('@/screens/Explore/DetailScreen'))
-const LearnScreen   = lazy(() => import('@/screens/Learn/LearnScreen'))
-const ReviseScreen  = lazy(() => import('@/screens/Revise/ReviseScreen'))
-const MeScreen      = lazy(() => import('@/screens/Me/MeScreen'))
+const TodayScreen   = lazy(() => import('@/screens/Today/TodayScreen'));
+const ExploreScreen = lazy(() => import('@/screens/Explore/ExploreScreen'));
+const DetailScreen  = lazy(() => import('@/screens/Explore/DetailScreen'));
+const LearnScreen   = lazy(() => import('@/screens/Learn/LearnScreen'));
+const ReviseScreen  = lazy(() => import('@/screens/Revise/ReviseScreen'));
+const MeScreen      = lazy(() => import('@/screens/Me/MeScreen'));
 
 // Simple loading fallback
 function ScreenLoader() {
@@ -23,7 +24,7 @@ function ScreenLoader() {
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 export default function AppRouter() {
@@ -35,8 +36,15 @@ export default function AppRouter() {
       <AppShell>
         <Suspense fallback={<ScreenLoader />}>
           <Routes>
-    {/* Admin route */}
-    <Route path="/admin/generation" element={<GenerationScreen />} />
+            {/* Protected Admin route */}
+            <Route
+              path="/admin/generation"
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <GenerationScreen />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/"        element={<TodayScreen />}   />
             <Route path="/explore" element={<ExploreScreen />} />
             <Route path="/explore/:id" element={<DetailScreen />} />
@@ -49,5 +57,5 @@ export default function AppRouter() {
         </Suspense>
       </AppShell>
     </ErrorBoundary>
-  )
+  );
 }
