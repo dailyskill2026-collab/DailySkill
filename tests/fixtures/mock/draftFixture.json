@@ -1,0 +1,46 @@
+{
+  "documentId": "doc123",
+  "sourceName": "Salesforce Release Notes",
+  "originalUrl": "https://releasenotes.salesforce.com/2023/05",
+  "title": "Salesforce Spring '23 Update",
+  "technology": "Salesforce",
+  "releaseVersion": "Spring23",
+  "publishedAt": "2023-05-01",
+  "fetchedAt": "2023-05-02",
+  "topics": [
+    { "id": "t1", "title": "Apex Enhancements", "description": "New features in Apex", "relevanceScore": 0.9 }
+  ],
+  "lessons": [
+    {
+      "id": "l1",
+      "topicId": "t1",
+      "title": "New Apex Syntax",
+      "shortExplanation": "Introduces new @future syntax",
+      "whyItMatters": "Improves async handling",
+      "realWorldExample": "Example snippet",
+      "estimatedMinutes": 5,
+      "difficulty": "medium",
+      "releaseVersion": "Spring23",
+      "verificationStatus": "verified"
+    }
+  ],
+  "scenarios": [
+    { "id": "s1", "lessonId": "l1", "description": "Write a future method using new syntax" }
+  ],
+  "mcqs": [
+    {
+      "id": "q1",
+      "lessonId": "l1",
+      "question": "What annotation replaces @future?",
+      "options": [
+        { "id": "o1", "label": "@future2" },
+        { "id": "o2", "label": "@asynchronous" }
+      ],
+      "correctOptionId": "o1",
+      "explanation": "@future2 is the new annotation"
+    }
+  ],
+  "evidences": [
+    { "id": "e1", "sourceName": "Salesforce Docs", "sourceUrl": "https://releasenotes.salesforce.com/2023/05/apex", "citation": "Section 2.1" }
+  ]
+}
