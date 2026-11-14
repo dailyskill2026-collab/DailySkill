@@ -14,6 +14,9 @@ import { MockAuditRepository } from './mock/MockAuditRepository';
 import { MockFeedbackRepository } from './mock/MockFeedbackRepository';
 import { MockAnalyticsRepository } from './mock/MockAnalyticsRepository';
 import { MockBacklogRepository } from './mock/MockBacklogRepository';
+import { MockAssessmentRepository } from './mock/MockAssessmentRepository';
+import { MockChallengeRepository } from './mock/MockChallengeRepository';
+import { MockAchievementRepository } from './mock/MockAchievementRepository';
 
 // Firebase Repositories
 import { FirebaseAuthRepository } from './firebase/FirebaseAuthRepository';
@@ -36,6 +39,9 @@ function createMockRepositories(): Repositories {
     feedback: new MockFeedbackRepository(),
     analytics: new MockAnalyticsRepository(),
     backlog: new MockBacklogRepository(),
+    assessment: new MockAssessmentRepository(),
+    challenge: new MockChallengeRepository(),
+    achievement: new MockAchievementRepository(),
     isMock: true,
   };
 }
@@ -52,6 +58,9 @@ function createFirebaseRepositories(): Repositories {
     feedback: new MockFeedbackRepository(),
     analytics: new MockAnalyticsRepository(),
     backlog: new MockBacklogRepository(),
+    assessment: new MockAssessmentRepository(),
+    challenge: new MockChallengeRepository(),
+    achievement: new MockAchievementRepository(),
     isMock: false,
   };
 }
@@ -72,4 +81,7 @@ export function getRepositories(): Repositories {
 }
 
 export const repositories = getRepositories();
+export const assessmentRepository = repositories.assessment;
+export const challengeRepository = repositories.challenge;
+export const achievementRepository = repositories.achievement;
 export * from './types';

@@ -48,6 +48,7 @@ interface IndexedEntry {
 export class QuestionMatchingEngine {
   private entries: KnowledgeEntry[] = [];
   private indexedEntries: IndexedEntry[] = [];
+  private canonicalMap: Map<string, KnowledgeEntry> = new Map();
 
   constructor(entries: KnowledgeEntry[] = mockKnowledgeBase) {
     this.setEntries(entries);
@@ -55,13 +56,18 @@ export class QuestionMatchingEngine {
 
   setEntries(entries: KnowledgeEntry[]) {
     this.entries = entries;
-    this.indexedEntries = entries.map((entry) => ({
-      entry,
-      normCanonical: this.normalize(entry.canonicalQuestion),
-      normSynonyms: entry.synonyms.map((s) => this.normalize(s)),
-      normKeywords: entry.keywords.map((k) => k.toLowerCase()),
-      normTopicTitle: entry.topicTitle.toLowerCase(),
-    }));
+    this.canonicalMap = new Map();
+    this.indexedEntries = entries.map((entry) => {
+      const normCanonical = this.normalize(entry.canonicalQuestion);
+      this.canonicalMap.set(normCanonical, entry);
+      return {
+        entry,
+        normCanonical,
+        normSynonyms: entry.synonyms.map((s) => this.normalize(s)),
+        normKeywords: entry.keywords.map((k) => k.toLowerCase()),
+        normTopicTitle: entry.topicTitle.toLowerCase(),
+      };
+    });
   }
 
   /**
@@ -95,6 +101,13 @@ export class QuestionMatchingEngine {
     if (!userQuestion || !userQuestion.trim()) return null;
 
     const normQ = this.normalize(userQuestion);
+
+    // Fast O(1) canonical question lookup
+    const exact = this.canonicalMap.get(normQ);
+    if (exact) {
+      return { entry: exact, score: 1.0 };
+    }
+
     const tokens = this.tokenize(userQuestion);
 
     let bestMatch: MatchResult | null = null;

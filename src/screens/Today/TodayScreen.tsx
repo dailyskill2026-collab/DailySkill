@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useProfileStore } from '@/store/profileStore';
 import { generateDailyPlan, getContentById } from '@/services/dailyPlan';
 import { useProgressStore } from '@/store/progressStore';
@@ -11,6 +12,7 @@ import CircularProgress from '@/components/common/CircularProgress';
 import InAppReminderBanner from '@/components/common/InAppReminderBanner';
 import ContinueLearningBanner from '@/components/common/ContinueLearningBanner';
 import { analytics } from '@/services/analyticsService';
+import { Zap, ArrowRight } from 'lucide-react';
 
 export default function TodayScreen() {
   const store = useProfileStore();
@@ -107,6 +109,29 @@ export default function TodayScreen() {
               </CircularProgress>
             </div>
           </div>
+        </div>
+
+        {/* Skill Diagnostic Prompt Card (Sprint 13) */}
+        <div className="card p-4 mt-3 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 border border-indigo-200/80 dark:border-indigo-800/60 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+              <Zap size={20} />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-indigo-900 dark:text-indigo-200">
+                Weekly Skill Assessment
+              </p>
+              <p className="text-[11px] text-indigo-700 dark:text-indigo-300">
+                Identify weak areas with a 3–5 min Quick Diagnostic.
+              </p>
+            </div>
+          </div>
+          <Link
+            to="/learn"
+            className="px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 shrink-0 flex items-center gap-1 shadow-xs"
+          >
+            Assess <ArrowRight size={13} />
+          </Link>
         </div>
       </div>
 

@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
 import {
   Settings, Code2, Layout, GitMerge, Shield, Workflow, Bot, MessageSquare,
-  Clock, ChevronRight, BookOpen, Layers,
+  Clock, ChevronRight, BookOpen, Layers, Zap
 } from 'lucide-react'
 import { mockLearningPaths, mockUser } from '@/data'
 import ProgressBar from '@/components/common/ProgressBar'
 import Badge from '@/components/common/Badge'
 import type { LearningPath } from '@/types'
+import { SkillAssessmentDashboard } from '@/components/assessment/SkillAssessmentDashboard'
 
 const ICON_MAP: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
   Settings, Code2, Layout, GitMerge, Shield, Workflow, Bot, MessageSquare, BookOpen, Layers,
@@ -64,6 +65,8 @@ function PathCard({ path }: { path: LearningPath }) {
 }
 
 export default function LearnScreen() {
+  const [activeTab, setActiveTab] = useState<'paths' | 'assessments'>('paths')
+
   const inProgress = mockLearningPaths.filter((p) => p.completedLessons > 0 && p.completedLessons < p.totalLessons)
   const notStarted = mockLearningPaths.filter((p) => p.completedLessons === 0)
 
@@ -75,10 +78,10 @@ export default function LearnScreen() {
     <div className="pb-safe">
       {/* Header */}
       <div className="px-4 pt-5 pb-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-3">
           <div>
             <h1 className="text-2xl font-bold text-primary">Learn</h1>
-            <p className="text-sm text-secondary">Structured Salesforce learning paths</p>
+            <p className="text-sm text-secondary">Structured learning & diagnostic assessments</p>
           </div>
           <div className="flex items-center gap-2">
             <div className="px-3 py-1.5 rounded-full bg-brand-50 dark:bg-brand-950/60 border border-brand-200 dark:border-brand-800">
@@ -86,65 +89,97 @@ export default function LearnScreen() {
             </div>
           </div>
         </div>
+
+        {/* Tab Switcher */}
+        <div className="flex rounded-xl bg-gray-100 dark:bg-gray-800 p-1">
+          <button
+            onClick={() => setActiveTab('paths')}
+            className={`flex-1 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+              activeTab === 'paths'
+                ? 'bg-white dark:bg-surface-dark text-primary shadow-xs'
+                : 'text-secondary hover:text-primary'
+            }`}
+          >
+            <BookOpen size={15} />
+            Learning Paths
+          </button>
+          <button
+            onClick={() => setActiveTab('assessments')}
+            className={`flex-1 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+              activeTab === 'assessments'
+                ? 'bg-white dark:bg-surface-dark text-indigo-600 dark:text-indigo-400 shadow-xs'
+                : 'text-secondary hover:text-primary'
+            }`}
+          >
+            <Zap size={15} className="text-amber-500" />
+            Skill Diagnostics & Challenges
+          </button>
+        </div>
       </div>
 
       <div className="px-4 space-y-5">
-        {/* Overall Progress */}
-        <div className="card gradient-brand-soft p-4">
-          <div className="flex items-center gap-4">
-            <div className="flex-shrink-0 w-14 h-14 rounded-2xl gradient-brand flex items-center justify-center shadow-brand">
-              <Layers size={26} className="text-white" />
+        {activeTab === 'assessments' ? (
+          <SkillAssessmentDashboard />
+        ) : (
+          <>
+            {/* Overall Progress */}
+            <div className="card gradient-brand-soft p-4">
+              <div className="flex items-center gap-4">
+                <div className="flex-shrink-0 w-14 h-14 rounded-2xl gradient-brand flex items-center justify-center shadow-brand">
+                  <Layers size={26} className="text-white" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs text-secondary mb-0.5">Overall Progress</p>
+                  <p className="text-lg font-bold text-primary mb-1">
+                    {totalCompleted} / {totalLessons} lessons
+                  </p>
+                  <ProgressBar percent={overallPercent} colorClass="bg-brand-500" height="h-2" />
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-brand-600 dark:text-brand-400">{overallPercent}%</p>
+                  <p className="text-2xs text-secondary">complete</p>
+                </div>
+              </div>
             </div>
-            <div className="flex-1">
-              <p className="text-xs text-secondary mb-0.5">Overall Progress</p>
-              <p className="text-lg font-bold text-primary mb-1">
-                {totalCompleted} / {totalLessons} lessons
-              </p>
-              <ProgressBar percent={overallPercent} colorClass="bg-brand-500" height="h-2" />
-            </div>
-            <div className="text-right">
-              <p className="text-2xl font-bold text-brand-600 dark:text-brand-400">{overallPercent}%</p>
-              <p className="text-2xs text-secondary">complete</p>
-            </div>
-          </div>
-        </div>
 
-        {/* Stats row */}
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { label: 'Paths', value: mockLearningPaths.length },
-            { label: 'In Progress', value: inProgress.length },
-            { label: 'Completed', value: mockUser.pathsCompleted },
-          ].map((stat) => (
-            <div key={stat.label} className="card p-3 text-center">
-              <p className="text-xl font-bold text-primary">{stat.value}</p>
-              <p className="text-2xs text-secondary">{stat.label}</p>
+            {/* Stats row */}
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { label: 'Paths', value: mockLearningPaths.length },
+                { label: 'In Progress', value: inProgress.length },
+                { label: 'Completed', value: mockUser.pathsCompleted },
+              ].map((stat) => (
+                <div key={stat.label} className="card p-3 text-center">
+                  <p className="text-xl font-bold text-primary">{stat.value}</p>
+                  <p className="text-2xs text-secondary">{stat.label}</p>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        {/* In-Progress Paths */}
-        {inProgress.length > 0 && (
-          <section aria-labelledby="inprogress-heading">
-            <div className="flex items-center justify-between mb-3">
-              <h2 id="inprogress-heading" className="section-heading">Continue Where You Left Off</h2>
-            </div>
-            <div className="card divide-y divide-border-light dark:divide-border-dark">
-              {inProgress.map((path) => <PathCard key={path.id} path={path} />)}
-            </div>
-          </section>
+            {/* In-Progress Paths */}
+            {inProgress.length > 0 && (
+              <section aria-labelledby="inprogress-heading">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 id="inprogress-heading" className="section-heading">Continue Where You Left Off</h2>
+                </div>
+                <div className="card divide-y divide-border-light dark:divide-border-dark">
+                  {inProgress.map((path) => <PathCard key={path.id} path={path} />)}
+                </div>
+              </section>
+            )}
+
+            {/* All Categories */}
+            <section aria-labelledby="all-paths-heading">
+              <div className="flex items-center justify-between mb-3">
+                <h2 id="all-paths-heading" className="section-heading">All Learning Paths</h2>
+                <Badge label="Sample" variant="sample" />
+              </div>
+              <div className="card divide-y divide-border-light dark:divide-border-dark">
+                {notStarted.map((path) => <PathCard key={path.id} path={path} />)}
+              </div>
+            </section>
+          </>
         )}
-
-        {/* All Categories */}
-        <section aria-labelledby="all-paths-heading">
-          <div className="flex items-center justify-between mb-3">
-            <h2 id="all-paths-heading" className="section-heading">All Learning Paths</h2>
-            <Badge label="Sample" variant="sample" />
-          </div>
-          <div className="card divide-y divide-border-light dark:divide-border-dark">
-            {notStarted.map((path) => <PathCard key={path.id} path={path} />)}
-          </div>
-        </section>
 
         <div className="h-2" />
       </div>

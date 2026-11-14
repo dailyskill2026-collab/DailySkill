@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useBookmarkStore } from '@/store/bookmarkStore';
 import { useThemeStore } from '@/store/themeStore';
@@ -12,6 +12,8 @@ import AuthCard from '@/components/auth/AuthCard';
 import LearningInsightsCard from '@/components/common/LearningInsightsCard';
 import FeedbackModal from '@/components/feedback/FeedbackModal';
 import PrivacySettingsSection from '@/components/privacy/PrivacySettingsSection';
+import { achievementService } from '@/services/achievementService';
+import type { UserAchievement } from '@/types/challenge';
 import {
   Flame,
   BookOpen,
@@ -27,16 +29,22 @@ import {
   Calendar,
   MessageSquare,
   BarChart3,
+  Trophy,
 } from 'lucide-react';
 
 export default function MeScreen() {
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+  const [achievements, setAchievements] = useState<UserAchievement[]>([]);
   const { theme, toggleTheme } = useThemeStore();
   const isDark = theme === 'dark';
   const profile = useProfileStore();
   const { setProfile } = useProfileStore();
   const { bookmarks } = useBookmarkStore();
   const bookmarkedIds = Array.from(bookmarks);
+
+  useEffect(() => {
+    achievementService.getAchievements().then(setAchievements);
+  }, []);
 
   const handleDurationChange = (d: Duration) => {
     setProfile({ dailyDuration: d });
@@ -120,6 +128,41 @@ export default function MeScreen() {
                 <ProgressBar percent={s.percent} colorClass={s.color} height="h-2" />
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Achievements & Skill Badges (Sprint 13) */}
+        <div className="card p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-primary flex items-center gap-1.5">
+              <Trophy size={16} className="text-amber-500" />
+              Achievements & Skill Badges
+            </h2>
+            <Link to="/learn" className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">
+              Assess Skills →
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            {achievements.map((ach) => {
+              const isEarned = Boolean(ach.earnedAt);
+              return (
+                <div
+                  key={ach.achievementId}
+                  className={`p-2.5 rounded-xl border text-left flex items-center gap-2 ${
+                    isEarned
+                      ? 'border-indigo-200 dark:border-indigo-800 bg-indigo-50/40 dark:bg-indigo-950/20'
+                      : 'border-border-light dark:border-border-dark opacity-50 bg-gray-50/50 dark:bg-gray-800/20'
+                  }`}
+                >
+                  <span className="text-lg">{ach.icon}</span>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-primary truncate">{ach.title}</p>
+                    <p className="text-[10px] text-secondary truncate">{ach.description}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -310,7 +353,7 @@ export default function MeScreen() {
           </div>
         </div>
 
-        <p className="text-center text-2xs text-muted pb-2">IT Daily Upskilling v0.11.0 · Sprint 11</p>
+        <p className="text-center text-2xs text-muted pb-2">IT Daily Upskilling v0.13.0 · Sprint 13</p>
 
         {/* In-App Feedback Modal */}
         <FeedbackModal

@@ -5,6 +5,8 @@ import type { Draft } from '@/ai/schemas';
 import type { AnalyticsEvent, AnalyticsEventType } from '@/types/analytics';
 import type { UserFeedback, FeedbackStatus, FeedbackPriority } from '@/types/feedback';
 import type { BacklogTask } from '@/types/backlog';
+import type { AssessmentAttempt, InProgressAssessment, PersonalizedImprovementPlan } from '@/types/assessment';
+import type { LearningChallenge, UserAchievement } from '@/types/challenge';
 
 export interface AuthUser {
   uid: string;
@@ -120,6 +122,30 @@ export interface IBacklogRepository {
   clearBacklog(): Promise<void>;
 }
 
+export interface IAssessmentRepository {
+  saveAttempt(attempt: AssessmentAttempt): Promise<void>;
+  getAttempts(userId: string): Promise<AssessmentAttempt[]>;
+  getInProgress(userId: string): Promise<InProgressAssessment | null>;
+  saveInProgress(assessment: InProgressAssessment): Promise<void>;
+  clearInProgress(userId: string): Promise<void>;
+  saveImprovementPlan(plan: PersonalizedImprovementPlan): Promise<void>;
+  getImprovementPlans(userId: string): Promise<PersonalizedImprovementPlan[]>;
+  getLatestImprovementPlan(userId: string): Promise<PersonalizedImprovementPlan | null>;
+}
+
+export interface IChallengeRepository {
+  getChallenges(userId: string, period: 'daily' | 'weekly', periodKey: string): Promise<LearningChallenge[]>;
+  saveChallenges(userId: string, challenges: LearningChallenge[]): Promise<void>;
+  updateChallenge(userId: string, challengeId: string, updates: Partial<LearningChallenge>): Promise<LearningChallenge>;
+}
+
+export interface IAchievementRepository {
+  getAchievements(userId: string): Promise<UserAchievement[]>;
+  awardAchievement(userId: string, achievementId: string): Promise<UserAchievement>;
+  unlockAchievement(userId: string, achievementId: string): Promise<UserAchievement>;
+  resetAchievements(userId: string): Promise<void>;
+}
+
 export interface Repositories {
   auth: IAuthRepository;
   user: IUserRepository;
@@ -131,5 +157,8 @@ export interface Repositories {
   feedback: IFeedbackRepository;
   analytics: IAnalyticsRepository;
   backlog: IBacklogRepository;
+  assessment: IAssessmentRepository;
+  challenge: IChallengeRepository;
+  achievement: IAchievementRepository;
   isMock: boolean;
 }
