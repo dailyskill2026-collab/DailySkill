@@ -7,6 +7,8 @@ import { updateSRSAttempt, getDueSRSTopics } from '@/services/spacedRepetition';
 import ProgressBar from '@/components/common/ProgressBar';
 import Badge from '@/components/common/Badge';
 import { analytics } from '@/services/analyticsService';
+import LearningAssistantModal from '@/components/assistant/LearningAssistantModal';
+import { Bot } from 'lucide-react';
 
 function StrengthBar({ percent }: { percent: number }) {
   const color =
@@ -21,6 +23,7 @@ function StrengthBar({ percent }: { percent: number }) {
 function QuizModal({ onClose }: { onClose: () => void }) {
   const quiz = mockQuizzes[0];
   const [selected, setSelected] = useState<number | null>(null);
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const isAnswered = selected !== null;
   const isCorrect = selected === quiz.correctIndex;
 
@@ -90,13 +93,24 @@ function QuizModal({ onClose }: { onClose: () => void }) {
 
           {/* Explanation */}
           {isAnswered && (
-            <div className={`p-3 rounded-xl mb-4 text-xs leading-relaxed ${
-              isCorrect
-                ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300'
-                : 'bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300'
-            }`}>
-              <strong>{isCorrect ? '✓ Correct! ' : '✗ Not quite. '}</strong>
-              {quiz.explanation}
+            <div className="space-y-3 mb-4">
+              <div className={`p-3 rounded-xl text-xs leading-relaxed ${
+                isCorrect
+                  ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300'
+                  : 'bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300'
+              }`}>
+                <strong>{isCorrect ? '✓ Correct! ' : '✗ Not quite. '}</strong>
+                {quiz.explanation}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsAssistantOpen(true)}
+                className="w-full py-2 bg-brand-50 dark:bg-brand-950/50 border border-brand-300 dark:border-brand-800 text-brand-700 dark:text-brand-300 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 hover:bg-brand-100 transition-colors"
+              >
+                <Bot size={14} />
+                <span>Ask Assistant More Questions About {quiz.topicTitle}</span>
+              </button>
             </div>
           )}
 
@@ -107,6 +121,16 @@ function QuizModal({ onClose }: { onClose: () => void }) {
             Done
           </button>
         </div>
+
+        {/* AI Learning Assistant */}
+        <LearningAssistantModal
+          isOpen={isAssistantOpen}
+          onClose={() => setIsAssistantOpen(false)}
+          context={{
+            topicId: 'queueable_apex',
+            topicTitle: quiz.topicTitle,
+          }}
+        />
       </div>
     </div>
   );

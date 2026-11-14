@@ -4,7 +4,9 @@ import { LearningContent } from '@/types/learning';
 import Badge from '@/components/common/Badge';
 import { useProgressStore } from '@/store/progressStore';
 import ContentFeedbackBar from '@/components/feedback/ContentFeedbackBar';
+import LearningAssistantModal from '@/components/assistant/LearningAssistantModal';
 import { analytics } from '@/services/analyticsService';
+import { Bot } from 'lucide-react';
 
 interface Props {
   content: LearningContent;
@@ -15,6 +17,7 @@ const UpdateActivity: React.FC<Props> = ({ content }) => {
   const { dailyProgress, setProgress } = useProgressStore();
   const progressed = dailyProgress[content.id];
   const [isCompleted, setIsCompleted] = useState<boolean>(!!(progressed?.status === 'completed'));
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
 
   const handleToggle = () => {
     const newState = !isCompleted;
@@ -56,8 +59,30 @@ const UpdateActivity: React.FC<Props> = ({ content }) => {
         )}
       </section>
 
-      <div onClick={(e) => e.stopPropagation()}>
+      <div onClick={(e) => e.stopPropagation()} className="space-y-2">
+        <div className="flex items-center justify-between pt-1">
+          <button
+            onClick={() => setIsAssistantOpen(true)}
+            className="text-xs font-semibold text-brand-600 dark:text-brand-400 flex items-center gap-1 hover:underline"
+          >
+            <Bot size={13} />
+            <span>Ask Assistant</span>
+          </button>
+        </div>
         <ContentFeedbackBar contentId={content.id} />
+      </div>
+
+      <div onClick={(e) => e.stopPropagation()}>
+        <LearningAssistantModal
+          isOpen={isAssistantOpen}
+          onClose={() => setIsAssistantOpen(false)}
+          context={{
+            topicId: content.category || 'apex',
+            topicTitle: content.title,
+            lessonId: content.id,
+            lessonTitle: content.title,
+          }}
+        />
       </div>
     </div>
   );

@@ -1,16 +1,19 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { exploreContent, LearningContent } from '@/data/exploreContent';
 import { useBookmarkStore } from '@/store/bookmarkStore';
 import { useHistoryStore } from '@/store/historyStore';
 import ContentFeedbackBar from '@/components/feedback/ContentFeedbackBar';
+import LearningAssistantModal from '@/components/assistant/LearningAssistantModal';
 import { analytics } from '@/services/analyticsService';
+import { HelpCircle } from 'lucide-react';
 
 export const DetailScreen: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const content = exploreContent.find((c) => c.id === id) as LearningContent | undefined;
   const { toggleBookmark, isBookmarked } = useBookmarkStore();
   const { addViewed, getViewed } = useHistoryStore();
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
 
   useEffect(() => {
     if (content) {
@@ -79,7 +82,14 @@ export const DetailScreen: React.FC = () => {
       {lastViewed && (
         <p className="text-xs text-gray-500">Last viewed: {new Date(lastViewed).toLocaleString()}</p>
       )}
-      <div className="flex space-x-4 mt-2">
+      <div className="flex flex-wrap items-center gap-4 mt-2">
+        <button
+          onClick={() => setIsAssistantOpen(true)}
+          className="text-sm font-semibold text-brand-600 dark:text-brand-400 flex items-center gap-1.5 hover:underline"
+        >
+          <HelpCircle size={16} />
+          <span>Ask a Doubt</span>
+        </button>
         <button onClick={handleBookmark} className="text-sm text-blue-600">
           {isBookmarked(content.id) ? 'Remove Bookmark' : 'Bookmark'}
         </button>
@@ -88,6 +98,18 @@ export const DetailScreen: React.FC = () => {
 
       {/* Content Quality Feedback (Sprint 11) */}
       <ContentFeedbackBar contentId={content.id} contentVersion={content.version} />
+
+      {/* AI Learning Assistant (Sprint 12) */}
+      <LearningAssistantModal
+        isOpen={isAssistantOpen}
+        onClose={() => setIsAssistantOpen(false)}
+        context={{
+          topicId: content.topic.toLowerCase(),
+          topicTitle: content.topic,
+          lessonId: content.id,
+          lessonTitle: content.title,
+        }}
+      />
     </div>
   );
 };
