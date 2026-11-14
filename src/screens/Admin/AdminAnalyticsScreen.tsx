@@ -33,11 +33,12 @@ import type {
   FeedbackPriority,
 } from '@/types/feedback';
 import type { BacklogTask, BacklogStatus, BacklogPriority } from '@/types/backlog';
+import { ProductQualityDashboard } from '@/components/admin/ProductQualityDashboard';
 
 export default function AdminAnalyticsScreen() {
   const [timeWindow, setTimeWindow] = useState<'today' | '7days' | '30days'>('7days');
   const [includeSimulated, setIncludeSimulated] = useState<boolean>(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'funnel' | 'content' | 'feedback' | 'backlog' | 'beta'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'funnel' | 'content' | 'quality' | 'feedback' | 'backlog' | 'beta'>('overview');
 
   const [metrics, setMetrics] = useState<EngagementSummary | null>(null);
   const [cohorts, setCohorts] = useState<RetentionCohort[]>([]);
@@ -231,6 +232,7 @@ export default function AdminAnalyticsScreen() {
           { id: 'overview', label: 'Engagement & KPIs' },
           { id: 'funnel', label: 'User Journey Funnel' },
           { id: 'content', label: 'Content Performance' },
+          { id: 'quality', label: 'Quality & Coverage Audit' },
           { id: 'feedback', label: `Feedback (${feedbackList.length})` },
           { id: 'backlog', label: `Product Backlog (${backlogTasks.length})` },
           { id: 'beta', label: 'Beta Simulator' },
@@ -522,6 +524,11 @@ export default function AdminAnalyticsScreen() {
             </table>
           </div>
         </div>
+      )}
+
+      {/* TAB QUALITY: PRODUCT QUALITY & KNOWLEDGE COVERAGE AUDIT (Sprint 14) */}
+      {activeTab === 'quality' && (
+        <ProductQualityDashboard />
       )}
 
       {/* TAB 4: FEEDBACK MANAGEMENT */}

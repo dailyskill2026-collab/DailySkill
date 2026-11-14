@@ -341,6 +341,16 @@ export default function MeScreen() {
               <ChevronRight size={14} className="text-muted" />
             </Link>
             <Link
+              to="/admin/analytics"
+              className="flex items-center justify-between p-2.5 rounded-xl border border-border-light dark:border-border-dark hover:bg-gray-50 dark:hover:bg-gray-800/50 text-primary font-medium"
+            >
+              <span className="flex items-center gap-2">
+                <Award size={15} className="text-indigo-500" />
+                Content Quality & Knowledge Coverage Audit
+              </span>
+              <ChevronRight size={14} className="text-muted" />
+            </Link>
+            <Link
               to="/admin/generation"
               className="flex items-center justify-between p-2.5 rounded-xl border border-border-light dark:border-border-dark hover:bg-gray-50 dark:hover:bg-gray-800/50 text-primary font-medium"
             >
@@ -353,7 +363,7 @@ export default function MeScreen() {
           </div>
         </div>
 
-        <p className="text-center text-2xs text-muted pb-2">IT Daily Upskilling v0.13.0 · Sprint 13</p>
+        <p className="text-center text-2xs text-muted pb-2">IT Daily Upskilling v0.14.0 · Sprint 14</p>
 
         {/* In-App Feedback Modal */}
         <FeedbackModal

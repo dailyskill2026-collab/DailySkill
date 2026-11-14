@@ -19,7 +19,7 @@ const LEVEL_COLORS: Record<string, string> = {
   advanced: 'bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-400',
 }
 
-function PathCard({ path }: { path: LearningPath }) {
+function PathCard({ path, onSelect }: { path: LearningPath; onSelect: (path: LearningPath) => void }) {
   const percent = path.totalLessons > 0
     ? Math.round((path.completedLessons / path.totalLessons) * 100)
     : 0
@@ -30,7 +30,8 @@ function PathCard({ path }: { path: LearningPath }) {
 
   return (
     <button
-      className="w-full text-left card-hover p-4 flex gap-4 items-start"
+      onClick={() => onSelect(path)}
+      className="w-full text-left card-hover p-4 flex gap-4 items-start cursor-pointer"
       aria-label={`${path.title} — ${percent}% complete`}
     >
       <div className={`flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br ${path.color} flex items-center justify-center shadow-md`}>
@@ -66,6 +67,7 @@ function PathCard({ path }: { path: LearningPath }) {
 
 export default function LearnScreen() {
   const [activeTab, setActiveTab] = useState<'paths' | 'assessments'>('paths')
+  const [selectedPath, setSelectedPath] = useState<LearningPath | null>(null)
 
   const inProgress = mockLearningPaths.filter((p) => p.completedLessons > 0 && p.completedLessons < p.totalLessons)
   const notStarted = mockLearningPaths.filter((p) => p.completedLessons === 0)
@@ -163,7 +165,9 @@ export default function LearnScreen() {
                   <h2 id="inprogress-heading" className="section-heading">Continue Where You Left Off</h2>
                 </div>
                 <div className="card divide-y divide-border-light dark:divide-border-dark">
-                  {inProgress.map((path) => <PathCard key={path.id} path={path} />)}
+                  {inProgress.map((path) => (
+                    <PathCard key={path.id} path={path} onSelect={(p) => setSelectedPath(p)} />
+                  ))}
                 </div>
               </section>
             )}
@@ -175,7 +179,9 @@ export default function LearnScreen() {
                 <Badge label="Sample" variant="sample" />
               </div>
               <div className="card divide-y divide-border-light dark:divide-border-dark">
-                {notStarted.map((path) => <PathCard key={path.id} path={path} />)}
+                {notStarted.map((path) => (
+                  <PathCard key={path.id} path={path} onSelect={(p) => setSelectedPath(p)} />
+                ))}
               </div>
             </section>
           </>
@@ -183,6 +189,80 @@ export default function LearnScreen() {
 
         <div className="h-2" />
       </div>
+
+      {/* Learning Path Curriculum & Syllabus Modal (Sprint 14) */}
+      {selectedPath && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-surface-dark p-6 rounded-2xl max-w-lg w-full shadow-2xl border border-border-light dark:border-border-dark space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-start justify-between">
+              <div>
+                <span className="text-2xs font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-brand-50 dark:bg-brand-950/60 text-brand-700 dark:text-brand-300">
+                  {selectedPath.level} Track
+                </span>
+                <h3 className="text-lg font-bold text-primary mt-1">{selectedPath.title}</h3>
+              </div>
+              <button
+                onClick={() => setSelectedPath(null)}
+                className="text-muted hover:text-primary text-sm p-1"
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="text-xs text-secondary leading-relaxed">{selectedPath.description}</p>
+
+            <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl space-y-1.5 text-xs">
+              <p className="font-semibold text-primary">Prerequisites & Scope:</p>
+              <p className="text-secondary">
+                Designed for {selectedPath.level} learners. Lessons follow a progressive 3–5 min sequence from foundational syntax to enterprise scenario practice.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-secondary">
+                Curriculum Syllabus ({selectedPath.totalLessons} Lessons)
+              </h4>
+              <div className="divide-y divide-border-light dark:divide-border-dark text-xs max-h-56 overflow-y-auto">
+                {[
+                  { title: 'Core Architectural Concepts & Baseline Rules', status: 'Ready to Learn', ready: true },
+                  { title: 'Scenario-Based Micro-Practice & Hands-on MCQs', status: 'Ready to Learn', ready: true },
+                  { title: 'Governor Limits, Best Practices & Bulkification', status: 'Ready to Learn', ready: true },
+                  { title: 'Integration Boundaries & Error Handling', status: 'In Content Development', ready: false },
+                  { title: 'Advanced Production Patterns & Optimization', status: 'Scheduled in Release Drop', ready: false },
+                ].map((mod, idx) => (
+                  <div key={idx} className="py-2.5 flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-primary">Module {idx + 1}: {mod.title}</p>
+                      <p className="text-2xs text-muted">Estimated 3–5 minutes</p>
+                    </div>
+                    <span
+                      className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                        mod.ready
+                          ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                          : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
+                      }`}
+                    >
+                      {mod.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-2 flex justify-between items-center text-xs">
+              <span className="text-2xs text-muted">
+                {selectedPath.completedLessons} of {selectedPath.totalLessons} completed
+              </span>
+              <button
+                onClick={() => setSelectedPath(null)}
+                className="btn-primary text-xs py-2 px-4"
+              >
+                Close Syllabus
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
