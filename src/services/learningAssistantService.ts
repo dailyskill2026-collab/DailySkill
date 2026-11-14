@@ -1,6 +1,9 @@
 // src/services/learningAssistantService.ts
 import type { IAnswerProvider, AssistantRequest, AssistantResponse, ExplanationStyle } from '@/types/assistant';
 import { mockAnswerProvider } from './MockAnswerProvider';
+import { GeminiAnswerProvider } from './GeminiAnswerProvider';
+import { OpenAIAnswerProvider } from './OpenAIAnswerProvider';
+import { getAIConfig } from '@/store/aiConfigStore';
 import { doubtHistoryService } from './doubtHistoryService';
 import { repositories } from '@/repositories';
 import { analytics } from './analyticsService';
@@ -8,9 +11,21 @@ import { analytics } from './analyticsService';
 export class LearningAssistantService {
   private static instance: LearningAssistantService;
   private provider: IAnswerProvider;
+  private isCustomProvider = false;
 
-  constructor(provider: IAnswerProvider = mockAnswerProvider) {
-    this.provider = provider;
+  constructor() {
+    this.provider = this.resolveProvider();
+  }
+
+  private resolveProvider(): IAnswerProvider {
+    const config = getAIConfig();
+    if (config.provider === 'gemini' && config.geminiApiKey) {
+      return new GeminiAnswerProvider(config.geminiApiKey, config.model || 'gemini-1.5-flash');
+    }
+    if (config.provider === 'openai' && config.openaiApiKey) {
+      return new OpenAIAnswerProvider(config.openaiApiKey, config.model || 'gpt-4o-mini');
+    }
+    return mockAnswerProvider;
   }
 
   static getInstance(): LearningAssistantService {
@@ -20,8 +35,14 @@ export class LearningAssistantService {
     return LearningAssistantService.instance;
   }
 
+  refreshProviderFromConfig() {
+    this.isCustomProvider = false;
+    this.provider = this.resolveProvider();
+  }
+
   setProvider(provider: IAnswerProvider) {
     this.provider = provider;
+    this.isCustomProvider = true;
   }
 
   getProvider(): IAnswerProvider {
@@ -37,6 +58,18 @@ export class LearningAssistantService {
       selectedStyle?: ExplanationStyle;
     }
   ): Promise<AssistantResponse> {
+    // Only check configuration if a custom provider was not explicitly injected
+    if (!this.isCustomProvider) {
+      const currentConfig = getAIConfig();
+      if (
+        (currentConfig.provider === 'gemini' && !(this.provider instanceof GeminiAnswerProvider)) ||
+        (currentConfig.provider === 'openai' && !(this.provider instanceof OpenAIAnswerProvider)) ||
+        (currentConfig.provider === 'mock' && this.provider !== mockAnswerProvider)
+      ) {
+        this.refreshProviderFromConfig();
+      }
+    }
+
     const user = repositories.auth.getCurrentUser();
     const userId = user?.uid || 'guest-user';
     const style = context?.selectedStyle || 'simple';

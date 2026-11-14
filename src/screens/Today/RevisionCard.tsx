@@ -43,7 +43,12 @@ const RevisionCard: React.FC<Props> = ({ content }) => {
   return (
     <div className="card p-4 space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-primary">Quick Revision</h3>
+        <div>
+          <span className="text-2xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+            Remember
+          </span>
+          <h3 className="text-lg font-semibold text-primary">Quick Revision</h3>
+        </div>
         {isSample && <Badge label="Sample Content" variant="sample" />}
       </div>
       <p className="text-sm text-secondary">

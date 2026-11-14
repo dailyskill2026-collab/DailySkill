@@ -36,13 +36,18 @@ const UpdateActivity: React.FC<Props> = ({ content }) => {
   return (
     <div
       role="button"
-      aria-label={`Apex Queueable: ${content.title}`}
+      aria-label={`Apex Queueable: Stay Updated - ${content.title}`}
       aria-pressed={isCompleted}
       onClick={handleToggle}
       className="card p-4 space-y-2"
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-primary">{content.title}</h3>
+        <div>
+          <span className="text-2xs font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400">
+            Stay Updated
+          </span>
+          <h3 className="text-lg font-semibold text-primary">{content.title}</h3>
+        </div>
         {!isVerified && <Badge label="Sample Content" variant="sample" />}
       </div>
       <p className="text-sm text-secondary">{content.summary}</p>

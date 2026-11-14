@@ -16,11 +16,13 @@ import {
   ExternalLink,
   ChevronRight,
   ShieldCheck,
+  Settings,
 } from 'lucide-react';
 import { learningAssistantService } from '@/services/learningAssistantService';
 import { doubtHistoryService } from '@/services/doubtHistoryService';
 import { feedbackService } from '@/services/feedbackService';
 import { repositories } from '@/repositories';
+import { getAIConfig, saveAIConfig, AIProviderType } from '@/store/aiConfigStore';
 import type {
   ExplanationStyle,
   AssistantResponse,
@@ -61,6 +63,12 @@ export default function LearningAssistantModal({ isOpen, onClose, context }: Pro
   // Feedback on active response
   const [feedbackGiven, setFeedbackGiven] = useState<Record<string, 'helpful' | 'not_helpful' | 'reported'>>({});
   const [actionNotice, setActionNotice] = useState<string | null>(null);
+
+  // AI Configuration state (Mock vs Gemini vs OpenAI)
+  const [showConfig, setShowConfig] = useState(false);
+  const [aiConfig, setAiConfig] = useState(getAIConfig());
+  const [tempKey, setTempKey] = useState(aiConfig.geminiApiKey || aiConfig.openaiApiKey || '');
+  const [selectedProvider, setSelectedProvider] = useState<AIProviderType>(aiConfig.provider);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
   const user = repositories.auth.getCurrentUser();
@@ -245,22 +253,171 @@ export default function LearningAssistantModal({ isOpen, onClose, context }: Pro
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-bold leading-tight">AI Learning Assistant</h2>
-                <span className="text-2xs bg-white/20 border border-white/30 px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider">
-                  Demo / Mock
+                <span className={`text-2xs px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider border ${
+                  aiConfig.provider === 'gemini'
+                    ? 'bg-amber-400/30 border-amber-300/50 text-amber-100'
+                    : aiConfig.provider === 'openai'
+                    ? 'bg-emerald-400/30 border-emerald-300/50 text-emerald-100'
+                    : 'bg-white/20 border-white/30 text-white'
+                }`}>
+                  {aiConfig.provider === 'gemini'
+                    ? 'Gemini 1.5 Flash (Live)'
+                    : aiConfig.provider === 'openai'
+                    ? 'OpenAI (Live)'
+                    : 'Verified (Mock)'}
                 </span>
               </div>
-              <p className="text-xs text-brand-200">Predefined local verified answers & real-world examples</p>
+              <p className="text-xs text-brand-200">
+                {aiConfig.provider !== 'mock' && (aiConfig.geminiApiKey || aiConfig.openaiApiKey)
+                  ? 'Connected to live AI model for real-time answers'
+                  : 'Predefined verified Salesforce answers & real-world examples'}
+              </p>
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            aria-label="Close Assistant"
-            className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 transition-colors text-white"
-          >
-            <X size={18} />
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setShowConfig(!showConfig)}
+              aria-label="AI Settings"
+              title="Configure AI Provider (Gemini / OpenAI)"
+              className={`p-1.5 rounded-xl transition-colors ${
+                showConfig || aiConfig.provider !== 'mock'
+                  ? 'bg-amber-400/30 text-amber-200 border border-amber-300/40'
+                  : 'bg-white/10 hover:bg-white/20 text-white'
+              }`}
+            >
+              <Settings size={18} />
+            </button>
+            <button
+              onClick={onClose}
+              aria-label="Close Assistant"
+              className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 transition-colors text-white"
+            >
+              <X size={18} />
+            </button>
+          </div>
         </div>
+
+        {/* AI Configuration Panel */}
+        {showConfig && (
+          <div className="p-4 bg-brand-50/90 dark:bg-gray-900 border-b border-brand-200 dark:border-brand-800 text-xs flex-shrink-0 animate-fade-in space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 font-bold text-gray-900 dark:text-white">
+                <Sparkles size={16} className="text-amber-500" />
+                <span>Live AI Engine Settings</span>
+              </div>
+              <button
+                onClick={() => setShowConfig(false)}
+                className="text-gray-500 hover:text-gray-900 dark:hover:text-white text-xs underline"
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <button
+                onClick={() => setSelectedProvider('mock')}
+                className={`p-2.5 rounded-xl border text-left transition-all ${
+                  selectedProvider === 'mock'
+                    ? 'border-brand-600 bg-white dark:bg-gray-800 shadow-xs ring-1 ring-brand-500'
+                    : 'border-border-light dark:border-border-dark bg-white/60 dark:bg-gray-800/40 opacity-70'
+                }`}
+              >
+                <div className="font-semibold text-gray-900 dark:text-white">Verified (Mock)</div>
+                <div className="text-2xs text-gray-500 dark:text-gray-400">Zero-cost local verified corpus</div>
+              </button>
+
+              <button
+                onClick={() => setSelectedProvider('gemini')}
+                className={`p-2.5 rounded-xl border text-left transition-all ${
+                  selectedProvider === 'gemini'
+                    ? 'border-amber-500 bg-white dark:bg-gray-800 shadow-xs ring-1 ring-amber-400'
+                    : 'border-border-light dark:border-border-dark bg-white/60 dark:bg-gray-800/40 opacity-70'
+                }`}
+              >
+                <div className="font-semibold text-amber-600 dark:text-amber-400">Gemini 1.5 Flash (Live)</div>
+                <div className="text-2xs text-gray-500 dark:text-gray-400">Live Google AI (Fast & Free Tier)</div>
+              </button>
+
+              <button
+                onClick={() => setSelectedProvider('openai')}
+                className={`p-2.5 rounded-xl border text-left transition-all ${
+                  selectedProvider === 'openai'
+                    ? 'border-emerald-500 bg-white dark:bg-gray-800 shadow-xs ring-1 ring-emerald-400'
+                    : 'border-border-light dark:border-border-dark bg-white/60 dark:bg-gray-800/40 opacity-70'
+                }`}
+              >
+                <div className="font-semibold text-emerald-600 dark:text-emerald-400">OpenAI (Live)</div>
+                <div className="text-2xs text-gray-500 dark:text-gray-400">Live OpenAI Chat Completions</div>
+              </button>
+            </div>
+
+            {selectedProvider !== 'mock' ? (
+              <div className="space-y-2">
+                <label className="block text-2xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300">
+                  {selectedProvider === 'gemini' ? 'Google Gemini API Key' : 'OpenAI API Key'}
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="password"
+                    value={tempKey}
+                    onChange={(e) => setTempKey(e.target.value)}
+                    placeholder={selectedProvider === 'gemini' ? 'Paste AIzaSy... key here' : 'Paste sk-... key here'}
+                    className="flex-1 px-3 py-1.5 text-xs rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  />
+                  <button
+                    onClick={() => {
+                      const patch = {
+                        provider: selectedProvider,
+                        ...(selectedProvider === 'gemini' ? { geminiApiKey: tempKey } : { openaiApiKey: tempKey }),
+                      };
+                      const updated = saveAIConfig(patch);
+                      setAiConfig(updated);
+                      learningAssistantService.refreshProviderFromConfig();
+                      setActionNotice(`Switched to Live ${selectedProvider.toUpperCase()} AI!`);
+                      setShowConfig(false);
+                      setTimeout(() => setActionNotice(null), 3000);
+                    }}
+                    className="px-3 py-1.5 bg-brand-600 text-white rounded-xl font-medium hover:bg-brand-700 transition-colors shadow-xs"
+                  >
+                    Save & Connect
+                  </button>
+                </div>
+                {selectedProvider === 'gemini' && (
+                  <p className="text-2xs text-gray-500 dark:text-gray-400">
+                    Get a free API key in 1 minute from{' '}
+                    <a
+                      href="https://aistudio.google.com/app/apikey"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-brand-600 dark:text-brand-400 underline font-semibold"
+                    >
+                      Google AI Studio (free)
+                    </a>
+                    . Your key is stored safely in your browser's localStorage.
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="flex justify-between items-center">
+                <p className="text-2xs text-gray-500">Using the verified local Salesforce curriculum.</p>
+                <button
+                  onClick={() => {
+                    const updated = saveAIConfig({ provider: 'mock' });
+                    setAiConfig(updated);
+                    learningAssistantService.refreshProviderFromConfig();
+                    setActionNotice('Switched to Verified Mock Mode.');
+                    setShowConfig(false);
+                    setTimeout(() => setActionNotice(null), 3000);
+                  }}
+                  className="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-xl font-medium"
+                >
+                  Apply
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Context bar & Tab bar */}
         <div className="bg-gray-50 dark:bg-gray-800/60 border-b border-border-light dark:border-border-dark px-4 py-2 flex items-center justify-between text-xs flex-shrink-0">
