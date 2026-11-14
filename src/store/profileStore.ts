@@ -35,8 +35,9 @@ export type Interest =
   | 'agentforce'
   | 'devops'
   | 'interview'
-export type Duration = 2 | 5 | 10
+export type Duration = 2 | 3 | 5 | 10
 export type Reminder = 'morning' | 'afternoon' | 'evening' | 'none'
+export type WeeklyGoalDays = 3 | 5 | 7
 
 export interface Profile {
   onboardingCompleted: boolean
@@ -48,6 +49,7 @@ export interface Profile {
   goals: Goal[]
   interests: Interest[]
   dailyDuration: Duration
+  weeklyGoal?: WeeklyGoalDays
   reminder: Reminder
 }
 
@@ -62,6 +64,7 @@ export const defaultProfile: Profile = {
   goals: ['stay_updated'],
   interests: ['apex', 'lwc', 'integration'],
   dailyDuration: 5,
+  weeklyGoal: 5,
   reminder: 'none',
 };
 ;

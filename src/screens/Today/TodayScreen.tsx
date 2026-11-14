@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useProfileStore } from '@/store/profileStore';
 import { generateDailyPlan, getContentById } from '@/services/dailyPlan';
 import { useProgressStore } from '@/store/progressStore';
+import { recordDailyActivityCompletion } from '@/services/streakService';
 import UpdateActivity from '@/screens/Today/UpdateActivity';
 import QuizCard from '@/screens/Today/QuizCard';
 import RevisionCard from '@/screens/Today/RevisionCard';
 import ProgressBar from '@/components/common/ProgressBar';
 import CircularProgress from '@/components/common/CircularProgress';
+import InAppReminderBanner from '@/components/common/InAppReminderBanner';
+import ContinueLearningBanner from '@/components/common/ContinueLearningBanner';
 
 export default function TodayScreen() {
   const store = useProfileStore();
@@ -21,7 +24,14 @@ export default function TodayScreen() {
 
   const completed = activities.filter((a) => dailyProgress[a.id]?.status === 'completed').length;
   const total = activities.length;
-  const percent = Math.round((completed / total) * 100);
+  const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+  // Update streak when qualifying activities are completed
+  useEffect(() => {
+    if (completed > 0) {
+      recordDailyActivityCompletion();
+    }
+  }, [completed]);
 
   const greeting = () => {
     const h = new Date().getHours();
@@ -53,8 +63,14 @@ export default function TodayScreen() {
         </div>
       </div>
 
-      {/* ---- Daily Goal Card ---- */}
       <div className="px-4">
+        {/* Local In-App Reminders (Sprint 10) */}
+        <InAppReminderBanner />
+
+        {/* Continue Learning Prompt (Sprint 10) */}
+        <ContinueLearningBanner />
+
+        {/* ---- Daily Goal Card ---- */}
         <div className="card gradient-brand p-5 text-white overflow-hidden relative">
           <div className="absolute -right-6 -top-6 w-28 h-28 rounded-full bg-white/10" />
           <div className="absolute -right-2 bottom-0 w-16 h-16 rounded-full bg-white/5" />
@@ -63,7 +79,7 @@ export default function TodayScreen() {
               <p className="text-xs font-medium text-brand-200 uppercase tracking-wider mb-1">Today's Goal</p>
               <h2 className="text-lg font-bold mb-1">Your {dailyDuration}-Minute Learning</h2>
               <p className="text-sm text-brand-200 mb-3">
-                {completed === total
+                {completed === total && total > 0
                   ? '🎉 All done for today! Great work!'
                   : `${total - completed} activity${total - completed === 1 ? '' : 'ies'} remaining`}
               </p>

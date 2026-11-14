@@ -1,12 +1,14 @@
 import React from 'react';
 import { useBookmarkStore } from '@/store/bookmarkStore';
 import { useThemeStore } from '@/store/themeStore';
+import { useProfileStore, Duration, WeeklyGoalDays } from '@/store/profileStore';
 import { exploreContent } from '@/data/exploreContent';
 import { mockUser } from '@/data';
 import Badge from '@/components/common/Badge';
 import ProgressBar from '@/components/common/ProgressBar';
 import { ExploreCard } from '@/components/Explore/ExploreCard';
 import AuthCard from '@/components/auth/AuthCard';
+import LearningInsightsCard from '@/components/common/LearningInsightsCard';
 import {
   Flame,
   BookOpen,
@@ -17,47 +19,60 @@ import {
   Sun,
   HelpCircle,
   FileText,
-  LogOut,
   Bookmark,
+  Clock,
+  Calendar,
 } from 'lucide-react';
 
 export default function MeScreen() {
   const { theme, toggleTheme } = useThemeStore();
   const isDark = theme === 'dark';
+  const profile = useProfileStore();
+  const { setProfile } = useProfileStore();
   const { bookmarks } = useBookmarkStore();
   const bookmarkedIds = Array.from(bookmarks);
+
+  const handleDurationChange = (d: Duration) => {
+    setProfile({ dailyDuration: d });
+  };
+
+  const handleWeeklyGoalChange = (g: WeeklyGoalDays) => {
+    setProfile({ weeklyGoal: g });
+  };
 
   return (
     <div className="pb-safe">
       {/* Header */}
       <div className="px-4 pt-5 pb-4">
         <h1 className="text-2xl font-bold text-primary">Me</h1>
-        <p className="text-sm text-secondary">Your learning profile & account</p>
+        <p className="text-sm text-secondary">Your learning profile, insights & preferences</p>
       </div>
 
       <div className="px-4 space-y-5">
-        {/* Authentication & Account Card (Sprint 9) */}
+        {/* Authentication & Account Card */}
         <AuthCard />
 
         {/* Profile card */}
         <div className="card gradient-brand p-5 flex items-center gap-4 relative overflow-hidden">
           <div className="absolute -right-8 -bottom-8 w-32 h-32 rounded-full bg-white/10" />
-          {/* Avatar */}
           <div className="relative flex-shrink-0">
             <div className="w-16 h-16 rounded-2xl bg-white/20 border-2 border-white/30 flex items-center justify-center">
               <span className="text-2xl font-bold text-white">{mockUser.initials}</span>
             </div>
           </div>
           <div className="flex-1 min-w-0 relative">
-            <p className="text-lg font-bold text-white">{mockUser.name}</p>
+            <p className="text-lg font-bold text-white">{profile.name || mockUser.name}</p>
             <div className="flex items-center gap-2 mt-0.5">
-              <span className="chip text-2xs bg-white/20 text-white px-2 py-0.5">
-                Salesforce Developer
+              <span className="chip text-2xs bg-white/20 text-white px-2 py-0.5 capitalize">
+                {profile.role.replace('_', ' ')}
               </span>
             </div>
-            <p className="text-xs text-brand-200 mt-1 capitalize">{mockUser.experienceLevel} level</p>
+            <p className="text-xs text-brand-200 mt-1 capitalize">{profile.experience} experience</p>
           </div>
         </div>
+
+        {/* Learning Insights Dashboard (Sprint 10) */}
+        <LearningInsightsCard />
 
         {/* Stats grid */}
         <div className="grid grid-cols-2 gap-3">
@@ -77,34 +92,6 @@ export default function MeScreen() {
               </div>
             </div>
           ))}
-        </div>
-
-        {/* Weekly Activity */}
-        <div className="card p-4">
-          <h2 className="text-sm font-semibold text-primary mb-3">This Week's Activity</h2>
-          <div className="flex justify-between items-end gap-1">
-            {['S','M','T','W','T','F','S'].map((day, i) => {
-              const count = mockUser.weeklyActivity[i];
-              const isToday = i === new Date().getDay();
-              const heightPercent = count > 0 ? Math.max(20, (count / 3) * 100) : 8;
-              return (
-                <div key={i} className="flex flex-col items-center gap-1 flex-1">
-                  <div
-                    className={`w-full rounded-full transition-all duration-500 ${
-                      isToday
-                        ? 'gradient-brand'
-                        : count > 0
-                        ? 'bg-brand-300 dark:bg-brand-700'
-                        : 'bg-gray-100 dark:bg-gray-800'
-                    }`}
-                    style={{ height: `${heightPercent}%`, minHeight: '6px', maxHeight: '48px' }}
-                    aria-label={`${day}: ${count} lessons`}
-                  />
-                  <span className="text-2xs text-secondary">{day}</span>
-                </div>
-              );
-            })}
-          </div>
         </div>
 
         {/* Skill progress */}
@@ -134,7 +121,7 @@ export default function MeScreen() {
         <div className="card p-4">
           <h2 className="text-sm font-semibold text-primary mb-3">Learning Interests</h2>
           <div className="flex flex-wrap gap-2">
-            {mockUser.interests.map((interest) => (
+            {profile.interests.map((interest) => (
               <span
                 key={interest}
                 className="chip bg-brand-50 dark:bg-brand-950/60 text-brand-700 dark:text-brand-300 border border-brand-200 dark:border-brand-800"
@@ -145,9 +132,66 @@ export default function MeScreen() {
           </div>
         </div>
 
+        {/* Personalization Controls (Sprint 10) */}
+        <div className="card p-5 space-y-4">
+          <h2 className="text-sm font-semibold text-primary">Personalization Settings</h2>
+
+          {/* Daily Learning Budget */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium text-secondary flex items-center gap-1.5">
+                <Clock size={14} className="text-brand-600" />
+                Daily Learning Budget
+              </span>
+              <span className="text-xs font-bold text-primary">{profile.dailyDuration || 5} min/day</span>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {([3, 5, 10] as Duration[]).map((dur) => (
+                <button
+                  key={dur}
+                  onClick={() => handleDurationChange(dur)}
+                  className={`py-2 px-3 rounded-xl text-xs font-semibold border transition ${
+                    profile.dailyDuration === dur
+                      ? 'bg-brand-600 text-white border-brand-600 shadow-sm'
+                      : 'bg-gray-50 dark:bg-gray-800/60 border-border-light dark:border-border-dark text-secondary hover:text-primary'
+                  }`}
+                >
+                  {dur} Minutes
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Weekly Learning Goal */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium text-secondary flex items-center gap-1.5">
+                <Calendar size={14} className="text-indigo-600" />
+                Weekly Consistency Goal
+              </span>
+              <span className="text-xs font-bold text-primary">{profile.weeklyGoal || 5} days/week</span>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {([3, 5, 7] as WeeklyGoalDays[]).map((goal) => (
+                <button
+                  key={goal}
+                  onClick={() => handleWeeklyGoalChange(goal)}
+                  className={`py-2 px-3 rounded-xl text-xs font-semibold border transition ${
+                    profile.weeklyGoal === goal
+                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                      : 'bg-gray-50 dark:bg-gray-800/60 border-border-light dark:border-border-dark text-secondary hover:text-primary'
+                  }`}
+                >
+                  {goal === 7 ? 'Every Day' : `${goal} Days/Wk`}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* Preferences */}
         <div className="card p-4 space-y-1">
-          <h2 className="text-sm font-semibold text-primary mb-3">Preferences</h2>
+          <h2 className="text-sm font-semibold text-primary mb-3">Appearance</h2>
 
           {/* Theme toggle */}
           <div className="flex items-center justify-between py-2">
@@ -214,7 +258,7 @@ export default function MeScreen() {
           ))}
         </div>
 
-        <p className="text-center text-2xs text-muted pb-2">IT Daily Upskilling v0.9.0 · Sprint 9 (Dual-Mode)</p>
+        <p className="text-center text-2xs text-muted pb-2">IT Daily Upskilling v0.10.0 · Sprint 10</p>
       </div>
     </div>
   );

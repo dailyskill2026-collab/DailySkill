@@ -2,22 +2,33 @@
 import { LearningContent, DailyLearningPlan } from '@/types/learning';
 import { sampleLearningContent } from '@/data/sampleContent';
 import { useProfileStore } from '@/store/profileStore';
+import { getWeakTopicsList } from './weakTopicService';
+import { getDueSRSTopics } from './spacedRepetition';
 
 // Helper to create a deterministic profile key for caching
 function getProfileKey(profile: any): string {
-  const { technology, role, interests, goals, experience } = profile;
-  // order keys to keep stable string
-  return `${technology}|${role}|${interests.sort().join(',')}|${goals.sort().join(',')}|${experience}`;
+  const { technology, role, interests = [], goals = [], experience, dailyDuration = 5 } = profile;
+  const sortedInterests = [...interests].sort().join(',');
+  const sortedGoals = [...goals].sort().join(',');
+  return `${technology}|${role}|${sortedInterests}|${sortedGoals}|${experience}|${dailyDuration}`;
+}
+
+export interface DailyPlanMetrics {
+  totalActivities: number;
+  completedActivities: number;
+  totalEstimatedMinutes: number;
+  percentCompleted: number;
+  hasWeakTopicIncluded: boolean;
 }
 
 /**
  * Generate (or retrieve) the daily learning plan for the given user profile.
- * The plan is stable for a given local date + profile key.
+ * Tailors activity count to the user's selected time budget (3, 5, or 10 min).
+ * Prioritizes weak topics and due spaced repetition tasks.
  */
 export function generateDailyPlan(): DailyLearningPlan {
-  // Get the full profile object from the store
   const profile = useProfileStore.getState();
-  const today = new Date().toLocaleDateString('en-CA'); // YYYY‑MM‑DD (local)
+  const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
   const profileKey = getProfileKey(profile);
   const storageKey = `daily-plan-${today}-${profileKey}`;
 
@@ -26,70 +37,86 @@ export function generateDailyPlan(): DailyLearningPlan {
   if (raw) {
     try {
       const stored: DailyLearningPlan = JSON.parse(raw);
-      // Basic validation
       if (stored && stored.activityIds?.length) {
         return stored;
       }
-    } catch (e) {
+    } catch {
       // fall through to regenerate
     }
   }
 
-  // Filter content by technology first
+  // Filter content by technology
   let candidates = sampleLearningContent.filter(
-    (c) => c.technology === profile.technology && c.verificationStatus !== undefined,
+    (c) => c.technology === profile.technology && c.verificationStatus !== undefined
   );
 
-  // Filter by role (applicableRoles) – if none match, keep all
+  // Match role if available
   const roleMatches = candidates.filter((c) => c.applicableRoles.includes(profile.role));
   if (roleMatches.length) candidates = roleMatches;
 
-  // Filter by interests (match title or summary keywords)
-  if (profile.interests?.length) {
-    const interestSet = new Set(profile.interests.map((i: string) => i.toLowerCase()));
-    const interestFiltered = candidates.filter(
-      (c) =>
-        interestSet.has(c.title.toLowerCase()) ||
-        interestSet.has(c.summary.toLowerCase()),
-    );
-    if (interestFiltered.length) candidates = interestFiltered;
+  // Retrieve weak topics & due SRS topics
+  const weakTopics = new Set(getWeakTopicsList().map((t) => t.toLowerCase()));
+  const dueSRSTopics = new Set(getDueSRSTopics().map((s) => s.topicTitle.toLowerCase()));
+
+  // Prioritize items that match weak or due topics
+  candidates.sort((a, b) => {
+    const aWeak = weakTopics.has(a.title.toLowerCase()) || dueSRSTopics.has(a.title.toLowerCase());
+    const bWeak = weakTopics.has(b.title.toLowerCase()) || dueSRSTopics.has(b.title.toLowerCase());
+    if (aWeak && !bWeak) return -1;
+    if (!aWeak && bWeak) return 1;
+    return a.id.localeCompare(b.id);
+  });
+
+  const durationBudget = profile.dailyDuration ?? 5;
+  const categories: ('update' | 'practice' | 'revision')[] =
+    durationBudget === 3
+      ? ['update', 'practice']
+      : ['update', 'practice', 'revision'];
+
+  const activityIds: string[] = [];
+  let accumulatedMinutes = 0;
+
+  for (const cat of categories) {
+    const perCat = candidates.filter((c) => c.category === cat && !activityIds.includes(c.id));
+    if (perCat.length) {
+      const selected = perCat[0];
+      activityIds.push(selected.id);
+      accumulatedMinutes += selected.estimatedMinutes || 2;
+    } else {
+      const fallback = sampleLearningContent.find((c) => c.category === cat && !activityIds.includes(c.id));
+      if (fallback) {
+        activityIds.push(fallback.id);
+        accumulatedMinutes += fallback.estimatedMinutes || 2;
+      }
+    }
+
+    // For 3-minute budgets, stop once we have enough
+    if (durationBudget === 3 && accumulatedMinutes >= 3) break;
   }
 
-  // Pick one per category (update, practice, revision)
-  const categories: ('update' | 'practice' | 'revision')[] = ['update', 'practice', 'revision'];
-  const activityIds: string[] = [];
-  for (const cat of categories) {
-    const perCat = candidates.filter((c) => c.category === cat);
-    if (perCat.length) {
-      // Simple deterministic selection: first element after sorting by id
-      perCat.sort((a, b) => a.id.localeCompare(b.id));
-      activityIds.push(perCat[0].id);
-    } else {
-      // Fallback: pick any sample content of that category or leave empty
-      const fallback = sampleLearningContent.find((c) => c.category === cat);
-      if (fallback) activityIds.push(fallback.id);
-    }
+  // Fallback safe minimum
+  if (activityIds.length === 0 && sampleLearningContent.length > 0) {
+    activityIds.push(sampleLearningContent[0].id);
   }
 
   const plan: DailyLearningPlan = {
     id: `${today}-${profileKey}`,
     localDate: today,
     userProfileKey: profileKey,
-    durationPreference: profile.dailyDuration ?? 5,
+    durationPreference: durationBudget,
     activityIds,
     createdAt: new Date().toISOString(),
   };
 
-  // Persist for the day
   try {
     localStorage.setItem(storageKey, JSON.stringify(plan));
-  } catch (e) {
-    // ignore storage failures – app will regenerate next load
+  } catch {
+    // ignore
   }
+
   return plan;
 }
 
-/** Utility to get LearningContent by id */
 export function getContentById(id: string): LearningContent | undefined {
   return sampleLearningContent.find((c) => c.id === id);
 }
