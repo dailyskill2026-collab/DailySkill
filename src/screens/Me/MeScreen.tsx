@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useBookmarkStore } from '@/store/bookmarkStore';
 import { useThemeStore } from '@/store/themeStore';
 import { useProfileStore, Duration, WeeklyGoalDays } from '@/store/profileStore';
@@ -9,6 +10,8 @@ import ProgressBar from '@/components/common/ProgressBar';
 import { ExploreCard } from '@/components/Explore/ExploreCard';
 import AuthCard from '@/components/auth/AuthCard';
 import LearningInsightsCard from '@/components/common/LearningInsightsCard';
+import FeedbackModal from '@/components/feedback/FeedbackModal';
+import PrivacySettingsSection from '@/components/privacy/PrivacySettingsSection';
 import {
   Flame,
   BookOpen,
@@ -22,9 +25,12 @@ import {
   Bookmark,
   Clock,
   Calendar,
+  MessageSquare,
+  BarChart3,
 } from 'lucide-react';
 
 export default function MeScreen() {
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const { theme, toggleTheme } = useThemeStore();
   const isDark = theme === 'dark';
   const profile = useProfileStore();
@@ -235,8 +241,22 @@ export default function MeScreen() {
           )}
         </div>
 
-        {/* Navigation & Help Links */}
+        {/* In-App Feedback & Help */}
         <div className="card divide-y divide-border-light dark:divide-border-dark">
+          <button
+            onClick={() => setIsFeedbackModalOpen(true)}
+            className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+          >
+            <div className="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand-950 flex items-center justify-center flex-shrink-0">
+              <MessageSquare size={18} className="text-brand-600 dark:text-brand-400" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-primary">Share Feedback</p>
+              <p className="text-xs text-secondary">Bugs, feature requests & ideas</p>
+            </div>
+            <ChevronRight size={16} className="text-muted" />
+          </button>
+
           {[
             { icon: Bookmark, label: 'Saved Articles', sub: 'Your bookmarks' },
             { icon: HelpCircle, label: 'Help & FAQ', sub: 'Get support' },
@@ -258,7 +278,46 @@ export default function MeScreen() {
           ))}
         </div>
 
-        <p className="text-center text-2xs text-muted pb-2">IT Daily Upskilling v0.10.0 · Sprint 10</p>
+        {/* Local Privacy & Analytics Controls (Sprint 11) */}
+        <PrivacySettingsSection />
+
+        {/* Mock Admin Console Links */}
+        <div className="card p-4 space-y-2">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-secondary">
+            Mock Admin Console
+          </h2>
+          <div className="flex flex-col gap-2 pt-1 text-xs">
+            <Link
+              to="/admin/analytics"
+              className="flex items-center justify-between p-2.5 rounded-xl border border-border-light dark:border-border-dark hover:bg-gray-50 dark:hover:bg-gray-800/50 text-primary font-medium"
+            >
+              <span className="flex items-center gap-2">
+                <BarChart3 size={15} className="text-brand-500" />
+                Product Analytics & Feedback Dashboard
+              </span>
+              <ChevronRight size={14} className="text-muted" />
+            </Link>
+            <Link
+              to="/admin/generation"
+              className="flex items-center justify-between p-2.5 rounded-xl border border-border-light dark:border-border-dark hover:bg-gray-50 dark:hover:bg-gray-800/50 text-primary font-medium"
+            >
+              <span className="flex items-center gap-2">
+                <FileText size={15} className="text-brand-500" />
+                AI Content Generation & Publishing
+              </span>
+              <ChevronRight size={14} className="text-muted" />
+            </Link>
+          </div>
+        </div>
+
+        <p className="text-center text-2xs text-muted pb-2">IT Daily Upskilling v0.11.0 · Sprint 11</p>
+
+        {/* In-App Feedback Modal */}
+        <FeedbackModal
+          isOpen={isFeedbackModalOpen}
+          onClose={() => setIsFeedbackModalOpen(false)}
+          relatedScreen="me"
+        />
       </div>
     </div>
   );

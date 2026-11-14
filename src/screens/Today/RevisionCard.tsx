@@ -4,6 +4,7 @@ import { LearningContent } from '@/types/learning';
 import { useProgressStore } from '@/store/progressStore';
 import { useNavigate } from 'react-router-dom';
 import Badge from '@/components/common/Badge';
+import { analytics } from '@/services/analyticsService';
 
 interface Props {
   content: LearningContent;
@@ -29,6 +30,7 @@ const RevisionCard: React.FC<Props> = ({ content }) => {
       status: 'completed',
       completedAt: new Date().toISOString(),
     });
+    analytics.trackRevisionCompleted(content.id, 'today');
     setShowAnswer(true);
   };
 

@@ -6,6 +6,7 @@ import { recordQuizAttempt, getWeakTopicsList } from '@/services/weakTopicServic
 import { updateSRSAttempt, getDueSRSTopics } from '@/services/spacedRepetition';
 import ProgressBar from '@/components/common/ProgressBar';
 import Badge from '@/components/common/Badge';
+import { analytics } from '@/services/analyticsService';
 
 function StrengthBar({ percent }: { percent: number }) {
   const color =
@@ -31,6 +32,7 @@ function QuizModal({ onClose }: { onClose: () => void }) {
     // Record for Weak Topic Analysis and Spaced Repetition (Sprint 10)
     recordQuizAttempt(quiz.topicTitle, correct);
     updateSRSAttempt(quiz.id, quiz.topicTitle, 'Apex', correct);
+    analytics.trackRevisionCompleted(quiz.topicTitle, 'revise');
   };
 
   return (

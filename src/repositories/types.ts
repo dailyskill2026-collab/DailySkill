@@ -2,6 +2,9 @@
 import type { Profile } from '@/store/profileStore';
 import type { LearningContent, LearningProgress } from '@/types/learning';
 import type { Draft } from '@/ai/schemas';
+import type { AnalyticsEvent, AnalyticsEventType } from '@/types/analytics';
+import type { UserFeedback, FeedbackStatus, FeedbackPriority } from '@/types/feedback';
+import type { BacklogTask } from '@/types/backlog';
 
 export interface AuthUser {
   uid: string;
@@ -90,6 +93,33 @@ export interface IAuditRepository {
   getLogs(contentId?: string): Promise<AuditLogEntry[]>;
 }
 
+export interface IFeedbackRepository {
+  submitFeedback(feedback: Omit<UserFeedback, 'id' | 'createdAt' | 'auditTrail'>): Promise<UserFeedback>;
+  getAllFeedback(includeSimulated?: boolean): Promise<UserFeedback[]>;
+  getFeedbackByUser(userId: string): Promise<UserFeedback[]>;
+  getFeedbackByContent(contentId: string): Promise<UserFeedback[]>;
+  updateFeedbackStatus(feedbackId: string, newStatus: FeedbackStatus, changedBy: string, note?: string): Promise<UserFeedback>;
+  updateFeedbackPriority(feedbackId: string, priority: FeedbackPriority): Promise<UserFeedback>;
+  linkToBacklogTask(feedbackId: string, taskId: string): Promise<void>;
+  clearFeedback(onlySimulated?: boolean): Promise<void>;
+}
+
+export interface IAnalyticsRepository {
+  recordEvent(event: Omit<AnalyticsEvent, 'eventId' | 'timestamp' | 'schemaVersion'>): Promise<AnalyticsEvent | null>;
+  getEvents(options?: { includeSimulated?: boolean; startDate?: string; endDate?: string }): Promise<AnalyticsEvent[]>;
+  clearEvents(onlySimulated?: boolean): Promise<void>;
+  isAnalyticsOptedOut(): boolean;
+  setAnalyticsOptOut(optOut: boolean): void;
+}
+
+export interface IBacklogRepository {
+  createTask(task: Omit<BacklogTask, 'taskId' | 'createdAt' | 'updatedAt'>): Promise<BacklogTask>;
+  getAllTasks(): Promise<BacklogTask[]>;
+  updateTask(taskId: string, updates: Partial<BacklogTask>): Promise<BacklogTask>;
+  deleteTask(taskId: string): Promise<boolean>;
+  clearBacklog(): Promise<void>;
+}
+
 export interface Repositories {
   auth: IAuthRepository;
   user: IUserRepository;
@@ -98,5 +128,8 @@ export interface Repositories {
   revision: IRevisionRepository;
   content: IContentRepository;
   audit: IAuditRepository;
+  feedback: IFeedbackRepository;
+  analytics: IAnalyticsRepository;
+  backlog: IBacklogRepository;
   isMock: boolean;
 }

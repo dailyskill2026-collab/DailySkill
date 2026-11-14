@@ -10,6 +10,7 @@ import ProgressBar from '@/components/common/ProgressBar';
 import CircularProgress from '@/components/common/CircularProgress';
 import InAppReminderBanner from '@/components/common/InAppReminderBanner';
 import ContinueLearningBanner from '@/components/common/ContinueLearningBanner';
+import { analytics } from '@/services/analyticsService';
 
 export default function TodayScreen() {
   const store = useProfileStore();
@@ -26,12 +27,20 @@ export default function TodayScreen() {
   const total = activities.length;
   const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
 
+  // Track app opened on mount
+  useEffect(() => {
+    analytics.trackAppOpened('today');
+  }, []);
+
   // Update streak when qualifying activities are completed
   useEffect(() => {
     if (completed > 0) {
       recordDailyActivityCompletion();
     }
-  }, [completed]);
+    if (total > 0 && completed === total) {
+      analytics.trackLearningGoalCompleted(total);
+    }
+  }, [completed, total]);
 
   const greeting = () => {
     const h = new Date().getHours();

@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { exploreContent, LearningContent } from '@/data/exploreContent';
 import { useBookmarkStore } from '@/store/bookmarkStore';
 import { useHistoryStore } from '@/store/historyStore';
+import ContentFeedbackBar from '@/components/feedback/ContentFeedbackBar';
+import { analytics } from '@/services/analyticsService';
 
 export const DetailScreen: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -13,6 +15,7 @@ export const DetailScreen: React.FC = () => {
   useEffect(() => {
     if (content) {
       addViewed(content.id);
+      analytics.trackContentOpened(content.id, 'detail');
     }
   }, [content, addViewed]);
 
@@ -82,6 +85,9 @@ export const DetailScreen: React.FC = () => {
         </button>
         <button onClick={handleShare} className="text-sm text-blue-600">Share</button>
       </div>
+
+      {/* Content Quality Feedback (Sprint 11) */}
+      <ContentFeedbackBar contentId={content.id} contentVersion={content.version} />
     </div>
   );
 };

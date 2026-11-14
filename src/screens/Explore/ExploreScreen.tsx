@@ -9,6 +9,7 @@ import { ExploreCard } from '@/components/Explore/ExploreCard';
 import { ExploreFilters } from '@/components/Explore/ExploreFilters';
 import { ExploreSearch } from '@/components/Explore/ExploreSearch';
 import { Sparkles, Clock, Globe } from 'lucide-react';
+import { analytics } from '@/services/analyticsService';
 
 export const ExploreScreen: React.FC = () => {
   const profile = useProfileStore();
@@ -69,6 +70,10 @@ export const ExploreScreen: React.FC = () => {
           c.technology.toLowerCase().includes(q) ||
           c.topic.toLowerCase().includes(q)
       );
+    }
+
+    if (search.trim()) {
+      analytics.trackSearchPerformed(search.trim(), items.length);
     }
 
     setFeed(items);

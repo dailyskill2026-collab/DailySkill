@@ -11,6 +11,9 @@ import { MockBookmarkRepository } from './mock/MockBookmarkRepository';
 import { MockRevisionRepository } from './mock/MockRevisionRepository';
 import { MockContentRepository } from './mock/MockContentRepository';
 import { MockAuditRepository } from './mock/MockAuditRepository';
+import { MockFeedbackRepository } from './mock/MockFeedbackRepository';
+import { MockAnalyticsRepository } from './mock/MockAnalyticsRepository';
+import { MockBacklogRepository } from './mock/MockBacklogRepository';
 
 // Firebase Repositories
 import { FirebaseAuthRepository } from './firebase/FirebaseAuthRepository';
@@ -30,6 +33,9 @@ function createMockRepositories(): Repositories {
     revision: new MockRevisionRepository(),
     content: new MockContentRepository(),
     audit: new MockAuditRepository(),
+    feedback: new MockFeedbackRepository(),
+    analytics: new MockAnalyticsRepository(),
+    backlog: new MockBacklogRepository(),
     isMock: true,
   };
 }
@@ -43,6 +49,9 @@ function createFirebaseRepositories(): Repositories {
     revision: new FirebaseRevisionRepository(),
     content: new FirebaseContentRepository(),
     audit: new FirebaseAuditRepository(),
+    feedback: new MockFeedbackRepository(),
+    analytics: new MockAnalyticsRepository(),
+    backlog: new MockBacklogRepository(),
     isMock: false,
   };
 }

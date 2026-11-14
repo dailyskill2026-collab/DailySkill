@@ -5,6 +5,7 @@ import { useProgressStore } from '@/store/progressStore';
 import { useNavigate } from 'react-router-dom';
 import { sampleQuizQuestions } from '@/data/sampleQuiz';
 import Badge from '@/components/common/Badge';
+import { analytics } from '@/services/analyticsService';
 
 interface Props {
   contentId: string; // the LearningContent.id this quiz is linked to
@@ -43,6 +44,7 @@ const QuizCard: React.FC<Props> = ({ contentId }) => {
       selectedAnswerId: selected,
       isCorrect: correct,
     });
+    analytics.trackQuizCompleted(contentId, correct, 'today');
   };
 
   const handleClose = () => {

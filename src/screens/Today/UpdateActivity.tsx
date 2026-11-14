@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { LearningContent } from '@/types/learning';
 import Badge from '@/components/common/Badge';
 import { useProgressStore } from '@/store/progressStore';
+import ContentFeedbackBar from '@/components/feedback/ContentFeedbackBar';
+import { analytics } from '@/services/analyticsService';
 
 interface Props {
   content: LearningContent;
@@ -24,8 +26,7 @@ const UpdateActivity: React.FC<Props> = ({ content }) => {
         status: 'completed',
         completedAt: new Date().toISOString(),
       });
-    } else {
-      // optional: remove progress – for test simplicity we just leave it as is
+      analytics.trackLessonCompleted(content.id, 'today');
     }
   };
 
@@ -54,6 +55,10 @@ const UpdateActivity: React.FC<Props> = ({ content }) => {
           </p>
         )}
       </section>
+
+      <div onClick={(e) => e.stopPropagation()}>
+        <ContentFeedbackBar contentId={content.id} />
+      </div>
     </div>
   );
 };
