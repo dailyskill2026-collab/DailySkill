@@ -15,7 +15,7 @@ describe('TodayScreen', () => {
     // Should have a heading-level element with greeting
     const heading = screen.getByRole('heading', { level: 1 })
     expect(heading).toBeInTheDocument()
-    expect(heading.textContent).toMatch(/Rahul/)
+    expect(heading.textContent).toMatch(/Good (morning|afternoon|evening)/)
   })
 
   it('renders Today\'s Activities section', () => {

@@ -28,7 +28,8 @@ const SALESFORCE_TOPICS = [
 
 const InterestsScreen: React.FC = () => {
   const navigate = useNavigate();
-  const { profile, setProfile } = useProfileStore();
+  const profile = useProfileStore();
+  const setProfile = profile.setProfile;
 
   // Ensure we start with at least the default interests for the selected role
   useEffect(() => {

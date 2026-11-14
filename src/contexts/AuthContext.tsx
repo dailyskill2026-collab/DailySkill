@@ -21,7 +21,7 @@ interface AuthContextType {
   dismissGuestMigration: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(repositories.auth.getCurrentUser());
@@ -80,6 +80,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         onboardingCompleted: true,
         isGuest: false,
       });
+      useProfileStore.getState().setProfile({
+        name: displayName || email.split('@')[0],
+        onboardingCompleted: true,
+        isGuest: false,
+      });
     }
 
     return newUser;
@@ -93,6 +98,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const adminStatus = await repositories.auth.checkIsAdmin();
     setIsAdmin(adminStatus);
 
+    useProfileStore.getState().setProfile({
+      name: loggedInUser.displayName || email.split('@')[0],
+      isGuest: false,
+    });
+
     if (guestData) {
       setPendingGuestMigration(guestData);
     }
@@ -105,6 +115,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     setIsAdmin(false);
     setPendingGuestMigration(null);
+    useProfileStore.getState().setProfile({
+      name: '',
+      isGuest: true,
+    });
   };
 
   const resetPassword = async (email: string) => {

@@ -1,15 +1,23 @@
 // src/repositories/mock/MockAuthRepository.ts
 import type { IAuthRepository, AuthUser } from '../types';
 
+const AUTH_STORAGE_KEY = 'it-daily-auth-user';
+
 export class MockAuthRepository implements IAuthRepository {
-  private currentUser: AuthUser | null = {
-    uid: 'mock-user-123',
-    email: 'mock.user@salesforce.dev',
-    displayName: 'Rahul (Mock)',
-    isAnonymous: false,
-    isAdmin: true,
-  };
+  private currentUser: AuthUser | null = this.loadStoredUser();
   private listeners: Array<(user: AuthUser | null) => void> = [];
+
+  private loadStoredUser(): AuthUser | null {
+    try {
+      const stored = localStorage.getItem(AUTH_STORAGE_KEY);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch {
+      // fallback
+    }
+    return null;
+  }
 
   getCurrentUser(): AuthUser | null {
     return this.currentUser;
@@ -21,9 +29,14 @@ export class MockAuthRepository implements IAuthRepository {
       email,
       displayName: displayName || email.split('@')[0],
       isAnonymous: false,
-      isAdmin: false,
+      isAdmin: email.includes('admin') || email === 'dailyskill2026@gmail.com',
     };
     this.currentUser = user;
+    try {
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+    } catch {
+      // ignore
+    }
     this.notify();
     return user;
   }
@@ -37,12 +50,22 @@ export class MockAuthRepository implements IAuthRepository {
       isAdmin: email.includes('admin') || email === 'dailyskill2026@gmail.com',
     };
     this.currentUser = user;
+    try {
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+    } catch {
+      // ignore
+    }
     this.notify();
     return user;
   }
 
   async signOut(): Promise<void> {
     this.currentUser = null;
+    try {
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+    } catch {
+      // ignore
+    }
     this.notify();
   }
 
@@ -54,7 +77,7 @@ export class MockAuthRepository implements IAuthRepository {
     this.listeners.push(callback);
     callback(this.currentUser);
     return () => {
-      this.listeners = this.listeners.filter(l => l !== callback);
+      this.listeners = this.listeners.filter((l) => l !== callback);
     };
   }
 
@@ -63,6 +86,6 @@ export class MockAuthRepository implements IAuthRepository {
   }
 
   private notify() {
-    this.listeners.forEach(l => l(this.currentUser));
+    this.listeners.forEach((l) => l(this.currentUser));
   }
 }

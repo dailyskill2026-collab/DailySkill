@@ -56,8 +56,8 @@ export interface Profile {
 // Default profile for a new guest user
 export const defaultProfile: Profile = {
   onboardingCompleted: false,
-  isGuest: false,
-  name: 'Rahul',
+  isGuest: true,
+  name: '',
   technology: 'salesforce',
   role: 'salesforce_dev',
   experience: '0-2',

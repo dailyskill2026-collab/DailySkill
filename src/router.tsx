@@ -12,6 +12,15 @@ const LearnScreen   = lazy(() => import('@/screens/Learn/LearnScreen'));
 const ReviseScreen  = lazy(() => import('@/screens/Revise/ReviseScreen'));
 const MeScreen      = lazy(() => import('@/screens/Me/MeScreen'));
 
+// Lazy-loaded Onboarding screens
+const WelcomeScreen        = lazy(() => import('@/screens/Onboarding/WelcomeScreen'));
+const TechnologyScreen     = lazy(() => import('@/screens/Onboarding/TechnologyScreen'));
+const RoleExperienceScreen = lazy(() => import('@/screens/Onboarding/RoleExperienceScreen'));
+const GoalsScreen          = lazy(() => import('@/screens/Onboarding/GoalsScreen'));
+const InterestsScreen      = lazy(() => import('@/screens/Onboarding/InterestsScreen'));
+const PreferenceScreen     = lazy(() => import('@/screens/Onboarding/PreferenceScreen'));
+const SummaryScreen        = lazy(() => import('@/screens/Onboarding/SummaryScreen'));
+
 // Simple loading fallback
 function ScreenLoader() {
   return (
@@ -54,6 +63,15 @@ export default function AppRouter() {
                 </ProtectedRoute>
               }
             />
+            {/* Onboarding routes */}
+            <Route path="/onboarding"             element={<WelcomeScreen />} />
+            <Route path="/onboarding/technology"  element={<TechnologyScreen />} />
+            <Route path="/onboarding/role"        element={<RoleExperienceScreen />} />
+            <Route path="/onboarding/goals"       element={<GoalsScreen />} />
+            <Route path="/onboarding/interests"   element={<InterestsScreen />} />
+            <Route path="/onboarding/preference"  element={<PreferenceScreen />} />
+            <Route path="/onboarding/summary"     element={<SummaryScreen />} />
+
             <Route path="/"        element={<TodayScreen />}   />
             <Route path="/explore" element={<ExploreScreen />} />
             <Route path="/explore/:id" element={<DetailScreen />} />

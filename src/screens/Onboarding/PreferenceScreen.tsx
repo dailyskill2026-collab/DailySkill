@@ -11,7 +11,8 @@ const REMINDER_OPTIONS = ["Morning", "Afternoon", "Evening", "None"]; // "None" 
 
 const PreferenceScreen: React.FC = () => {
   const navigate = useNavigate();
-  const { profile, setProfile } = useProfileStore();
+  const profile = useProfileStore();
+  const setProfile = profile.setProfile;
 
   const toggleDuration = (value: number) => {
     setProfile({ dailyDuration: value });

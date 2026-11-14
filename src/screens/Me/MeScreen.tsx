@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom';
 import { useBookmarkStore } from '@/store/bookmarkStore';
 import { useThemeStore } from '@/store/themeStore';
 import { useProfileStore, Duration, WeeklyGoalDays } from '@/store/profileStore';
+import { useAuth } from '@/contexts/AuthContext';
+import { useProgressStore } from '@/store/progressStore';
+import { getStreakState } from '@/services/streakService';
 import { exploreContent } from '@/data/exploreContent';
-import { mockUser } from '@/data';
 import Badge from '@/components/common/Badge';
 import ProgressBar from '@/components/common/ProgressBar';
 import { ExploreCard } from '@/components/Explore/ExploreCard';
@@ -30,6 +32,7 @@ import {
   MessageSquare,
   BarChart3,
   Trophy,
+  RotateCcw,
 } from 'lucide-react';
 
 export default function MeScreen() {
@@ -40,6 +43,24 @@ export default function MeScreen() {
   const profile = useProfileStore();
   const { setProfile } = useProfileStore();
   const { bookmarks } = useBookmarkStore();
+  const { user } = useAuth();
+  const { dailyProgress } = useProgressStore();
+  const streak = getStreakState();
+
+  const completedLessonsCount = Object.values(dailyProgress).filter(
+    (p) => p.status === 'completed'
+  ).length;
+
+  const displayName =
+    user?.displayName ||
+    (profile.name && profile.name !== 'Rahul' ? profile.name : user?.email ? user.email.split('@')[0] : 'Learner (Guest)');
+  const initials = (displayName || 'L').substring(0, 2).toUpperCase();
+
+  // Dynamic Skill progress based on actual activity
+  const apexPercent = Math.min(100, Math.round((completedLessonsCount / 4) * 100));
+  const lwcPercent = dailyProgress['sf-revision-basic-object']?.status === 'completed' ? 100 : 0;
+  const adminPercent = dailyProgress['sf-practice-queueable']?.status === 'completed' ? 100 : 0;
+
   const bookmarkedIds = Array.from(bookmarks);
 
   useEffect(() => {
@@ -52,6 +73,14 @@ export default function MeScreen() {
 
   const handleWeeklyGoalChange = (g: WeeklyGoalDays) => {
     setProfile({ weeklyGoal: g });
+  };
+
+  const handleResetProgress = () => {
+    if (window.confirm('Reset all your local progress, streaks, and quiz results to 0% and start fresh?')) {
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.reload();
+    }
   };
 
   return (
@@ -71,11 +100,11 @@ export default function MeScreen() {
           <div className="absolute -right-8 -bottom-8 w-32 h-32 rounded-full bg-white/10" />
           <div className="relative flex-shrink-0">
             <div className="w-16 h-16 rounded-2xl bg-white/20 border-2 border-white/30 flex items-center justify-center">
-              <span className="text-2xl font-bold text-white">{mockUser.initials}</span>
+              <span className="text-2xl font-bold text-white">{initials}</span>
             </div>
           </div>
           <div className="flex-1 min-w-0 relative">
-            <p className="text-lg font-bold text-white">{profile.name || mockUser.name}</p>
+            <p className="text-lg font-bold text-white">{displayName}</p>
             <div className="flex items-center gap-2 mt-0.5">
               <span className="chip text-2xs bg-white/20 text-white px-2 py-0.5 capitalize">
                 {profile.role.replace('_', ' ')}
@@ -91,10 +120,10 @@ export default function MeScreen() {
         {/* Stats grid */}
         <div className="grid grid-cols-2 gap-3">
           {[
-            { icon: Flame, label: 'Day Streak', value: mockUser.streak, color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-950' },
-            { icon: BookOpen, label: 'Lessons Done', value: mockUser.totalLessons, color: 'text-brand-600 dark:text-brand-400', bg: 'bg-brand-50 dark:bg-brand-950' },
-            { icon: Target, label: 'Revision Score', value: `${mockUser.revisionScore}%`, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950' },
-            { icon: Award, label: 'Paths Done', value: mockUser.pathsCompleted, color: 'text-indigo-600 dark:text-indigo-400', bg: 'bg-indigo-50 dark:bg-indigo-950' },
+            { icon: Flame, label: 'Day Streak', value: `${streak.currentStreak} Days`, color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-950' },
+            { icon: BookOpen, label: 'Lessons Done', value: completedLessonsCount, color: 'text-brand-600 dark:text-brand-400', bg: 'bg-brand-50 dark:bg-brand-950' },
+            { icon: Target, label: 'Revision Score', value: `${completedLessonsCount > 0 ? 100 : 0}%`, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950' },
+            { icon: Award, label: 'Paths Done', value: completedLessonsCount >= 3 ? 1 : 0, color: 'text-indigo-600 dark:text-indigo-400', bg: 'bg-indigo-50 dark:bg-indigo-950' },
           ].map((stat) => (
             <div key={stat.label} className="card p-4 flex items-center gap-3">
               <div className={`w-10 h-10 rounded-xl ${stat.bg} flex items-center justify-center flex-shrink-0`}>
@@ -112,13 +141,13 @@ export default function MeScreen() {
         <div className="card p-4">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-primary">Skill Progress</h2>
-            <Badge label="Sample" variant="sample" />
+            <Badge label={completedLessonsCount > 0 ? 'Active' : 'Not Started'} variant={completedLessonsCount > 0 ? 'verified' : 'sample'} />
           </div>
           <div className="space-y-3">
             {[
-              { skill: 'Apex Development', percent: 25, color: 'bg-brand-500' },
-              { skill: 'LWC', percent: 11, color: 'bg-indigo-500' },
-              { skill: 'Administration', percent: 8, color: 'bg-sky-500' },
+              { skill: 'Apex Development', percent: apexPercent, color: 'bg-brand-500' },
+              { skill: 'LWC', percent: lwcPercent, color: 'bg-indigo-500' },
+              { skill: 'Administration', percent: adminPercent, color: 'bg-sky-500' },
             ].map((s) => (
               <div key={s.skill}>
                 <div className="flex justify-between mb-1">

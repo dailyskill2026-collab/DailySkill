@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { useProfileStore } from '@/store/profileStore';
 import { generateDailyPlan, getContentById } from '@/services/dailyPlan';
@@ -13,11 +13,14 @@ import InAppReminderBanner from '@/components/common/InAppReminderBanner';
 import ContinueLearningBanner from '@/components/common/ContinueLearningBanner';
 import { analytics } from '@/services/analyticsService';
 import { Zap, ArrowRight } from 'lucide-react';
+import { AuthContext } from '@/contexts/AuthContext';
 
 export default function TodayScreen() {
+  const auth = useContext(AuthContext);
+  const user = auth?.user;
   const store = useProfileStore();
-  const safeName = store?.name ?? 'User';
-  const firstName = safeName.split(' ')[0];
+  const rawName = user?.displayName || (store?.name && store.name !== 'Rahul' ? store.name : user?.email ? user.email.split('@')[0] : 'Learner');
+  const firstName = rawName.split(' ')[0] || 'Learner';
   const technology = store?.technology?.toUpperCase() ?? '';
   const role = store?.role?.replace('salesforce_', '') ?? '';
   const dailyDuration = store?.dailyDuration ?? 0;
@@ -75,6 +78,22 @@ export default function TodayScreen() {
       </div>
 
       <div className="px-4">
+        {/* Onboarding Banner for new users */}
+        {!store.onboardingCompleted && (
+          <div className="mb-4 p-3.5 bg-gradient-to-r from-brand-50 to-indigo-50 dark:from-brand-950/40 dark:to-indigo-950/40 border border-brand-200 dark:border-brand-800 rounded-xl flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-brand-900 dark:text-brand-200">Personalize Your Learning</p>
+              <p className="text-xs text-brand-700 dark:text-brand-300">Set your tech, role & goals for tailored daily lessons.</p>
+            </div>
+            <Link
+              to="/onboarding"
+              className="text-xs font-medium px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg transition-colors flex-shrink-0 ml-2"
+            >
+              Get Started →
+            </Link>
+          </div>
+        )}
+
         {/* Local In-App Reminders (Sprint 10) */}
         <InAppReminderBanner />
 

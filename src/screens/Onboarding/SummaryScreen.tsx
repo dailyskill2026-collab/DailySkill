@@ -8,7 +8,8 @@ import SelectableChip from "../../components/common/SelectableChip";
 
 const SummaryScreen: React.FC = () => {
   const navigate = useNavigate();
-  const { profile, setProfile } = useProfileStore();
+  const profile = useProfileStore();
+  const setProfile = profile.setProfile;
 
   const handleFinish = () => {
     // Mark onboarding as completed and navigate to home (Today screen)
