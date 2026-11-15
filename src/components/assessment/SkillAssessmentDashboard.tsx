@@ -139,21 +139,21 @@ export const SkillAssessmentDashboard: React.FC<SkillAssessmentDashboardProps> =
       )}
 
       {/* Header Banner with Disclaimer */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white shadow-xl relative overflow-hidden">
+      <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white shadow-xl relative overflow-hidden">
         <div className="relative z-10 space-y-2 max-w-2xl">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/30 text-indigo-200 text-xs font-semibold backdrop-blur-sm border border-indigo-400/20">
             <Zap className="w-3.5 h-3.5 text-amber-300" />
             Skill Assessment & Gap Analysis
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight leading-snug">
             Benchmark Your Salesforce Proficiency
           </h2>
-          <p className="text-sm text-indigo-200 leading-relaxed">
+          <p className="text-xs sm:text-sm text-indigo-200 leading-relaxed">
             Take focused 3–15 minute scenario diagnostics. Identify weak topics, complete tailored micro-plans, and earn mastery achievements.
           </p>
 
-          <div className="pt-2 flex items-center gap-2 text-xs text-indigo-300/80">
-            <ShieldCheck className="w-4 h-4 text-indigo-300 shrink-0" />
+          <div className="pt-2 flex items-start sm:items-center gap-2 text-xs text-indigo-300/80">
+            <ShieldCheck className="w-4 h-4 text-indigo-300 shrink-0 mt-0.5 sm:mt-0" />
             <span>
               <strong>Educational Self-Assessment:</strong> Designed to guide daily upskilling; not an official certification.
             </span>
@@ -194,16 +194,16 @@ export const SkillAssessmentDashboard: React.FC<SkillAssessmentDashboardProps> =
         </div>
       )}
 
-      {/* Assessment Modes Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Assessment Modes List (Mobile-Optimized Vertical Stack) */}
+      <div className="flex flex-col gap-4">
         {/* Quick Diagnostic */}
         <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col justify-between space-y-4 hover:border-indigo-400 transition-all">
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
+              <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
                 5 Questions
               </span>
-              <span className="text-xs text-slate-500 flex items-center gap-1 font-medium">
+              <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 font-medium">
                 <Clock className="w-3.5 h-3.5" /> 3–5 min
               </span>
             </div>
@@ -214,14 +214,14 @@ export const SkillAssessmentDashboard: React.FC<SkillAssessmentDashboardProps> =
               Fast, high-yield drill to spot knowledge gaps during coffee breaks.
             </p>
 
-            <div className="pt-2">
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            <div className="pt-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                 Domain:
               </label>
               <select
                 value={quickCategory}
                 onChange={e => setQuickCategory(e.target.value as SkillCategory | 'all')}
-                className="w-full text-xs p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200"
+                className="w-full text-xs p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
               >
                 <option value="all">General (Cross-Domain)</option>
                 {CATEGORIES.map(c => (
@@ -235,20 +235,20 @@ export const SkillAssessmentDashboard: React.FC<SkillAssessmentDashboardProps> =
 
           <button
             onClick={() => handleStart('quick', quickCategory === 'all' ? undefined : quickCategory)}
-            className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-sm flex items-center justify-center gap-1.5"
+            className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-semibold text-xs shadow-sm flex items-center justify-center gap-2 transition-all"
           >
-            Start Quick Diagnostic <ArrowRight className="w-3.5 h-3.5" />
+            Start Quick Diagnostic <ArrowRight className="w-4 h-4" />
           </button>
         </div>
 
         {/* Topic Assessment */}
         <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col justify-between space-y-4 hover:border-indigo-400 transition-all">
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300">
+              <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300">
                 10 Questions
               </span>
-              <span className="text-xs text-slate-500 flex items-center gap-1 font-medium">
+              <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 font-medium">
                 <Clock className="w-3.5 h-3.5" /> 8–10 min
               </span>
             </div>
@@ -259,14 +259,14 @@ export const SkillAssessmentDashboard: React.FC<SkillAssessmentDashboardProps> =
               Deep dive into a specific technical discipline with scenario-based MCQs.
             </p>
 
-            <div className="pt-2">
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            <div className="pt-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                 Target Topic:
               </label>
               <select
                 value={topicCategory}
                 onChange={e => setTopicCategory(e.target.value as SkillCategory)}
-                className="w-full text-xs p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200"
+                className="w-full text-xs p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
               >
                 {CATEGORIES.map(c => (
                   <option key={c.id} value={c.id}>
@@ -279,20 +279,20 @@ export const SkillAssessmentDashboard: React.FC<SkillAssessmentDashboardProps> =
 
           <button
             onClick={() => handleStart('topic', topicCategory)}
-            className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-sm flex items-center justify-center gap-1.5"
+            className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-semibold text-xs shadow-sm flex items-center justify-center gap-2 transition-all"
           >
-            Start Topic Assessment <ArrowRight className="w-3.5 h-3.5" />
+            Start Topic Assessment <ArrowRight className="w-4 h-4" />
           </button>
         </div>
 
         {/* Skill Check */}
-        <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col justify-between space-y-4 hover:border-indigo-400 transition-all">
-          <div className="space-y-2">
+        <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col justify-between space-y-4 hover:border-purple-400 transition-all">
+          <div className="space-y-2.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300">
+              <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300">
                 20 Questions
               </span>
-              <span className="text-xs text-slate-500 flex items-center gap-1 font-medium">
+              <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 font-medium">
                 <Clock className="w-3.5 h-3.5" /> 15–20 min
               </span>
             </div>
@@ -303,22 +303,22 @@ export const SkillAssessmentDashboard: React.FC<SkillAssessmentDashboardProps> =
               Comprehensive exam covering all 8 Salesforce categories with gap rating.
             </p>
 
-            <div className="pt-2 text-xs text-slate-500 dark:text-slate-400">
+            <div className="pt-1 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800">
               Covers Admin, Apex, LWC, Integrations, Security, Flows, Async & DevOps.
             </div>
           </div>
 
           <button
             onClick={() => handleStart('skill_check')}
-            className="w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs shadow-sm flex items-center justify-center gap-1.5"
+            className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-700 active:scale-[0.99] text-white font-semibold text-xs shadow-sm flex items-center justify-center gap-2 transition-all"
           >
-            Start Comprehensive Check <ArrowRight className="w-3.5 h-3.5" />
+            Start Comprehensive Check <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </div>
 
       {/* Learning Challenges & Badges Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="flex flex-col gap-4">
         {/* Challenges Widget */}
         <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
@@ -397,11 +397,11 @@ export const SkillAssessmentDashboard: React.FC<SkillAssessmentDashboardProps> =
                 >
                   <div className="flex items-center gap-2">
                     <span className="text-xl">{ach.icon}</span>
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-tight">
+                    <div className="min-w-0 flex-1">
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-tight truncate">
                         {ach.title}
                       </h4>
-                      <p className="text-[10px] text-slate-500 mt-0.5 line-clamp-1">
+                      <p className="text-[10px] text-slate-500 mt-0.5 truncate">
                         {ach.description}
                       </p>
                     </div>
