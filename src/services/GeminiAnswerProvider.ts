@@ -48,58 +48,68 @@ Target Explanation Style: "${style.toUpperCase()}"
 
 Include official documentation references or citations where applicable.`;
 
-    const CANDIDATE_MODELS = [
-      this.model,
-      'gemini-2.0-flash',
-      'gemini-1.5-flash-latest',
-      'gemini-1.5-flash',
-      'gemini-2.0-flash-exp',
-      'gemini-1.5-pro',
-      'gemini-pro',
-    ];
+    let activeModels: string[] = [];
+    try {
+      const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${this.apiKey}`);
+      if (listRes.ok) {
+        const listData = await listRes.json();
+        const models: any[] = listData.models || [];
+        activeModels = models
+          .filter((m) => m.supportedGenerationMethods?.includes('generateContent'))
+          .map((m) => m.name);
+      }
+    } catch {
+      // fallback
+    }
 
-    const uniqueModels = Array.from(new Set(CANDIDATE_MODELS.filter(Boolean)));
+    if (activeModels.length === 0) {
+      activeModels = [
+        'models/gemini-2.0-flash',
+        'models/gemini-1.5-flash',
+        'models/gemini-1.5-flash-latest',
+        'models/gemini-1.5-pro',
+      ];
+    }
+
     let data: any = null;
     let lastError = '';
 
     try {
-      for (const model of uniqueModels) {
-        for (const apiVersion of ['v1beta', 'v1']) {
-          const endpoint = `https://generativelanguage.googleapis.com/${apiVersion}/models/${model}:generateContent?key=${this.apiKey}`;
-          try {
-            const response = await fetch(endpoint, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                contents: [
-                  {
-                    parts: [
-                      {
-                        text: `${systemPrompt}\n\nUser Question: ${request.question}${
-                          request.topicId ? `\nContext Topic: ${request.topicId}` : ''
-                        }`,
-                      },
-                    ],
-                  },
-                ],
-                generationConfig: {
-                  temperature: 0.2,
-                  maxOutputTokens: 1024,
+      for (const modelPath of activeModels) {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/${modelPath}:generateContent?key=${this.apiKey}`;
+        try {
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [
+                {
+                  parts: [
+                    {
+                      text: `${systemPrompt}\n\nUser Question: ${request.question}${
+                        request.topicId ? `\nContext Topic: ${request.topicId}` : ''
+                      }`,
+                    },
+                  ],
                 },
-              }),
-            });
+              ],
+              generationConfig: {
+                temperature: 0.2,
+                maxOutputTokens: 1024,
+              },
+            }),
+          });
 
-            if (response.ok) {
-              data = await response.json();
-              this.model = model;
-              break;
-            } else {
-              const errorData = await response.json().catch(() => ({}));
-              lastError = errorData?.error?.message || response.statusText;
-            }
-          } catch (e: any) {
-            lastError = e.message;
+          if (response.ok) {
+            data = await response.json();
+            this.model = modelPath.replace('models/', '');
+            break;
+          } else {
+            const errorData = await response.json().catch(() => ({}));
+            lastError = errorData?.error?.message || response.statusText;
           }
+        } catch (e: any) {
+          lastError = e.message;
         }
         if (data) break;
       }
