@@ -56,18 +56,23 @@ export default function GenerationScreen() {
     }
   };
 
+  const currentTopic = draft ? ((draft as any).topic || draft.topics?.[0]) : null;
+  const currentLesson = draft ? ((draft as any).lesson || draft.lessons?.[0]) : null;
+  const currentScenario = draft ? ((draft as any).scenario || draft.scenarios?.[0]) : null;
+  const currentMcq = draft ? ((draft as any).mcq || draft.mcqs?.[0]) : null;
+
   const handlePublish = () => {
-    if (!draft) return;
+    if (!draft || !currentLesson) return;
     const newLesson: LearningContent = {
       id: `ai-${Date.now()}`,
       technology: 'Salesforce',
-      topic: draft.topic?.title || 'Apex',
-      title: draft.lesson.title,
-      summary: draft.lesson.shortExplanation,
-      whyItMatters: draft.lesson.whyItMatters || 'Enterprise production standard',
-      projectExample: draft.scenario?.description || 'Implemented in mission-critical applications',
-      readingTimeMinutes: draft.lesson.estimatedMinutes || 3,
-      difficulty: (draft.lesson.difficulty === 'hard' ? 'Advanced' : draft.lesson.difficulty === 'medium' ? 'Intermediate' : 'Beginner') as any,
+      topic: currentTopic?.title || 'Apex',
+      title: currentLesson.title,
+      summary: currentLesson.shortExplanation,
+      whyItMatters: currentLesson.whyItMatters || 'Enterprise production standard',
+      projectExample: currentScenario?.description || 'Implemented in mission-critical applications',
+      readingTimeMinutes: currentLesson.estimatedMinutes || 3,
+      difficulty: (currentLesson.difficulty === 'hard' ? 'Advanced' : currentLesson.difficulty === 'medium' ? 'Intermediate' : 'Beginner') as any,
       verificationStatus: 'published',
       sourceName: 'Google Gemini 1.5 Flash AI Engine',
       lastVerified: new Date().toISOString().split('T')[0],
@@ -200,59 +205,63 @@ export default function GenerationScreen() {
       )}
 
       {/* Generated Result Preview */}
-      {draft && (
+      {draft && currentLesson && (
         <div className="space-y-4 animate-fade-in">
           <div className="p-6 rounded-2xl bg-white dark:bg-gray-800 border border-brand-200 dark:border-brand-800 shadow-md space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-xs uppercase font-bold tracking-wider px-2.5 py-1 rounded-full bg-brand-100 text-brand-700 dark:bg-brand-950 dark:text-brand-300">
-                {draft.topic.title}
+                {currentTopic?.title || 'Salesforce'}
               </span>
               <span className="text-xs text-gray-500">
-                Est. {draft.lesson.estimatedMinutes} Mins · {draft.lesson.difficulty.toUpperCase()}
+                Est. {currentLesson.estimatedMinutes} Mins · {currentLesson.difficulty.toUpperCase()}
               </span>
             </div>
 
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-              {draft.lesson.title}
+              {currentLesson.title}
             </h3>
 
             <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-              {draft.lesson.shortExplanation}
+              {currentLesson.shortExplanation}
             </p>
 
-            <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 space-y-2">
-              <div className="font-semibold text-xs text-gray-600 dark:text-gray-400 uppercase">
-                Enterprise Scenario MCQ
-              </div>
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
-                {draft.scenario.description}
-              </p>
-              <p className="text-sm font-bold text-brand-600 dark:text-brand-400">
-                {draft.mcq.question}
-              </p>
+            {currentMcq && (
+              <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 space-y-2">
+                <div className="font-semibold text-xs text-gray-600 dark:text-gray-400 uppercase">
+                  Enterprise Scenario MCQ
+                </div>
+                {currentScenario && (
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    {currentScenario.description}
+                  </p>
+                )}
+                <p className="text-sm font-bold text-brand-600 dark:text-brand-400">
+                  {currentMcq.question}
+                </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
-                {draft.mcq.options.map((opt) => (
-                  <div
-                    key={opt.id}
-                    className={`p-2.5 rounded-lg border text-xs flex items-center gap-2 ${
-                      opt.id === draft.mcq.correctAnswerId
-                        ? 'border-emerald-500 bg-emerald-50/60 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-200 font-semibold'
-                        : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
-                    }`}
-                  >
-                    <span className="w-5 h-5 rounded-full flex items-center justify-center bg-gray-200 dark:bg-gray-700 text-2xs font-bold">
-                      {opt.id}
-                    </span>
-                    <span>{opt.label}</span>
-                  </div>
-                ))}
-              </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                  {currentMcq.options.map((opt: any) => (
+                    <div
+                      key={opt.id}
+                      className={`p-2.5 rounded-lg border text-xs flex items-center gap-2 ${
+                        opt.id === (currentMcq.correctAnswerId || currentMcq.correctOptionId)
+                          ? 'border-emerald-500 bg-emerald-50/60 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-200 font-semibold'
+                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
+                      }`}
+                    >
+                      <span className="w-5 h-5 rounded-full flex items-center justify-center bg-gray-200 dark:bg-gray-700 text-2xs font-bold">
+                        {opt.id}
+                      </span>
+                      <span>{opt.label}</span>
+                    </div>
+                  ))}
+                </div>
 
-              <div className="text-xs text-gray-500 pt-2 border-t dark:border-gray-800">
-                <strong>Correct: Option {draft.mcq.correctAnswerId}</strong> — {draft.mcq.explanation}
+                <div className="text-xs text-gray-500 pt-2 border-t dark:border-gray-800">
+                  <strong>Correct: Option {currentMcq.correctAnswerId || currentMcq.correctOptionId}</strong> — {currentMcq.explanation}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Action Buttons */}
             <div className="pt-2 flex items-center justify-between">
