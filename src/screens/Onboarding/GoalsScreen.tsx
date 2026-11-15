@@ -15,10 +15,8 @@ const GOAL_OPTIONS = [
 
 export default function GoalsScreen() {
   const navigate = useNavigate()
-  const { goals, setProfile } = useProfileStore(state => ({
-    goals: state.goals,
-    setProfile: state.setProfile,
-  }))
+  const goals = useProfileStore(state => state.goals) || []
+  const setProfile = useProfileStore(state => state.setProfile)
 
   const toggleGoal = (key: string) => {
     const exists = goals.includes(key as any)

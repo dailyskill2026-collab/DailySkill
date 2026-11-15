@@ -31,17 +31,15 @@ export const TechnologyCard: React.FC<TechnologyCardProps> = ({ tech, label, isS
 
 export default function TechnologyScreen() {
   const navigate = useNavigate()
-  const { technology, setProfile } = useProfileStore(state => ({
-    technology: state.technology,
-    setProfile: state.setProfile,
-  }))
+  const technology = useProfileStore(state => state.technology)
+  const setProfile = useProfileStore(state => state.setProfile)
 
   const handleSelect = (tech: string) => {
     setProfile({ technology: tech as any })
   }
 
   const next = () => navigate('/onboarding/role')
-  const back = () => navigate('/') // could go back to welcome if needed
+  const back = () => navigate('/onboarding')
 
   const techOptions = [
     { key: 'salesforce', label: 'Salesforce', disabled: false },

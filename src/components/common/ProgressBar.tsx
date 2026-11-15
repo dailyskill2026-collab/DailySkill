@@ -6,6 +6,7 @@ interface ProgressBarProps {
   trackClass?: string
   height?: string
   animated?: boolean
+  className?: string
   'aria-label'?: string
 }
 
@@ -15,13 +16,14 @@ export default function ProgressBar({
   trackClass = 'bg-gray-100 dark:bg-gray-800',
   height = 'h-2',
   animated = true,
+  className = '',
   'aria-label': ariaLabel,
 }: ProgressBarProps) {
   const clamped = Math.min(100, Math.max(0, percent))
 
   return (
     <div
-      className={`w-full ${height} ${trackClass} rounded-full overflow-hidden`}
+      className={`w-full ${height} ${trackClass} rounded-full overflow-hidden ${className}`}
       role="progressbar"
       aria-valuenow={clamped}
       aria-valuemin={0}

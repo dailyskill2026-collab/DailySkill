@@ -38,11 +38,9 @@ function RoleCard({ roleKey, label, isSelected, onSelect }: { roleKey: string; l
 
 export default function RoleExperienceScreen() {
   const navigate = useNavigate()
-  const { role, experience, setProfile } = useProfileStore(state => ({
-    role: state.role,
-    experience: state.experience,
-    setProfile: state.setProfile,
-  }))
+  const role = useProfileStore(state => state.role)
+  const experience = useProfileStore(state => state.experience)
+  const setProfile = useProfileStore(state => state.setProfile)
 
   const selectRole = (key: string) => {
     setProfile({ role: key as any })
