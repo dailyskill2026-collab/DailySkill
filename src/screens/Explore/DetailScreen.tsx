@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { exploreContent, LearningContent } from '@/data/exploreContent';
+import { sampleLearningContent } from '@/data/sampleContent';
 import { useBookmarkStore } from '@/store/bookmarkStore';
 import { useHistoryStore } from '@/store/historyStore';
 import ContentFeedbackBar from '@/components/feedback/ContentFeedbackBar';
@@ -10,7 +11,7 @@ import { HelpCircle } from 'lucide-react';
 
 export const DetailScreen: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const content = exploreContent.find((c) => c.id === id) as LearningContent | undefined;
+  const content = (exploreContent.find((c) => c.id === id) || sampleLearningContent.find((c) => c.id === id)) as LearningContent | undefined;
   const { toggleBookmark, isBookmarked } = useBookmarkStore();
   const { addViewed, getViewed } = useHistoryStore();
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);

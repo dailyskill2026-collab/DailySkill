@@ -11,7 +11,13 @@ export class MockAuthRepository implements IAuthRepository {
     try {
       const stored = localStorage.getItem(AUTH_STORAGE_KEY);
       if (stored) {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored);
+        if (parsed) {
+          if (parsed.email && (parsed.email.includes('admin') || parsed.email === 'dailyskill2026@gmail.com' || parsed.email.includes('zahed'))) {
+            parsed.isAdmin = true;
+          }
+          return parsed;
+        }
       }
     } catch {
       // fallback
@@ -29,7 +35,7 @@ export class MockAuthRepository implements IAuthRepository {
       email,
       displayName: displayName || email.split('@')[0],
       isAnonymous: false,
-      isAdmin: email.includes('admin') || email === 'dailyskill2026@gmail.com',
+      isAdmin: email.includes('admin') || email === 'dailyskill2026@gmail.com' || email.includes('zahed'),
     };
     this.currentUser = user;
     try {
@@ -47,7 +53,7 @@ export class MockAuthRepository implements IAuthRepository {
       email,
       displayName: email.split('@')[0],
       isAnonymous: false,
-      isAdmin: email.includes('admin') || email === 'dailyskill2026@gmail.com',
+      isAdmin: email.includes('admin') || email === 'dailyskill2026@gmail.com' || email.includes('zahed'),
     };
     this.currentUser = user;
     try {

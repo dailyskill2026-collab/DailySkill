@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useProfileStore } from '@/store/profileStore';
 import { useProgressStore } from '@/store/progressStore';
 import { exploreContent, LearningContent } from '@/data/exploreContent';
+import { getAllExploreContent } from '@/services/contentCatalogService';
 import { getPersonalizedRecommendations, ScoredRecommendation } from '@/services/recommendationEngine';
 import { getWeakTopicsList } from '@/services/weakTopicService';
 import { ExploreCard } from '@/components/Explore/ExploreCard';
@@ -28,8 +29,10 @@ export const ExploreScreen: React.FC = () => {
     );
     const weakTopics = new Set(getWeakTopicsList());
 
+    const catalog = getAllExploreContent();
+
     // 1. Get personalized recommendations
-    const scored = getPersonalizedRecommendations(exploreContent, {
+    const scored = getPersonalizedRecommendations(catalog, {
       profile,
       completedIds,
       weakTopics,
@@ -42,11 +45,11 @@ export const ExploreScreen: React.FC = () => {
     if (activeTab === 'for-you') {
       items = scored.map((s) => s.content);
     } else if (activeTab === 'latest') {
-      items = [...exploreContent]
+      items = [...catalog]
         .filter((c) => c.verificationStatus === 'published' || c.verificationStatus === 'sample')
         .sort((a, b) => (b.lastVerified || '').localeCompare(a.lastVerified || '') || b.id.localeCompare(a.id));
     } else {
-      items = [...exploreContent].filter(
+      items = [...catalog].filter(
         (c) => c.verificationStatus === 'published' || c.verificationStatus === 'sample'
       );
     }

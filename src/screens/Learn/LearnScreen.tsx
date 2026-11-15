@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import {
   Settings, Code2, Layout, GitMerge, Shield, Workflow, Bot, MessageSquare,
   Clock, ChevronRight, BookOpen, Layers, Zap
@@ -66,7 +67,9 @@ function PathCard({ path, onSelect }: { path: LearningPath; onSelect: (path: Lea
 }
 
 export default function LearnScreen() {
-  const [activeTab, setActiveTab] = useState<'paths' | 'assessments'>('paths')
+  const [searchParams] = useSearchParams()
+  const initialTab = searchParams.get('tab') === 'assessments' ? 'assessments' : 'paths'
+  const [activeTab, setActiveTab] = useState<'paths' | 'assessments'>(initialTab)
   const [selectedPath, setSelectedPath] = useState<LearningPath | null>(null)
 
   const inProgress = mockLearningPaths.filter((p) => p.completedLessons > 0 && p.completedLessons < p.totalLessons)

@@ -16,6 +16,7 @@ import FeedbackModal from '@/components/feedback/FeedbackModal';
 import PrivacySettingsSection from '@/components/privacy/PrivacySettingsSection';
 import { achievementService } from '@/services/achievementService';
 import type { UserAchievement } from '@/types/challenge';
+import { getAIConfig, saveAIConfig, AIProviderType } from '@/store/aiConfigStore';
 import {
   Flame,
   BookOpen,
@@ -33,6 +34,8 @@ import {
   BarChart3,
   Trophy,
   RotateCcw,
+  Bot,
+  Sparkles,
 } from 'lucide-react';
 
 export default function MeScreen() {
@@ -46,6 +49,20 @@ export default function MeScreen() {
   const { user } = useAuth();
   const { dailyProgress } = useProgressStore();
   const streak = getStreakState();
+
+  const [aiConfig, setAiConfig] = useState(getAIConfig());
+  const [geminiKeyInput, setGeminiKeyInput] = useState(aiConfig.geminiApiKey);
+  const [aiSaveNotice, setAiSaveNotice] = useState<string | null>(null);
+
+  const handleSaveAI = (provider: AIProviderType) => {
+    const updated = saveAIConfig({
+      provider,
+      geminiApiKey: geminiKeyInput.trim(),
+    });
+    setAiConfig(updated);
+    setAiSaveNotice(provider === 'gemini' ? 'Google Gemini 1.5 Flash activated!' : 'Switched to Mock Curated Engine');
+    setTimeout(() => setAiSaveNotice(null), 3500);
+  };
 
   const completedLessonsCount = Object.values(dailyProgress).filter(
     (p) => p.status === 'completed'
@@ -352,6 +369,86 @@ export default function MeScreen() {
 
         {/* Local Privacy & Analytics Controls (Sprint 11) */}
         <PrivacySettingsSection />
+
+        {/* AI Engine & Studio Settings */}
+        <div className="card p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Bot size={18} className="text-amber-500" />
+              <h2 className="text-sm font-semibold text-primary">AI Engine Configuration</h2>
+            </div>
+            <span className={`text-2xs px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
+              aiConfig.provider === 'gemini' && aiConfig.geminiApiKey
+                ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
+            }`}>
+              {aiConfig.provider === 'gemini' && aiConfig.geminiApiKey ? 'Live Gemini AI' : 'Curated Mock Engine'}
+            </span>
+          </div>
+
+          <p className="text-xs text-secondary">
+            Connect live Google Gemini 1.5 Flash to ask any custom doubt and generate lessons.
+          </p>
+
+          <div className="space-y-2 pt-1">
+            <label className="block text-2xs font-semibold uppercase text-secondary">
+              Google Gemini API Key (Free)
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="password"
+                value={geminiKeyInput}
+                onChange={(e) => setGeminiKeyInput(e.target.value)}
+                placeholder="Paste AIzaSy... key"
+                className="flex-1 px-3 py-1.5 text-xs rounded-xl border border-border-light dark:border-border-dark bg-white dark:bg-gray-900 text-primary outline-none focus:ring-2 focus:ring-amber-500"
+              />
+              <button
+                onClick={() => handleSaveAI('gemini')}
+                disabled={!geminiKeyInput.trim()}
+                className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white rounded-xl text-xs font-bold transition shadow-xs"
+              >
+                Save & Connect
+              </button>
+            </div>
+            {aiConfig.provider === 'gemini' && aiConfig.geminiApiKey && (
+              <button
+                onClick={() => handleSaveAI('mock')}
+                className="text-2xs text-secondary hover:text-red-500 underline"
+              >
+                Disconnect & Use Curated Offline Mode
+              </button>
+            )}
+            <p className="text-2xs text-muted">
+              Get a free API key at{' '}
+              <a
+                href="https://aistudio.google.com/app/apikey"
+                target="_blank"
+                rel="noreferrer"
+                className="text-brand-600 underline font-semibold"
+              >
+                Google AI Studio
+              </a>
+              . Key stays securely in your browser.
+            </p>
+          </div>
+
+          {aiSaveNotice && (
+            <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 text-emerald-800 dark:text-emerald-200 text-xs font-medium">
+              ✓ {aiSaveNotice}
+            </div>
+          )}
+
+          <div className="pt-2 border-t border-border-light dark:border-border-dark flex items-center justify-between">
+            <span className="text-xs text-secondary">Want to generate new Salesforce lessons?</span>
+            <Link
+              to="/admin/generation"
+              className="text-xs font-semibold text-brand-600 dark:text-brand-400 flex items-center gap-1 hover:underline"
+            >
+              <span>AI Content Studio</span>
+              <ChevronRight size={13} />
+            </Link>
+          </div>
+        </div>
 
         {/* Mock Admin Console Links */}
         <div className="card p-4 space-y-2">

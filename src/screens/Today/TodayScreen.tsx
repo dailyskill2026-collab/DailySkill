@@ -111,7 +111,7 @@ export default function TodayScreen() {
               <p className="text-sm text-brand-200 mb-3">
                 {completed === total && total > 0
                   ? '🎉 All done for today! Great work!'
-                  : `${total - completed} activity${total - completed === 1 ? '' : 'ies'} remaining`}
+                  : `${total - completed} ${total - completed === 1 ? 'activity' : 'activities'} remaining`}
               </p>
               <div className="flex items-center gap-3">
                 <div className="flex-1">
@@ -146,7 +146,7 @@ export default function TodayScreen() {
             </div>
           </div>
           <Link
-            to="/learn"
+            to="/learn?tab=assessments"
             className="px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 shrink-0 flex items-center gap-1 shadow-xs"
           >
             Assess <ArrowRight size={13} />

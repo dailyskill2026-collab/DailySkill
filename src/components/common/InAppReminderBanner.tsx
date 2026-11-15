@@ -34,6 +34,14 @@ export default function InAppReminderBanner() {
       <div className="flex items-center gap-1.5 flex-shrink-0">
         <Link
           to={current.actionPath}
+          onClick={() => {
+            if (current.actionPath === '/' || current.actionPath.startsWith('#')) {
+              const el = document.getElementById('activities-heading');
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+              }
+            }
+          }}
           className="px-2.5 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-2xs font-semibold flex items-center gap-1 transition"
         >
           <span>{current.actionLabel}</span>
