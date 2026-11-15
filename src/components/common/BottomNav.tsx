@@ -18,13 +18,12 @@ export default function BottomNav() {
       aria-label="Main navigation"
       className={`
         fixed bottom-0 left-0 right-0 z-30
-        md:hidden
         bottom-nav-height
         bg-white dark:bg-surface-dark
         border-t border-border-light dark:border-border-dark
         flex items-start justify-around
         pt-2
-        max-w-lg mx-auto
+        max-w-md mx-auto
         shadow-[0_-4px_20px_rgba(0,0,0,0.06)]
         dark:shadow-[0_-4px_20px_rgba(0,0,0,0.3)]
       `}

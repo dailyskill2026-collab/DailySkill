@@ -36,14 +36,7 @@ export function computeLearningInsights(): LearningInsights {
 
   let totalAttempts = attempts.length;
   let correctCount = attempts.filter((a) => a.isCorrect).length;
-
-  // Fallback demo data if user has no attempts yet
-  let isDemoData = false;
-  if (totalAttempts === 0 && profile.isGuest) {
-    totalAttempts = 5;
-    correctCount = 4;
-    isDemoData = true;
-  }
+  const isDemoData = false;
 
   const quizAccuracy = totalAttempts > 0 ? Math.round((correctCount / totalAttempts) * 100) : 0;
 
