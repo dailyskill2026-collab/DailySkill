@@ -180,7 +180,10 @@ export default function GenerationScreen() {
             className="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white rounded-xl font-bold flex items-center gap-2 shadow-sm transition-all"
           >
             {loading ? (
-              'Generating...'
+              <span className="flex items-center gap-2">
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>AI Generating...</span>
+              </span>
             ) : (
               <>
                 <Sparkles size={16} />
@@ -191,9 +194,24 @@ export default function GenerationScreen() {
         </div>
       </div>
 
+      {loading && (
+        <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200 flex items-center gap-3 text-xs animate-pulse">
+          <span className="w-5 h-5 border-2 border-amber-600 border-t-transparent rounded-full animate-spin shrink-0" />
+          <div>
+            <p className="font-bold">Contacting Google Gemini AI...</p>
+            <p className="text-secondary">Synthesizing lesson, enterprise scenario & practice quiz (~3-5 sec).</p>
+          </div>
+        </div>
+      )}
+
       {error && (
-        <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950/60 border border-red-200 text-red-700 dark:text-red-300 text-sm">
-          <strong>Error:</strong> {error}
+        <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950/60 border border-red-200 text-red-700 dark:text-red-300 text-sm space-y-2">
+          <div>
+            <strong>Error:</strong> {error}
+          </div>
+          <p className="text-xs text-secondary">
+            Tip: You can select "Verified Fixture (Mock)" above to test generation and instant publishing without depending on external API availability.
+          </p>
         </div>
       )}
 

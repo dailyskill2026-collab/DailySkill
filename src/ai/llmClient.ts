@@ -108,22 +108,29 @@ You MUST return ONLY valid raw JSON matching this schema:
         throw new Error('Google returned 0 available models for this API key. Please check your Google AI Studio project.');
       }
 
-      // Sort flash models to the front for fastest generation
-      activeModels.sort((a, b) => {
-        if (a.includes('flash') && !b.includes('flash')) return -1;
-        if (!a.includes('flash') && b.includes('flash')) return 1;
-        return 0;
-      });
+      // Prioritize flash models and test at most 2 candidates to prevent long delays
+      let targetModels = activeModels.filter((m) =>
+        m.includes('gemini-2.0-flash') || m.includes('gemini-1.5-flash') || m.includes('flash')
+      );
+      if (targetModels.length === 0) {
+        targetModels = activeModels.slice(0, 2);
+      } else {
+        targetModels = targetModels.slice(0, 2);
+      }
 
       let resData: any = null;
       let lastError = '';
 
-      for (const modelPath of activeModels) {
+      for (const modelPath of targetModels) {
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/${modelPath}:generateContent?key=${apiKey}`;
         try {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 15000);
+
           const res = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            signal: controller.signal,
             body: JSON.stringify({
               contents: [{ parts: [{ text: prompt }] }],
               generationConfig: {
@@ -131,6 +138,7 @@ You MUST return ONLY valid raw JSON matching this schema:
               },
             }),
           });
+          clearTimeout(timer);
 
           if (res.ok) {
             resData = await res.json();
