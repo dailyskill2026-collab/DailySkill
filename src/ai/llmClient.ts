@@ -77,25 +77,58 @@ You MUST return ONLY valid raw JSON matching this schema:
   }
 }`;
 
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.2,
-            responseMimeType: 'application/json',
-          },
-        }),
-      });
+      const CANDIDATE_MODELS = [
+        'gemini-2.0-flash',
+        'gemini-1.5-flash-latest',
+        'gemini-1.5-flash',
+        'gemini-2.0-flash-exp',
+        'gemini-1.5-pro',
+        'gemini-pro',
+      ];
 
-      if (!res.ok) {
-        const errJson = await res.json().catch(() => ({}));
-        throw new Error(`Gemini generation failed: ${errJson?.error?.message || res.statusText}`);
+      let lastError: string = '';
+      let resData: any = null;
+
+      for (const model of CANDIDATE_MODELS) {
+        for (const apiVersion of ['v1beta', 'v1']) {
+          const endpoint = `https://generativelanguage.googleapis.com/${apiVersion}/models/${model}:generateContent?key=${apiKey}`;
+          try {
+            const res = await fetch(endpoint, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                  temperature: 0.2,
+                  responseMimeType: 'application/json',
+                },
+              }),
+            });
+
+            if (res.ok) {
+              resData = await res.json();
+              break;
+            } else {
+              const errJson = await res.json().catch(() => ({}));
+              lastError = errJson?.error?.message || res.statusText;
+              if (res.status === 400 || res.status === 403) {
+                throw new Error(`Google Gemini Error (${res.status}): ${lastError}`);
+              }
+            }
+          } catch (fetchErr: any) {
+            if (fetchErr.message?.startsWith('Google Gemini Error')) {
+              throw fetchErr;
+            }
+            lastError = fetchErr.message;
+          }
+        }
+        if (resData) break;
       }
 
-      const resData = await res.json();
+      if (!resData) {
+        throw new Error(`Gemini generation failed: ${lastError || 'Could not find a supported Gemini model for this API key.'}`);
+      }
+
       const rawText = resData.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!rawText) throw new Error('Gemini returned an empty response.');
 
