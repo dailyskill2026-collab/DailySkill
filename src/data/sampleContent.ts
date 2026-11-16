@@ -49,7 +49,7 @@ export const sampleLearningContent: LearningContent[] = [
     realWorldExample:
       'Applying custom discount tiers and commission rates on high-value Opportunities before database commit, followed by an asynchronous after-save notification to account managers.',
     sourceName: 'Salesforce Architecture & Automation Guide',
-    sourceUrl: 'https://help.salesforce.com/s/articleView?id=sf.flow_concepts_trigger_explorer.htm',
+    sourceUrl: 'https://help.salesforce.com/s/articleView?id=sf.flow_concepts_trigger_explorer.htm&type=5',
     sourcePublishedAt: '2024-05-15',
     lastVerifiedAt: '2024-06-10',
     releaseVersion: 'Spring 24',
