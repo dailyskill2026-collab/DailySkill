@@ -196,7 +196,7 @@ export default function TodayScreen() {
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
                 <span className="text-xs font-bold text-purple-900 dark:text-purple-200 truncate">
-                  Tailored Release Feed
+                  Latest Releases (Winter '27 • Summer '26 • Spring '26)
                 </span>
                 <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-purple-200/80 dark:bg-purple-900/60 text-purple-800 dark:text-purple-300">
                   {releaseInfo.item.releaseTag}
