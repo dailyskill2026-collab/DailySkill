@@ -69,43 +69,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, displayName?: string) => {
-    const guestData = checkForGuestData();
     const newUser = await repositories.auth.signUp(email, password, displayName);
     setUser(newUser);
 
-    if (guestData) {
-      setPendingGuestMigration(guestData);
-    } else {
-      await repositories.user.saveProfile(newUser.uid, {
-        name: displayName || email.split('@')[0],
-        onboardingCompleted: true,
-        isGuest: false,
-      });
-      useProfileStore.getState().setProfile({
-        name: displayName || email.split('@')[0],
-        onboardingCompleted: true,
-        isGuest: false,
-      });
-    }
+    // Keep onboardingCompleted false so the candidate is prompted for email verification & profile setup form
+    await repositories.user.saveProfile(newUser.uid, {
+      name: displayName || '',
+      onboardingCompleted: false,
+      isGuest: false,
+    });
+    useProfileStore.getState().setProfile({
+      name: displayName || '',
+      onboardingCompleted: false,
+      isGuest: false,
+    });
 
     return newUser;
   };
 
   const signIn = async (email: string, password: string) => {
-    const guestData = checkForGuestData();
     const loggedInUser = await repositories.auth.signIn(email, password);
     setUser(loggedInUser);
 
     const adminStatus = await repositories.auth.checkIsAdmin();
     setIsAdmin(adminStatus);
 
-    useProfileStore.getState().setProfile({
-      name: loggedInUser.displayName || email.split('@')[0],
-      isGuest: false,
-    });
-
-    if (guestData) {
-      setPendingGuestMigration(guestData);
+    // Retrieve saved profile if available
+    const saved = await repositories.user.getProfile(loggedInUser.uid);
+    if (saved && saved.onboardingCompleted) {
+      useProfileStore.getState().setProfile({
+        ...saved,
+        isGuest: false,
+      });
+    } else {
+      useProfileStore.getState().setProfile({
+        name: loggedInUser.displayName || email.split('@')[0],
+        onboardingCompleted: false,
+        isGuest: false,
+      });
     }
 
     return loggedInUser;

@@ -25,13 +25,23 @@ type AuthStep = 'auth' | 'verify' | 'profile';
 export default function AuthScreen() {
   const navigate = useNavigate();
   const { user, signIn, signUp, verifyEmail } = useAuth();
-  const { setProfile } = useProfileStore();
+  const profileStore = useProfileStore();
+  const { setProfile } = profileStore;
 
-  const [step, setStep] = useState<AuthStep>('auth');
+  const determineInitialStep = (): AuthStep => {
+    if (!user) return 'auth';
+    if (!user.emailVerified) return 'verify';
+    if (!profileStore.onboardingCompleted || !profileStore.name || profileStore.name === 'Learner' || profileStore.name === 'Rahul') {
+      return 'profile';
+    }
+    return 'profile';
+  };
+
+  const [step, setStep] = useState<AuthStep>(determineInitialStep);
   const [authMode, setAuthMode] = useState<'signup' | 'signin'>('signup');
 
   // Step 1: Auth form state
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(user?.email || '');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -42,12 +52,22 @@ export default function AuthScreen() {
   const [resendNotice, setResendNotice] = useState<string | null>(null);
 
   // Step 3: Candidate profile state
-  const [fullName, setFullName] = useState('');
-  const [selectedTech, setSelectedTech] = useState<Technology>('salesforce');
-  const [selectedRole, setSelectedRole] = useState<Role>('salesforce_dev');
-  const [selectedExp, setSelectedExp] = useState<Experience>('2-5');
-  const [selectedDuration, setSelectedDuration] = useState<Duration>(5);
-  const [selectedGoal, setSelectedGoal] = useState<Goal>('stay_updated');
+  const [fullName, setFullName] = useState(profileStore.name && profileStore.name !== 'Rahul' && profileStore.name !== 'Learner' ? profileStore.name : user?.displayName || '');
+  const [selectedTech, setSelectedTech] = useState<Technology>(profileStore.technology || 'salesforce');
+  const [selectedRole, setSelectedRole] = useState<Role>(profileStore.role || 'salesforce_dev');
+  const [selectedExp, setSelectedExp] = useState<Experience>(profileStore.experience || '2-5');
+  const [selectedDuration, setSelectedDuration] = useState<Duration>(profileStore.dailyDuration || 5);
+  const [selectedGoal, setSelectedGoal] = useState<Goal>(profileStore.goals?.[0] || 'stay_updated');
+
+  // Auto-sync step if user state changes
+  React.useEffect(() => {
+    if (user?.email && !email) {
+      setEmail(user.email);
+    }
+    if (user && !user.emailVerified && step === 'auth') {
+      setStep('verify');
+    }
+  }, [user]);
 
   // Handle Sign Up / Sign In
   const handleAuthSubmit = async (e: React.FormEvent) => {

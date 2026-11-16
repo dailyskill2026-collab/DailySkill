@@ -44,8 +44,17 @@ function MainRoute() {
   const { user } = useAuth();
   const profile = useProfileStore();
 
+  const isCandidateReady = Boolean(
+    user &&
+    user.emailVerified &&
+    profile.onboardingCompleted &&
+    profile.name &&
+    profile.name !== 'Learner' &&
+    profile.name !== 'Rahul'
+  );
+
   // If first-time user without completed verified profile, direct to Sign Up & Personalization
-  if (!user || !profile.onboardingCompleted) {
+  if (!isCandidateReady) {
     return <AuthScreen />;
   }
 
