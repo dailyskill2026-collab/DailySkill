@@ -36,6 +36,7 @@ export class MockAuthRepository implements IAuthRepository {
       displayName: displayName || email.split('@')[0],
       isAnonymous: false,
       isAdmin: email.includes('admin') || email === 'dailyskill2026@gmail.com' || email.includes('zahed'),
+      emailVerified: false,
     };
     this.currentUser = user;
     try {
@@ -47,6 +48,20 @@ export class MockAuthRepository implements IAuthRepository {
     return user;
   }
 
+  async verifyEmail(code: string): Promise<boolean> {
+    if (this.currentUser) {
+      this.currentUser.emailVerified = true;
+      try {
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(this.currentUser));
+      } catch {
+        // ignore
+      }
+      this.notify();
+      return true;
+    }
+    return false;
+  }
+
   async signIn(email: string, _password: string): Promise<AuthUser> {
     const user: AuthUser = {
       uid: 'user-' + Date.now(),
@@ -54,6 +69,7 @@ export class MockAuthRepository implements IAuthRepository {
       displayName: email.split('@')[0],
       isAnonymous: false,
       isAdmin: email.includes('admin') || email === 'dailyskill2026@gmail.com' || email.includes('zahed'),
+      emailVerified: true,
     };
     this.currentUser = user;
     try {

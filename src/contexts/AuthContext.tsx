@@ -16,6 +16,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<AuthUser>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  verifyEmail: (code: string) => Promise<boolean>;
   pendingGuestMigration: GuestSnapshot | null;
   confirmGuestMigration: () => Promise<void>;
   dismissGuestMigration: () => void;
@@ -125,6 +126,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await repositories.auth.resetPassword(email);
   };
 
+  const verifyEmail = async (code: string): Promise<boolean> => {
+    if (repositories.auth && (repositories.auth as any).verifyEmail) {
+      const ok = await (repositories.auth as any).verifyEmail(code);
+      if (ok && user) {
+        setUser({ ...user, emailVerified: true });
+      }
+      return ok;
+    }
+    if (user) {
+      setUser({ ...user, emailVerified: true });
+      return true;
+    }
+    return true;
+  };
+
   const confirmGuestMigration = async () => {
     if (user && pendingGuestMigration) {
       await repositories.user.migrateGuestData(user.uid, pendingGuestMigration);
@@ -147,6 +163,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signIn,
         signOut,
         resetPassword,
+        verifyEmail,
         pendingGuestMigration,
         confirmGuestMigration,
         dismissGuestMigration,

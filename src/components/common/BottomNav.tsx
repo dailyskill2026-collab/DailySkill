@@ -13,6 +13,10 @@ const NAV_ITEMS = [
 export default function BottomNav() {
   const location = useLocation()
 
+  if (location.pathname === '/auth') {
+    return null
+  }
+
   return (
     <nav
       aria-label="Main navigation"

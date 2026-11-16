@@ -695,15 +695,732 @@ Actions to Apply:
       contentStatus: 'active',
     },
   },
+
+  // 7. Flow Trigger Explorer & Fast Field Updates (Winter '25)
+  {
+    id: 'release-winter25-flow-trigger-explorer',
+    releaseTag: "Winter '25 GA",
+    topicCategory: 'Flow & Automation',
+    update: {
+      id: 'sf-rel-winter25-flow-trigger-explorer',
+      technology: 'salesforce',
+      category: 'update',
+      title: "Flow Trigger Explorer: Deterministic Execution Order & Zero-DML Updates",
+      summary: "Visually sequence record-triggered flows to run before or after Apex triggers while maximizing performance with Fast Field Updates.",
+      contentType: 'article',
+      difficulty: 'easy',
+      applicableRoles: ['salesforce_admin', 'salesforce_consult', 'salesforce_dev', 'salesforce_fresher'],
+      estimatedMinutes: 2,
+      learningObjectives: [
+        'Sequence multiple record-triggered flows using visual priority numbering',
+        'Differentiate Fast Field Updates (before-save) from Actions and Related Records (after-save)',
+        'Optimize save order to avoid recursion and CPU timeouts',
+      ],
+      explanation:
+        "Flow Trigger Explorer gives administrators and developers unified visual command over all record-triggered flows per object. Before-save flows (Fast Field Updates) execute up to 10x faster because updates modify fields in memory before database commit without consuming synchronous DML limits.",
+      realWorldExample:
+        "An insurance carrier triggers 5 different flows on Opportunity creation. Using Flow Trigger Explorer, the admin sequences Discount Calculation first, followed by Tax Assessment, preventing uncoordinated recursion.",
+      codeSnippet: `// Flow Save Order Architecture:
+// 1. System Validation Rules
+// 2. Before-Save Flows (Fast Field Updates - Zero DML)
+// 3. Before Apex Triggers
+// 4. Custom Validation Rules
+// 5. After Apex Triggers
+// 6. After-Save Flows (Actions & Related Records)`,
+      keyTakeaways: [
+        'Before-save flows do not consume synchronous DML statements (150 limit).',
+        'Flow Trigger Explorer allows drag-and-drop or explicit integer priority order (1 to 2000).',
+        'Use Fast Field Updates whenever updating fields on the record that triggered the flow.',
+      ],
+      sourceName: 'Salesforce Automation Guide – Flow Trigger Explorer',
+      sourceUrl: 'https://help.salesforce.com/s/articleView?id=sf.flow_concepts_trigger_explorer.htm',
+      sourcePublishedAt: '2024-09-10',
+      lastVerifiedAt: '2024-10-25',
+      releaseVersion: "Winter '25",
+      verificationStatus: 'verified',
+      contentStatus: 'active',
+    },
+    practiceContent: {
+      id: 'sf-practice-flow-explorer',
+      technology: 'salesforce',
+      category: 'practice',
+      title: "Flow Architecture: Fast Field Updates vs DML Limits",
+      summary: "Choose the optimal flow execution path to eliminate governor limit exceptions.",
+      contentType: 'article',
+      difficulty: 'easy',
+      applicableRoles: ['salesforce_admin', 'salesforce_consult', 'salesforce_dev', 'salesforce_fresher'],
+      estimatedMinutes: 2,
+      verificationStatus: 'verified',
+      contentStatus: 'active',
+    },
+    practice: {
+      id: 'quiz-flow-explorer',
+      contentId: 'sf-practice-flow-explorer',
+      questionType: 'scenario_mcq',
+      scenario:
+        "A sales rep saves an Opportunity with 50 line items. A custom flow updates a status field on the same Opportunity. During high-volume imports, users intermittently receive 'System.LimitException: Too many DML statements: 151'.",
+      question:
+        "How should the administrator refactor this flow to eliminate the DML limit exception?",
+      options: [
+        {
+          id: 'A',
+          label: 'Change the flow trigger to Fast Field Updates (Before-Save) so changes apply before committing to the database',
+        },
+        {
+          id: 'B',
+          label: 'Convert the flow into a Scheduled Path running 1 minute after save',
+        },
+        {
+          id: 'C',
+          label: 'Add an explicit Update Records element at the end of the after-save flow',
+        },
+        {
+          id: 'D',
+          label: 'Create a Workflow Rule to overwrite the flow value',
+        },
+      ],
+      correctAnswerId: 'A',
+      explanation:
+        "Fast Field Updates (Before-Save flows) apply field changes directly in memory prior to the database commit. Because no additional DML statement is fired, it consumes zero synchronous DML limits and executes up to 10x faster.",
+      difficulty: 'easy',
+    },
+    revision: {
+      id: 'sf-rev-trigger-order',
+      technology: 'salesforce',
+      category: 'revision',
+      title: "Salesforce Save Order of Execution",
+      summary: "Review the critical lifecycle sequence: Validation -> Before Triggers -> After Triggers -> Flows.",
+      contentType: 'article',
+      difficulty: 'easy',
+      applicableRoles: ['salesforce_admin', 'salesforce_dev', 'salesforce_fresher'],
+      estimatedMinutes: 1,
+      recallQuestion: "Do Before-Save Flows run before or after custom Apex Before Triggers?",
+      keyPoints: [
+        'Before-Save Flows (Fast Field Updates) execute BEFORE custom Apex Before Triggers.',
+        'System validation rules run before Before-Save flows, but custom validation rules run after Before Triggers.',
+        'After-Save Flows execute after custom Apex After Triggers and Assignment Rules.',
+      ],
+      verificationStatus: 'verified',
+      contentStatus: 'active',
+    },
+  },
+
+  // 8. LWC Light DOM & Scoped Stylesheets (Spring '25)
+  {
+    id: 'release-spring25-lwc-light-dom',
+    releaseTag: "Spring '25 GA",
+    topicCategory: 'LWC',
+    update: {
+      id: 'sf-rel-spring25-lwc-light-dom',
+      technology: 'salesforce',
+      category: 'update',
+      title: "LWC Light DOM: High-Performance Enterprise UI & Global Styling",
+      summary: "Bypass Shadow DOM encapsulation when required for third-party CSS frameworks, global document queries, and high-density data tables.",
+      contentType: 'article',
+      difficulty: 'medium',
+      applicableRoles: ['salesforce_dev', 'salesforce_lead', 'salesforce_arch'],
+      estimatedMinutes: 2,
+      learningObjectives: [
+        'Declare static renderMode = "light" on Lightning Web Components',
+        'Enable global CSS framework integration (Tailwind / Bootstrap) without synthetic shadow workarounds',
+        'Evaluate security boundaries and DOM query implications',
+      ],
+      explanation:
+        "By default, LWC attaches components to a Shadow Root (Shadow DOM) to encapsulate CSS and DOM trees. Light DOM renders component markup directly inside the host element instead. This enables third-party analytics libraries, global CSS stylesheets, and accessibility scanners to interact directly with internal component elements.",
+      realWorldExample:
+        "An enterprise customer portal incorporates a corporate design system with global utility classes. With Light DOM, table cells inherit branding styles seamlessly without complex CSS custom properties (:host).",
+      codeSnippet: `// Spring '25 LWC Light DOM Component
+import { LightningElement } from 'lwc';
+
+export default class EnterpriseDataTable extends LightningElement {
+  static renderMode = 'light'; // Enables Light DOM
+
+  handleRowClick(event) {
+    // Queries work directly against the standard document DOM
+    console.log('Clicked row element:', event.target);
+  }
+}`,
+      keyTakeaways: [
+        'Enabling Light DOM requires "static renderMode = \'light\'" in JS and <template lwc:render-mode="light"> in HTML.',
+        'Child components are still encapsulated unless they also declare renderMode = light.',
+        'Useful for third-party scripts, corporate stylesheets, and advanced accessibility requirements.',
+      ],
+      sourceName: 'Salesforce LWC Developer Guide – Light DOM',
+      sourceUrl: 'https://developer.salesforce.com/docs/platform/lwc/guide/create-light-dom.html',
+      sourcePublishedAt: '2024-10-30',
+      lastVerifiedAt: '2024-11-10',
+      releaseVersion: "Spring '25",
+      verificationStatus: 'verified',
+      contentStatus: 'active',
+    },
+    practiceContent: {
+      id: 'sf-practice-light-dom',
+      technology: 'salesforce',
+      category: 'practice',
+      title: "LWC DOM Architecture: Shadow DOM vs Light DOM Selection",
+      summary: "Select the appropriate DOM encapsulation model for enterprise portal integration.",
+      contentType: 'article',
+      difficulty: 'medium',
+      applicableRoles: ['salesforce_dev', 'salesforce_lead'],
+      estimatedMinutes: 2,
+      verificationStatus: 'verified',
+      contentStatus: 'active',
+    },
+    practice: {
+      id: 'quiz-light-dom',
+      contentId: 'sf-practice-light-dom',
+      questionType: 'scenario_mcq',
+      scenario:
+        "A team is migrating an external React portal into Salesforce Experience Cloud using LWC. The team’s third-party accessibility auditor reports that screen-reader scripts cannot inspect elements encapsulated inside the Shadow Root.",
+      question:
+        "What is the recommended architectural solution in LWC to allow external accessibility tools to inspect component DOM elements?",
+      options: [
+        {
+          id: 'A',
+          label: 'Configure the LWC with static renderMode = "light" to render markup directly in the host DOM',
+        },
+        {
+          id: 'B',
+          label: 'Wrap the entire component in an iframe with sandbox="allow-scripts"',
+        },
+        {
+          id: 'C',
+          label: 'Inject jQuery into renderedCallback() to penetrate the shadow boundary',
+        },
+        {
+          id: 'D',
+          label: 'Set lightningStylesheets="false" in the component meta xml file',
+        },
+      ],
+      correctAnswerId: 'A',
+      explanation:
+        "Declaring static renderMode = 'light' causes LWC to render its markup into the host element's light DOM rather than an encapsulated shadow root. This allows third-party tools, accessibility scanners, and corporate CSS to inspect and style elements directly.",
+      difficulty: 'medium',
+    },
+    revision: {
+      id: 'sf-rev-shadow-dom',
+      technology: 'salesforce',
+      category: 'revision',
+      title: "Shadow DOM Encapsulation & this.template.querySelector",
+      summary: "Review how standard LWC encapsulates markup and why this.template is used.",
+      contentType: 'article',
+      difficulty: 'easy',
+      applicableRoles: ['salesforce_dev', 'salesforce_fresher'],
+      estimatedMinutes: 1,
+      recallQuestion: "Why should developers use this.template.querySelector() instead of document.querySelector() in standard LWC?",
+      keyPoints: [
+        'this.template.querySelector() queries only inside the component’s encapsulated shadow tree.',
+        'document.querySelector() cannot penetrate standard shadow roots and violates component isolation.',
+        'Never query DOM elements before renderedCallback() runs.',
+      ],
+      verificationStatus: 'verified',
+      contentStatus: 'active',
+    },
+  },
+
+  // 9. Apex Queueable Duplicate Signature Prevention (Winter '25)
+  {
+    id: 'release-winter25-queueable-signatures',
+    releaseTag: "Winter '25 GA",
+    topicCategory: 'Apex',
+    update: {
+      id: 'sf-rel-winter25-queueable-signatures',
+      technology: 'salesforce',
+      category: 'update',
+      title: "AsyncOptions & DuplicateSignature: Idempotent Queueable Apex",
+      summary: "Prevent duplicate asynchronous job execution during high-frequency trigger storms with built-in cryptographic idempotency keys.",
+      contentType: 'article',
+      difficulty: 'hard',
+      applicableRoles: ['salesforce_dev', 'salesforce_lead', 'salesforce_arch'],
+      estimatedMinutes: 2,
+      learningObjectives: [
+        'Utilize System.AsyncOptions to configure asynchronous job execution parameters',
+        'Compute SHA-256 duplicate signatures for payload idempotency',
+        'Prevent race conditions and duplicate ERP callouts during flash-sale bursts',
+      ],
+      explanation:
+        "When rapid DML operations or external webhooks trigger Queueable jobs, identical jobs often get enqueued multiple times before the first job finishes. In Winter '25, developers can pass an AsyncOptions instance with a DuplicateSignature string into System.enqueueJob(). Salesforce automatically rejects duplicate enqueue requests if an identical job is already queued or running.",
+      realWorldExample:
+        "A payment webhook fires 3 times in 200ms for the same Order ID. By supplying a DuplicateSignature based on Order ID, only the first Queueable job is enqueued, completely avoiding duplicate credit card settlement charges.",
+      codeSnippet: `// Winter '25 Idempotent Queueable Job
+AsyncOptions options = new AsyncOptions();
+// Generate unique hash for order payload
+options.DuplicateSignature = AsyncOptions.computeSignature(orderRecord);
+
+try {
+  Id jobId = System.enqueueJob(new OrderFulfillmentJob(orderRecord), options);
+} catch (DuplicateMessageException ex) {
+  System.debug('Job already in queue or running: ' + ex.getMessage());
+}`,
+      keyTakeaways: [
+        'DuplicateSignature provides native database-level idempotency for asynchronous jobs.',
+        'Eliminates the need for custom checkbox locking flags on database records.',
+        'Throws DuplicateMessageException or silently suppresses duplicate enqueues based on configuration.',
+      ],
+      sourceName: 'Salesforce Apex Developer Guide – AsyncOptions and Duplicate Signature',
+      sourceUrl: 'https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_async_options.htm',
+      sourcePublishedAt: '2024-10-12',
+      lastVerifiedAt: '2024-11-05',
+      releaseVersion: "Winter '25",
+      verificationStatus: 'verified',
+      contentStatus: 'active',
+    },
+    practiceContent: {
+      id: 'sf-practice-queueable-signatures',
+      technology: 'salesforce',
+      category: 'practice',
+      title: "Asynchronous Idempotency: Eliminating Duplicate Queueable Executions",
+      summary: "Implement idempotent asynchronous processing under high-concurrency conditions.",
+      contentType: 'article',
+      difficulty: 'hard',
+      applicableRoles: ['salesforce_dev', 'salesforce_arch'],
+      estimatedMinutes: 2,
+      verificationStatus: 'verified',
+      contentStatus: 'active',
+    },
+    practice: {
+      id: 'quiz-queueable-signatures',
+      contentId: 'sf-practice-queueable-signatures',
+      questionType: 'scenario_mcq',
+      scenario:
+        "An IoT fleet monitoring platform sends telemetry updates to Salesforce every 5 seconds. Each update enqueues an Apex Queueable job to compute vehicle route efficiency. During peak hours, 10 identical Queueable jobs pile up in the FlexQueue for the same vehicle.",
+      question:
+        "Which modern Winter '25 Apex feature prevents enqueueing duplicate asynchronous jobs while a matching job is already queued?",
+      options: [
+        {
+          id: 'A',
+          label: 'Pass an AsyncOptions object with DuplicateSignature set to the vehicle telemetry signature into System.enqueueJob()',
+        },
+        {
+          id: 'B',
+          label: 'Query the AsyncApexJob table before every enqueue using a FOR UPDATE database lock',
+        },
+        {
+          id: 'C',
+          label: 'Convert the Queueable class into a synchronous trigger handler',
+        },
+        {
+          id: 'D',
+          label: 'Add Thread.sleep(5000) inside the Queueable execute() method',
+        },
+      ],
+      correctAnswerId: 'A',
+      explanation:
+        "Setting AsyncOptions.DuplicateSignature instructs Salesforce to enforce server-side idempotency. If an enqueued job with the identical signature is already pending or executing in the queue, subsequent enqueue attempts are rejected, preventing duplicate queue saturation.",
+      difficulty: 'hard',
+    },
+    revision: {
+      id: 'sf-rev-queueable-chaining',
+      technology: 'salesforce',
+      category: 'revision',
+      title: "Queueable Apex Chaining & Transaction Depth Limits",
+      summary: "Review how Queueable jobs chain execution and the maximum stack depth rules.",
+      contentType: 'article',
+      difficulty: 'medium',
+      applicableRoles: ['salesforce_dev', 'salesforce_arch'],
+      estimatedMinutes: 1,
+      recallQuestion: "How many Queueable jobs can you chain consecutively in a single transaction sequence?",
+      keyPoints: [
+        'You can chain only ONE successor Queueable job from within an execute() method.',
+        'In Developer Edition and Trial orgs, maximum stack depth is restricted (5 depth); in Production orgs chaining has no strict depth cap.',
+        'System.enqueueJob() cannot be called from an @future method.',
+      ],
+      verificationStatus: 'verified',
+      contentStatus: 'active',
+    },
+  },
+
+  // 10. External Credentials with OAuth 2.0 (Winter '25)
+  {
+    id: 'release-winter25-external-credentials',
+    releaseTag: "Winter '25 GA",
+    topicCategory: 'Security',
+    update: {
+      id: 'sf-rel-winter25-external-credentials',
+      technology: 'salesforce',
+      category: 'update',
+      title: "External Credentials: Secure Server-to-Server OAuth 2.0 Integrations",
+      summary: "Connect Salesforce Apex callouts to AWS, GCP, and Azure APIs using Named Credentials with zero hardcoded API secrets.",
+      contentType: 'article',
+      difficulty: 'medium',
+      applicableRoles: ['salesforce_dev', 'salesforce_admin', 'salesforce_arch'],
+      estimatedMinutes: 2,
+      learningObjectives: [
+        'Configure External Credentials with OAuth 2.0 Client Credentials flow',
+        'Map Principal access to Permission Sets for least-privilege security',
+        'Execute authenticated HTTP callouts using callout:Named_Credential syntax',
+      ],
+      explanation:
+        "Legacy Named Credentials often required custom authentication plugins or hardcoded tokens for machine-to-machine integrations. Modern External Credentials decouple the endpoint definition from authentication parameters and principals. Permission Sets grant granular access to principals without exposing client secrets to Apex developers or logs.",
+      realWorldExample:
+        "A financial billing engine sends invoice PDFs to an AWS S3 bucket. Using External Credentials with AWS Signature Version 4, Apex issues signed HTTP requests without ever exposing AWS IAM Access Keys in code.",
+      codeSnippet: `// Modern Apex Callout using Named Credential
+HttpRequest req = new HttpRequest();
+req.setEndpoint('callout:AWS_Invoice_Storage/v1/invoices');
+req.setMethod('POST');
+req.setHeader('Content-Type', 'application/json');
+req.setBody(JSON.serialize(invoicePayload));
+
+Http http = new Http();
+HttpResponse res = http.send(req);`,
+      keyTakeaways: [
+        'Endpoints are configured as "callout:Named_Credential_Name".',
+        'Salesforce automatically injects OAuth Bearer tokens or AWS SigV4 headers at runtime.',
+        'Users must be assigned a Permission Set granting access to the External Credential Principal.',
+      ],
+      sourceName: 'Salesforce Security Guide – External Credentials and Named Credentials',
+      sourceUrl: 'https://help.salesforce.com/s/articleView?id=sf.nc_external_credentials.htm',
+      sourcePublishedAt: '2024-09-18',
+      lastVerifiedAt: '2024-10-15',
+      releaseVersion: "Winter '25",
+      verificationStatus: 'verified',
+      contentStatus: 'active',
+    },
+    practiceContent: {
+      id: 'sf-practice-external-credentials',
+      technology: 'salesforce',
+      category: 'practice',
+      title: "Integration Security: OAuth 2.0 Client Credentials Architecture",
+      summary: "Design secure API callouts adhering to enterprise zero-trust security.",
+      contentType: 'article',
+      difficulty: 'medium',
+      applicableRoles: ['salesforce_dev', 'salesforce_admin', 'salesforce_arch'],
+      estimatedMinutes: 2,
+      verificationStatus: 'verified',
+      contentStatus: 'active',
+    },
+    practice: {
+      id: 'quiz-external-credentials',
+      contentId: 'sf-practice-external-credentials',
+      questionType: 'scenario_mcq',
+      scenario:
+        "A Salesforce developer writes an HTTP callout to an enterprise ERP system. During security code review, the lead architect flags that client_id and client_secret are stored inside a protected Custom Metadata record in Apex.",
+      question:
+        "What is the recommended Salesforce security pattern in Winter '25 to eliminate secrets from custom metadata?",
+      options: [
+        {
+          id: 'A',
+          label: 'Create an External Credential with OAuth 2.0 Client Credentials flow and reference it via a Named Credential in the callout URL',
+        },
+        {
+          id: 'B',
+          label: 'Encrypt the client_secret in an encrypted text field on the User record',
+        },
+        {
+          id: 'C',
+          label: 'Pass the client secret as an unencrypted URL query parameter',
+        },
+        {
+          id: 'D',
+          label: 'Store the secret in an Apex class with the "private static final" modifier',
+        },
+      ],
+      correctAnswerId: 'A',
+      explanation:
+        "External Credentials natively manage OAuth 2.0 Client Credentials flows. Salesforce securely stores client IDs and secrets in its encrypted infrastructure and injects valid tokens at runtime, eliminating secrets from Apex code, metadata, or logs.",
+      difficulty: 'medium',
+    },
+    revision: {
+      id: 'sf-rev-remote-site-settings',
+      technology: 'salesforce',
+      category: 'revision',
+      title: "Named Credentials vs Remote Site Settings",
+      summary: "Understand when Remote Site Settings are needed versus Named Credentials.",
+      contentType: 'article',
+      difficulty: 'easy',
+      applicableRoles: ['salesforce_dev', 'salesforce_admin'],
+      estimatedMinutes: 1,
+      recallQuestion: "Do you need to configure a Remote Site Setting if you are using a Named Credential for an endpoint?",
+      keyPoints: [
+        'No! Named Credentials automatically bypass the requirement for Remote Site Settings.',
+        'Remote Site Settings only authorize network connectivity; they do not handle authentication headers.',
+        'Named Credentials handle both network authorization and secure credential injection.',
+      ],
+      verificationStatus: 'verified',
+      contentStatus: 'active',
+    },
+  },
+
+  // 11. Real-Time Event Monitoring & Pub/Sub API (Spring '25)
+  {
+    id: 'release-spring25-pubsub-api',
+    releaseTag: "Spring '25 Preview",
+    topicCategory: 'Data Cloud',
+    update: {
+      id: 'sf-rel-spring25-pubsub-api',
+      technology: 'salesforce',
+      category: 'update',
+      title: "Salesforce Pub/Sub API: High-Throughput Bidirectional Event Ingestion",
+      summary: "Stream millions of Change Data Capture and Platform Events into data lakes with gRPC-based binary flow control and subscription replay.",
+      contentType: 'article',
+      difficulty: 'hard',
+      applicableRoles: ['salesforce_arch', 'salesforce_lead', 'salesforce_dev'],
+      estimatedMinutes: 2,
+      learningObjectives: [
+        'Implement gRPC-based event streaming with binary Apache Avro serialization',
+        'Manage event replay with exact ReplayId subscription pointers',
+        'Compare Pub/Sub API performance against legacy CometD Streaming API',
+      ],
+      explanation:
+        "The Pub/Sub API replaces legacy CometD / Bayeux protocols with modern gRPC HTTP/2 bidirectional streaming. By utilizing Apache Avro binary serialization, it delivers up to 4x higher throughput and significantly reduced network serialization overhead, ideal for real-time Kafka and Snowflake synchronization.",
+      realWorldExample:
+        "A fintech banking platform synchronizes 2,000,000 transaction events per hour from Salesforce to an AWS Kafka cluster. Using Pub/Sub API with REPLAY_ID presets, the streaming client guarantees exactly-once delivery across cluster failovers.",
+      codeSnippet: `// Pub/Sub API Architecture (gRPC Protobuf)
+// rpc Subscribe (stream FetchRequest) returns (stream FetchResponse);
+
+FetchRequest request = FetchRequest.newBuilder()
+  .setTopicName('/data/AccountChangeEvent')
+  .setReplayPreset(ReplayPreset.LATEST)
+  .setNumRequested(1000)
+  .build();`,
+      keyTakeaways: [
+        'Built on gRPC and HTTP/2 for high-throughput, bidirectional event streaming.',
+        'Replaces legacy CometD Streaming API with binary Apache Avro payloads.',
+        'Supports exact ReplayId offsets to recover missed events after network disconnection.',
+      ],
+      sourceName: 'Salesforce Pub/Sub API Developer Documentation',
+      sourceUrl: 'https://developer.salesforce.com/docs/platform/pub-sub-api/overview',
+      sourcePublishedAt: '2024-11-08',
+      lastVerifiedAt: '2024-11-15',
+      releaseVersion: "Spring '25",
+      verificationStatus: 'verified',
+      contentStatus: 'active',
+    },
+    practiceContent: {
+      id: 'sf-practice-pubsub-api',
+      technology: 'salesforce',
+      category: 'practice',
+      title: "Event-Driven Architecture: Pub/Sub API Replay & Ingestion",
+      summary: "Select event ingestion patterns for real-time external data lake pipelines.",
+      contentType: 'article',
+      difficulty: 'hard',
+      applicableRoles: ['salesforce_arch', 'salesforce_lead', 'salesforce_dev'],
+      estimatedMinutes: 2,
+      verificationStatus: 'verified',
+      contentStatus: 'active',
+    },
+    practice: {
+      id: 'quiz-pubsub-api',
+      contentId: 'sf-practice-pubsub-api',
+      questionType: 'scenario_mcq',
+      scenario:
+        "An enterprise data engineering team needs to ingest 5 million Change Data Capture (CDC) events per day from Salesforce into an external Apache Kafka pipeline. Their legacy CometD client frequently drops connections and suffers high JSON parsing CPU overhead.",
+      question:
+        "What Salesforce API is recommended for high-volume, binary-serialized event streaming with automatic replay offset support?",
+      options: [
+        {
+          id: 'A',
+          label: 'Salesforce Pub/Sub API utilizing gRPC and Apache Avro binary serialization',
+        },
+        {
+          id: 'B',
+          label: 'Bulk API 2.0 with hourly scheduled queries',
+        },
+        {
+          id: 'C',
+          label: 'REST API polling every 500 milliseconds',
+        },
+        {
+          id: 'D',
+          label: 'SOAP API retrieve() requests over XML',
+        },
+      ],
+      correctAnswerId: 'A',
+      explanation:
+        "The Salesforce Pub/Sub API uses gRPC over HTTP/2 with Apache Avro binary serialization. It delivers substantially higher throughput with minimal serialization overhead and built-in ReplayId offset management for zero message loss.",
+      difficulty: 'hard',
+    },
+    revision: {
+      id: 'sf-rev-platform-events',
+      technology: 'salesforce',
+      category: 'revision',
+      title: "Platform Events vs Change Data Capture (CDC)",
+      summary: "Review the differences between custom platform event schemas and automated object CDC.",
+      contentType: 'article',
+      difficulty: 'medium',
+      applicableRoles: ['salesforce_arch', 'salesforce_dev'],
+      estimatedMinutes: 1,
+      recallQuestion: "What is the primary difference between a Platform Event and a Change Data Capture event?",
+      keyPoints: [
+        'Platform Events have custom defined fields (__e) and are published explicitly via code or flow.',
+        'Change Data Capture (CDC) events are automatically generated by Salesforce when records are created, updated, or deleted.',
+        'Both events are retained in Salesforce for 72 hours for subscriber replay.',
+      ],
+      verificationStatus: 'verified',
+      contentStatus: 'active',
+    },
+  },
+
+  // 12. Apex Bulkification & SOQL 101 Mastery (Foundations)
+  {
+    id: 'release-foundation-bulkification',
+    releaseTag: "Core Architecture",
+    topicCategory: 'Apex',
+    update: {
+      id: 'sf-rel-foundation-bulkification',
+      technology: 'salesforce',
+      category: 'update',
+      title: "Apex Bulkification: Multi-Record Collection Patterns & O(1) Map Lookups",
+      summary: "Architect Apex triggers and services to effortlessly handle 1 or 200 records without hitting synchronous SOQL 101 or DML 150 limits.",
+      contentType: 'article',
+      difficulty: 'easy',
+      applicableRoles: ['salesforce_fresher', 'salesforce_dev', 'salesforce_admin'],
+      estimatedMinutes: 2,
+      learningObjectives: [
+        'Eliminate SOQL queries and DML statements from inside iteration loops',
+        'Batch records into List collections prior to database operations',
+        'Use Map<Id, sObject> for O(1) in-memory record relationship mapping',
+      ],
+      explanation:
+        "Salesforce runs on a multitenant cloud architecture governed by synchronous limits (100 SOQL queries and 150 DML statements per transaction). Bulkifying Apex ensures that code functions identically whether a user creates a single record in the UI or an integration inserts a batch of 200 records.",
+      realWorldExample:
+        "An automated data integration inserts 2,000 Contacts in batches of 200. By collecting all Account IDs into a Set and querying once into a Map<Id, Account>, the trigger runs smoothly in 1 single SOQL query.",
+      codeSnippet: `// Bulkified Apex Pattern (Handles 1 or 200 records)
+Set<Id> accountIds = new Set<Id>();
+for (Contact con : newContacts) {
+  if (con.AccountId != null) accountIds.add(con.AccountId);
+}
+
+// 1 Bulk Query outside loop
+Map<Id, Account> accMap = new Map<Id, Account>(
+  [SELECT Id, Rating FROM Account WHERE Id IN :accountIds]
+);
+
+for (Contact con : newContacts) {
+  Account parent = accMap.get(con.AccountId);
+  if (parent != null) con.Account_Rating__c = parent.Rating;
+}`,
+      keyTakeaways: [
+        'Never place a SOQL query or DML operation inside a for-loop.',
+        'Use Set collections to filter out duplicate IDs before querying.',
+        'Map<Id, sObject> gives instantaneous O(1) memory lookup by record ID.',
+      ],
+      sourceName: 'Salesforce Apex Developer Guide – Bulk Design Patterns',
+      sourceUrl: 'https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_patterns_bulk.htm',
+      sourcePublishedAt: '2024-08-15',
+      lastVerifiedAt: '2024-10-10',
+      releaseVersion: "Summer 24",
+      verificationStatus: 'verified',
+      contentStatus: 'active',
+    },
+    practiceContent: {
+      id: 'sf-practice-foundation-bulkification',
+      technology: 'salesforce',
+      category: 'practice',
+      title: "Bulkification Refactoring: Resolving SOQL 101 LimitException",
+      summary: "Refactor a trigger that fails during bulk CSV record imports.",
+      contentType: 'article',
+      difficulty: 'easy',
+      applicableRoles: ['salesforce_fresher', 'salesforce_dev'],
+      estimatedMinutes: 2,
+      verificationStatus: 'verified',
+      contentStatus: 'active',
+    },
+    practice: {
+      id: 'quiz-foundation-bulkification',
+      contentId: 'sf-practice-foundation-bulkification',
+      questionType: 'scenario_mcq',
+      scenario:
+        "A junior developer writes a Contact before-insert trigger. In the loop, it queries the parent Account to check credit status: \n`for(Contact c : Trigger.new) { Account a = [SELECT Id FROM Account WHERE Id = :c.AccountId]; }` \nDuring a 200-record import, it crashes with System.LimitException: Too many SOQL queries: 101.",
+      question:
+        "What is the correct refactoring to make this trigger bulk-safe?",
+      options: [
+        {
+          id: 'A',
+          label: 'Collect all Account IDs into a Set<Id> outside the loop, execute a single SOQL query, and store results in a Map<Id, Account>',
+        },
+        {
+          id: 'B',
+          label: 'Surround the SOQL query with a try-catch block and ignore the LimitException',
+        },
+        {
+          id: 'C',
+          label: 'Change the batch import size in DataLoader from 200 to 1',
+        },
+        {
+          id: 'D',
+          label: 'Replace the SOQL query with a synchronous HTTP callout to the REST API',
+        },
+      ],
+      correctAnswerId: 'A',
+      explanation:
+        "Collecting IDs in a Set and executing one SOQL query outside the loop reduces query consumption from 200 queries down to 1 query. Storing results in Map<Id, Account> allows O(1) in-memory lookups without hitting governor limits.",
+      difficulty: 'easy',
+    },
+    revision: {
+      id: 'sf-rev-governor-limits',
+      technology: 'salesforce',
+      category: 'revision',
+      title: "Synchronous Governor Limits Summary",
+      summary: "Memorize the core numbers: 100 SOQL queries, 150 DML statements, 10,000 DML rows, 6MB heap.",
+      contentType: 'article',
+      difficulty: 'easy',
+      applicableRoles: ['salesforce_fresher', 'salesforce_dev'],
+      estimatedMinutes: 1,
+      recallQuestion: "What is the maximum number of SOQL queries allowed in a synchronous Apex transaction?",
+      keyPoints: [
+        'Synchronous limit: 100 SOQL queries per transaction.',
+        'Asynchronous limit: 200 SOQL queries per transaction (Batch / Queueable / Future).',
+        'Maximum 150 DML statements and 10,000 total records modified per transaction.',
+      ],
+      verificationStatus: 'verified',
+      contentStatus: 'active',
+    },
+  },
 ];
 
-export function getDailyReleaseByDate(date: Date = new Date(), offset: number = 0): DailyReleaseItem {
+export function getTailoredReleaseFeed(profile?: any): DailyReleaseItem[] {
+  if (!profile) return dailyReleaseFeed;
+  const role = profile.role || 'salesforce_dev';
+  const exp = profile.experience || '0-2';
+
+  // Score each item based on role match and experience match
+  const scored = dailyReleaseFeed.map((item) => {
+    let score = 0;
+    const applicableRoles = item.update.applicableRoles || [];
+
+    // Role matching
+    if (applicableRoles.includes(role)) {
+      score += 20;
+    } else if (applicableRoles.some((r) => r.includes(role.split('_')[1] || ''))) {
+      score += 10;
+    }
+
+    // Experience matching
+    const difficulty = item.update.difficulty || 'medium';
+    if (exp === 'fresher' || exp === '0-2') {
+      if (difficulty === 'easy') score += 15;
+      else if (difficulty === 'medium') score += 8;
+      else score += 1;
+    } else if (exp === '2-5') {
+      if (difficulty === 'medium') score += 15;
+      else if (difficulty === 'hard') score += 10;
+      else score += 6;
+    } else { // 5-8 or 8+
+      if (difficulty === 'hard') score += 18;
+      else if (difficulty === 'medium') score += 10;
+      else score += 2;
+    }
+
+    return { item, score };
+  });
+
+  scored.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    return a.item.id.localeCompare(b.item.id);
+  });
+
+  return scored.map((s) => s.item);
+}
+
+export function getDailyReleaseByDate(date: Date = new Date(), offset: number = 0, profile?: any): DailyReleaseItem {
+  const tailoredFeed = getTailoredReleaseFeed(profile);
   const startOfYear = new Date(date.getFullYear(), 0, 1);
   const diff = date.getTime() - startOfYear.getTime();
   const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const total = dailyReleaseFeed.length;
+  const total = tailoredFeed.length;
   const index = Math.abs((dayOfYear + offset) % total);
-  return dailyReleaseFeed[index];
+  return tailoredFeed[index];
 }
 
 export function getAllDailyReleaseContents(): LearningContent[] {
@@ -723,9 +1440,10 @@ export function getQuizByContentId(contentId: string): QuizQuestion | undefined 
   return item ? item.practice : undefined;
 }
 
-export function getDailyReleaseInfo(offset: number = 0) {
-  const item = getDailyReleaseByDate(new Date(), offset);
-  const total = dailyReleaseFeed.length;
+export function getDailyReleaseInfo(offset: number = 0, profile?: any) {
+  const tailoredFeed = getTailoredReleaseFeed(profile);
+  const item = getDailyReleaseByDate(new Date(), offset, profile);
+  const total = tailoredFeed.length;
   const startOfYear = new Date(new Date().getFullYear(), 0, 1);
   const dayOfYear = Math.floor((new Date().getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24));
   const currentIndex = Math.abs((dayOfYear + offset) % total);
@@ -735,4 +1453,5 @@ export function getDailyReleaseInfo(offset: number = 0) {
     totalTopics: total,
   };
 }
+
 

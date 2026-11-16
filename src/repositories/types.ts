@@ -14,6 +14,7 @@ export interface AuthUser {
   displayName: string | null;
   isAnonymous: boolean;
   isAdmin?: boolean;
+  emailVerified?: boolean;
 }
 
 export interface GuestSnapshot {

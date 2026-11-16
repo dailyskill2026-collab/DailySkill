@@ -3,6 +3,8 @@ import { Routes, Route } from 'react-router-dom';
 import AppShell from '@/components/layout/AppShell';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import { useAuth } from '@/contexts/AuthContext';
+import { useProfileStore } from '@/store/profileStore';
 
 // Lazy-loaded screens for code splitting
 const TodayScreen   = lazy(() => import('@/screens/Today/TodayScreen'));
@@ -11,6 +13,7 @@ const DetailScreen  = lazy(() => import('@/screens/Explore/DetailScreen'));
 const LearnScreen   = lazy(() => import('@/screens/Learn/LearnScreen'));
 const ReviseScreen  = lazy(() => import('@/screens/Revise/ReviseScreen'));
 const MeScreen      = lazy(() => import('@/screens/Me/MeScreen'));
+const AuthScreen    = lazy(() => import('@/screens/Auth/AuthScreen'));
 
 // Lazy-loaded Onboarding screens
 const WelcomeScreen        = lazy(() => import('@/screens/Onboarding/WelcomeScreen'));
@@ -34,6 +37,19 @@ function ScreenLoader() {
       ))}
     </div>
   );
+}
+
+// Routes root based on whether visitor is a new candidate or verified user
+function MainRoute() {
+  const { user } = useAuth();
+  const profile = useProfileStore();
+
+  // If first-time user without completed verified profile, direct to Sign Up & Personalization
+  if (!user || !profile.onboardingCompleted) {
+    return <AuthScreen />;
+  }
+
+  return <TodayScreen />;
 }
 
 export default function AppRouter() {
@@ -63,7 +79,11 @@ export default function AppRouter() {
                 </ProtectedRoute>
               }
             />
-            {/* Onboarding routes */}
+
+            {/* Auth / Sign Up / Verification / Profile Setup */}
+            <Route path="/auth" element={<AuthScreen />} />
+
+            {/* Legacy 6-step Onboarding routes */}
             <Route path="/onboarding"             element={<WelcomeScreen />} />
             <Route path="/onboarding/technology"  element={<TechnologyScreen />} />
             <Route path="/onboarding/role"        element={<RoleExperienceScreen />} />
@@ -72,14 +92,15 @@ export default function AppRouter() {
             <Route path="/onboarding/preference"  element={<PreferenceScreen />} />
             <Route path="/onboarding/summary"     element={<SummaryScreen />} />
 
-            <Route path="/"        element={<TodayScreen />}   />
+            <Route path="/"        element={<MainRoute />} />
             <Route path="/explore" element={<ExploreScreen />} />
             <Route path="/explore/:id" element={<DetailScreen />} />
             <Route path="/learn"   element={<LearnScreen />}   />
             <Route path="/revise"  element={<ReviseScreen />}  />
             <Route path="/me"      element={<MeScreen />}      />
+
             {/* Catch-all: redirect to home */}
-            <Route path="*"        element={<TodayScreen />}   />
+            <Route path="*"        element={<MainRoute />} />
           </Routes>
         </Suspense>
       </AppShell>

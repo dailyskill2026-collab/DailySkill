@@ -76,8 +76,8 @@ export function generateDailyPlan(customOffset?: number): DailyLearningPlan {
     }
   }
 
-  // Get current release item based on date and active offset
-  const releaseItem = getDailyReleaseByDate(new Date(), activeOffset);
+  // Get current release item based on date, active offset, and profile tailoring
+  const releaseItem = getDailyReleaseByDate(new Date(), activeOffset, profile);
 
   // If user tech is salesforce or default, serve the authentic daily release topic set
   const isSalesforce = !profile.technology || profile.technology === 'salesforce';
