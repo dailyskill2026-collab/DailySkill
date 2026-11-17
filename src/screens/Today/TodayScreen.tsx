@@ -186,45 +186,15 @@ export default function TodayScreen() {
             </div>
           </div>
         </div>
-
-        {/* ---- Tailored Salesforce Release Feed Switcher (Pista Green & Sky Blue Theme) ---- */}
-        <div className="p-3 bg-gradient-to-r from-emerald-50/90 via-teal-50/80 to-sky-50/80 dark:from-emerald-950/30 dark:via-teal-950/30 dark:to-sky-950/30 border border-emerald-200/80 dark:border-emerald-800/60 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
-              <Sparkles size={16} />
-            </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold text-emerald-950 dark:text-emerald-200 truncate">
-                  Latest Releases (Winter '27 • Summer '26 • Spring '26)
-                </span>
-                <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-sky-100 dark:bg-sky-900/60 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
-                  {releaseInfo.item.releaseTag}
-                </span>
-              </div>
-              <p className="text-2xs text-emerald-800/90 dark:text-emerald-300/90 truncate">
-                Topic {releaseInfo.currentIndex} of {releaseInfo.totalTopics}: {releaseInfo.item.update.title}
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={handleNextReleaseTopic}
-            title="Rotate to next tailored Salesforce release topic"
-            className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-emerald-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-800/60 text-emerald-800 dark:text-emerald-200 text-xs font-semibold shrink-0 border border-emerald-200 dark:border-emerald-700 flex items-center gap-1.5 shadow-2xs transition"
-          >
-            <RotateCw size={12} />
-            <span>Next Topic</span>
-          </button>
-        </div>
       </div>
 
       {/* ---- Daily Activities Section ---- */}
       <section aria-labelledby="activities-heading" className="px-4 pt-2">
         <div className="flex items-center justify-between mb-3">
-          <h2 id="activities-heading" className="text-lg font-bold text-primary tracking-tight">
+          <h2 id="activities-heading" className="text-xl font-bold text-primary tracking-tight">
             Today's Activities
           </h2>
-          <span className="text-2xs text-muted font-medium">
+          <span className="text-xs text-secondary font-medium">
             3-Step Sprint • Tailored for {roleFormatted}
           </span>
         </div>
@@ -233,7 +203,16 @@ export default function TodayScreen() {
           {activities.map((activity) => {
             const key = activity.id;
             if (activity.category === 'update') {
-              return <UpdateActivity key={key} content={activity} />;
+              return (
+                <UpdateActivity
+                  key={key}
+                  content={activity}
+                  releaseTag={releaseInfo.item.releaseTag}
+                  topicIndex={releaseInfo.currentIndex}
+                  totalTopics={releaseInfo.totalTopics}
+                  onNextTopic={handleNextReleaseTopic}
+                />
+              );
             }
             if (activity.category === 'practice') {
               return <QuizCard key={key} contentId={activity.id} />;

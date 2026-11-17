@@ -60,68 +60,68 @@ const RevisionCard: React.FC<Props> = ({ content }) => {
   ];
 
   return (
-    <div className="card p-5 space-y-4 shadow-sm border border-slate-200 dark:border-slate-800">
+    <div className="card p-5 sm:p-6 space-y-4 shadow-sm border border-slate-200 dark:border-slate-800">
       {/* Top Header */}
       <div className="flex items-center justify-between">
         <div>
-          <span className="text-2xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+          <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300">
             Remember
           </span>
-          <h3 className="text-lg font-bold text-primary">Quick Revision</h3>
+          <h3 className="text-xl font-bold text-primary">Quick Revision</h3>
         </div>
         <div className="flex items-center gap-2">
-          <span className="px-2.5 py-0.5 rounded-full text-2xs font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 flex items-center gap-1">
-            <Brain size={12} /> Spaced Recall
+          <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 flex items-center gap-1.5">
+            <Brain size={14} /> Spaced Recall
           </span>
           {isSample && <Badge label="Sample" variant="sample" />}
         </div>
       </div>
 
       {/* Target Concept Name */}
-      <div className="border-b border-slate-100 dark:border-slate-800/80 pb-2">
-        <p className="text-xs text-muted uppercase font-semibold">Previous Topic Recall</p>
-        <p className="text-base font-bold text-primary">{content.title}</p>
+      <div className="border-b border-slate-100 dark:border-slate-800/80 pb-2.5">
+        <p className="text-xs text-muted uppercase font-bold tracking-wider">Previous Topic Recall</p>
+        <p className="text-base sm:text-lg font-bold text-primary mt-0.5">{content.title}</p>
       </div>
 
       {/* Flashcard Body */}
       {!showAnswer ? (
-        <div className="bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-900/60 rounded-xl p-4 space-y-3">
-          <div className="flex items-start gap-2.5">
-            <Brain size={18} className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-            <div className="space-y-1">
-              <p className="text-xs font-bold text-amber-900 dark:text-amber-300">
+        <div className="bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-900/60 rounded-2xl p-4 sm:p-5 space-y-3.5">
+          <div className="flex items-start gap-3">
+            <Brain size={22} className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+            <div className="space-y-1.5">
+              <p className="text-xs sm:text-sm font-bold text-amber-900 dark:text-amber-300">
                 Active Memory Test
               </p>
-              <p className="text-sm font-medium text-amber-950 dark:text-amber-100 leading-snug">
+              <p className="text-base sm:text-lg font-semibold text-amber-950 dark:text-amber-100 leading-snug">
                 {recallQuestion}
               </p>
             </div>
           </div>
 
-          <p className="text-2xs text-amber-800/80 dark:text-amber-400/80 italic">
-            💡 Take 10 seconds to answer mentally before revealing the answer.
+          <p className="text-xs sm:text-sm text-amber-800/80 dark:text-amber-300/80 italic">
+            💡 Take 10 seconds to think of the answer before clicking Reveal.
           </p>
 
           <button
             onClick={handleReveal}
-            className="w-full py-2.5 px-4 bg-amber-600 hover:bg-amber-700 active:scale-[0.99] text-white font-semibold rounded-xl text-sm transition shadow-sm flex items-center justify-center gap-2"
+            className="w-full py-3 px-4 bg-amber-600 hover:bg-amber-700 active:scale-[0.99] text-white font-bold rounded-2xl text-sm sm:text-base transition shadow-sm flex items-center justify-center gap-2"
           >
-            <Eye size={15} />
-            <span>Reveal Answer & Key Insights</span>
+            <Eye size={17} />
+            <span>Reveal Answer & Key Points</span>
           </button>
         </div>
       ) : (
         <div className="space-y-4 animate-fade-in">
           {/* Revealed Answer Card */}
-          <div className="bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-xl p-4 space-y-2.5">
-            <p className="text-xs font-bold text-primary flex items-center gap-1.5">
-              <BookOpen size={14} className="text-amber-600 dark:text-amber-400" />
-              <span>Key Architectural Rules to Remember</span>
+          <div className="bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 space-y-3">
+            <p className="text-sm sm:text-base font-bold text-primary flex items-center gap-2">
+              <BookOpen size={16} className="text-amber-600 dark:text-amber-400" />
+              <span>Key Points to Remember</span>
             </p>
             <ul className="space-y-2">
               {keyPoints.map((pt, idx) => (
-                <li key={idx} className="text-xs sm:text-sm text-secondary flex items-start gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0" />
+                <li key={idx} className="text-sm sm:text-base text-gray-700 dark:text-gray-200 flex items-start gap-2.5">
+                  <span className="w-2 h-2 rounded-full bg-amber-500 mt-2 shrink-0" />
                   <span className="leading-relaxed">{pt}</span>
                 </li>
               ))}
@@ -130,43 +130,43 @@ const RevisionCard: React.FC<Props> = ({ content }) => {
 
           {/* Confidence Self-Rating */}
           <div className="space-y-2">
-            <p className="text-2xs uppercase font-bold tracking-wider text-muted">
+            <p className="text-xs uppercase font-bold tracking-wider text-muted">
               How well did you remember this?
             </p>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
               <button
                 onClick={() => handleRateConfidence('hard')}
-                className={`py-2 px-2.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition ${
+                className={`py-2.5 px-3 rounded-xl border text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 transition ${
                   confidenceRated === 'hard'
                     ? 'border-rose-500 bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300'
                     : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-secondary'
                 }`}
               >
-                <RotateCcw size={13} className="text-rose-500" />
+                <RotateCcw size={14} className="text-rose-500" />
                 <span>Need Review</span>
               </button>
 
               <button
                 onClick={() => handleRateConfidence('medium')}
-                className={`py-2 px-2.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition ${
+                className={`py-2.5 px-3 rounded-xl border text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 transition ${
                   confidenceRated === 'medium'
                     ? 'border-amber-500 bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300'
                     : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-secondary'
                 }`}
               >
-                <ThumbsUp size={13} className="text-amber-500" />
+                <ThumbsUp size={14} className="text-amber-500" />
                 <span>Good</span>
               </button>
 
               <button
                 onClick={() => handleRateConfidence('easy')}
-                className={`py-2 px-2.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition ${
+                className={`py-2.5 px-3 rounded-xl border text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 transition ${
                   confidenceRated === 'easy'
                     ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300'
                     : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-secondary'
                 }`}
               >
-                <Sparkles size={13} className="text-emerald-500" />
+                <Sparkles size={14} className="text-emerald-500" />
                 <span>Easy Recall</span>
               </button>
             </div>
@@ -175,7 +175,7 @@ const RevisionCard: React.FC<Props> = ({ content }) => {
           <div className="flex justify-end pt-1">
             <button
               onClick={handleClose}
-              className="px-4 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-secondary hover:text-primary rounded-lg text-xs font-semibold transition"
+              className="px-5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-secondary hover:text-primary rounded-xl text-xs sm:text-sm font-bold transition"
             >
               Continue
             </button>

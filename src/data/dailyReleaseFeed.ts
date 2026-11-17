@@ -19,7 +19,7 @@ export interface DailyReleaseItem {
 
 export const dailyReleaseFeed: DailyReleaseItem[] = [
   // =========================================================================
-  // 1. WINTER '27 RELEASE: Agentforce Multi-Agent Orchestration & Apex Actions
+  // 1. WINTER '27 RELEASE: Agentforce Invocable Actions
   // =========================================================================
   {
     id: 'release-winter27-agentforce-apex',
@@ -29,42 +29,38 @@ export const dailyReleaseFeed: DailyReleaseItem[] = [
       id: 'sf-rel-winter27-agentforce-apex',
       technology: 'salesforce',
       category: 'update',
-      title: "Agentforce: Multi-Agent Autonomous Orchestration & Invocable Apex Actions",
-      summary: "Empower autonomous Agentforce agents with typed Apex @InvocableMethod actions, contextual grounding evaluation, and seamless multi-agent handoffs.",
+      title: "Agentforce: Connect AI Chatbots to Custom Code",
+      summary: "Help your Salesforce AI assistant take real actions—like updating records or booking flights—by connecting it directly to your custom code.",
       contentType: 'article',
       difficulty: 'medium',
       applicableRoles: ['salesforce_dev', 'salesforce_arch', 'salesforce_consult', 'salesforce_lead'],
       estimatedMinutes: 2,
       learningObjectives: [
-        'Expose type-safe business services to Agentforce via @InvocableMethod',
-        'Configure semantic descriptions for the Atlas reasoning engine planner',
-        'Implement contextual guardrails and multi-agent topic delegation',
+        'Learn how to let AI run your custom code using simple annotations',
+        'Write clear descriptions so the AI knows when to trigger your action',
+        'Save hours of manual support time with automated actions',
       ],
       explanation:
-        "In the Salesforce Winter '27 Release, Agentforce introduces advanced multi-agent orchestration. Autonomous agents leverage reasoning engines to inspect natural language intent and dynamically trigger custom Apex actions. Clear parameter descriptions on @InvocableVariable instruct the LLM reasoning planner exactly how to extract input data from conversational context and pass it to Apex.",
+        "In the Winter '27 Release, Salesforce lets your AI chatbot call your custom code directly. When a customer types a message in plain English, the AI reads it, figures out what they need, and runs your code right away. All you need to do is give your code a clear label and description so the AI knows what it does.",
       realWorldExample:
-        "A customer chats with an airline Agentforce agent asking to rebook a missed flight. The front-line agent delegates to a specialized 'FlightOperationsAgent', which executes the 'RescheduleFlightApexAction' to re-issue boarding passes and send SMS notifications in real time.",
-      codeSnippet: `// Winter '27 Agentforce Autonomous Action
-public with sharing class FlightBookingAgentActions {
+        "A customer chats with your support bot asking to change their flight. The AI understands the request, calls your custom booking code, updates the ticket, and sends a confirmation text in seconds—without needing a human agent.",
+      codeSnippet: `// Simple action that AI can run for users
+public class BookingActions {
   @InvocableMethod(
-    label='Reschedule Passenger Flight'
-    description='Rebooks a passenger on the next available flight and issues a revised boarding pass.'
-    category='Agentforce Aviation'
+    label='Rebook Customer Flight'
+    description='Changes a customer booking to a new time and sends a confirmation email'
   )
-  public static List<RebookResult> rescheduleFlight(List<RebookRequest> requests) {
-    List<RebookResult> results = new List<RebookResult>();
-    for (RebookRequest req : requests) {
-      results.add(AirlineService.rebookPassenger(req.pnrCode, req.preferredTime));
-    }
-    return results;
+  public static List<String> changeFlight(List<String> ticketNumbers) {
+    // Code updates the booking in Salesforce
+    return new List<String>{ 'Flight successfully updated!' };
   }
 }`,
       keyTakeaways: [
-        'Descriptive labels and descriptions are essential for the Agentforce Atlas reasoning engine to select actions.',
-        '@InvocableMethod must accept List<Request> and return List<Response> to satisfy platform bulkification.',
-        'Enforce "with sharing" and user-mode security to safeguard sensitive ERP operations.',
+        'Give your code simple, clear descriptions so the AI knows when to use it.',
+        'The AI reads the user message and picks the right action automatically.',
+        'Saves time by letting AI solve customer requests 24/7 without manual effort.',
       ],
-      sourceName: 'Salesforce Developer Docs – Agentforce Invocable Actions',
+      sourceName: 'Salesforce Official Docs – Agentforce Actions',
       sourceUrl: 'https://developer.salesforce.com/docs/agentforce/overview/guide/agent-action-apex.html',
       sourcePublishedAt: '2026-10-15',
       lastVerifiedAt: '2026-11-01',
@@ -90,47 +86,47 @@ public with sharing class FlightBookingAgentActions {
       contentId: 'sf-practice-winter27-agentforce',
       questionType: 'scenario_mcq',
       scenario:
-        "You are building an Invocable Apex action for an Agentforce Service Agent to verify warranty claims. During conversational testing, the agent frequently hallucinates input parameters or calls an unrelated action.",
+        "You built a custom action for an AI assistant to check customer warranty claims. However, when users chat with the bot, it gets confused and picks the wrong action.",
       question:
-        "What is the recommended best practice in Winter '27 to ensure the Agentforce reasoning engine accurately matches and invokes your Apex action?",
+        "What is the best way to help the AI assistant pick the correct action every time?",
       options: [
         {
           id: 'A',
-          label: 'Provide unambiguous, intent-focused descriptions on both @InvocableMethod and each @InvocableVariable parameter',
+          label: 'Write clear, simple descriptions on the method explaining exactly what it does and when to use it',
         },
         {
           id: 'B',
-          label: 'Hardcode user prompt keywords inside the class constructor',
+          label: 'Hardcode exact question phrases inside the class code',
         },
         {
           id: 'C',
-          label: 'Declare all input parameters as untyped Object references',
+          label: 'Make all inputs plain untyped objects without names',
         },
         {
           id: 'D',
-          label: 'Wrap the Invocable action in a legacy Workflow Rule',
+          label: 'Wrap the code inside an old Workflow Rule',
         },
       ],
       correctAnswerId: 'A',
       explanation:
-        "Agentforce's reasoning engine evaluates semantic descriptions to determine tool availability and schema. Providing precise, intent-focused descriptions on @InvocableMethod and @InvocableVariable ensures the LLM planner accurately binds conversational context to Apex inputs.",
+        "The AI decides which code to run by reading your descriptions. Writing clear, plain-English descriptions helps the AI match customer questions to the right code every time.",
       difficulty: 'medium',
     },
     revision: {
       id: 'sf-rev-invocable-limits',
       technology: 'salesforce',
       category: 'revision',
-      title: "Apex @InvocableMethod Bulkification Rules",
-      summary: "Review how Flow and Agent engines invoke Apex methods in bulk batches.",
+      title: "Apex Invocable Action Rules",
+      summary: "Quick refresher on how actions work with AI and Flows.",
       contentType: 'article',
       difficulty: 'easy',
       applicableRoles: ['salesforce_dev', 'salesforce_fresher'],
       estimatedMinutes: 1,
-      recallQuestion: "Why must @InvocableMethod always accept List<Input> and return List<Output>?",
+      recallQuestion: "Why should Invocable actions always accept and return Lists in Salesforce?",
       keyPoints: [
-        'Flow and Agentforce engines invoke actions in bulk batches across concurrent user turns.',
-        'The output list count and order must match the input list count exactly.',
-        'Only one @InvocableMethod is allowed per Apex class.',
+        'Salesforce processes records in batches to handle many users at once.',
+        'Using Lists allows the code to run safely for 1 or 200 records at the same time.',
+        'Keep your method descriptions simple and descriptive for the AI.',
       ],
       verificationStatus: 'verified',
       contentStatus: 'active',
@@ -138,7 +134,7 @@ public with sharing class FlightBookingAgentActions {
   },
 
   // =========================================================================
-  // 2. WINTER '27 RELEASE: Apex Cursors Stateful Pagination & Large Scale SOQL
+  // 2. WINTER '27 RELEASE: Apex Cursors
   // =========================================================================
   {
     id: 'release-winter27-apex-cursors',
@@ -148,36 +144,36 @@ public with sharing class FlightBookingAgentActions {
       id: 'sf-rel-winter27-apex-cursors',
       technology: 'salesforce',
       category: 'update',
-      title: "Apex Cursors: High-Volume SOQL Processing Without Heap Size Limits",
-      summary: "Process up to 50 million records efficiently in forward and backward chunks without hitting the 12MB synchronous heap limit or relying on heavy Batch Apex.",
+      title: "Apex Cursors: Read Large Lists of Data Without Errors",
+      summary: "Work with huge amounts of data safely without running into memory limit crashes.",
       contentType: 'article',
       difficulty: 'medium',
       applicableRoles: ['salesforce_dev', 'salesforce_arch', 'salesforce_lead'],
       estimatedMinutes: 2,
       learningObjectives: [
-        'Use Database.getCursor() to navigate massive query result sets in memory-safe slices',
-        'Fetch forward and backward record chunks using cursor.fetch(offset, count)',
-        'Compare Apex Cursors vs Batch Apex and SOQL for-loops',
+        'Read huge query results in small, safe chunks',
+        'Prevent the dreaded "Apex heap size too large" error',
+        'Build fast background jobs without complicated code',
       ],
       explanation:
-        "Apex Cursors in the Winter '27 Release provide a lightweight, cursor-based mechanism to navigate large query result sets in manageable chunks. Instead of loading thousands of records into heap memory at once (which triggers System.LimitException: Apex heap size too large), cursors maintain a server-side pointer and fetch only the requested batch into memory.",
+        "Earlier in Salesforce, trying to load thousands of records all at once would crash your code because of strict memory limits. Apex Cursors fix this problem. Instead of holding all records in memory at once, a cursor acts like a bookmark that reads records in small, clean batches of 200 at a time.",
       realWorldExample:
-        "A financial claims engine processes 250,000 policy payouts in a Queueable worker. Instead of a 4-hour Batch Apex job, it uses Database.getCursor() to fetch 500-record slices and enqueues successor jobs with the cursor offset token.",
-      codeSnippet: `// Winter '27 Apex Cursor Pattern
-Database.Cursor cursor = Database.getCursor(
-  'SELECT Id, Amount, StageName FROM Opportunity WHERE IsClosed = false'
+        "An insurance company needs to review 50,000 policy claims every night. Using Apex Cursors, the system checks 200 claims at a time smoothly without crashing or freezing the app.",
+      codeSnippet: `// Create a bookmark on your query
+Database.Cursor myCursor = Database.getCursor(
+  'SELECT Id, Amount FROM Opportunity WHERE IsClosed = false'
 );
 
-// Fetch only 200 records at a time into heap
-List<Opportunity> batch = cursor.fetch(0, 200);
+// Fetch only 200 records at a time into memory
+List<Opportunity> batch = myCursor.fetch(0, 200);
 for (Opportunity opp : batch) {
-  opp.Needs_Review__c = true;
+  // Review records safely
 }
 update batch;`,
       keyTakeaways: [
-        'Cursors chunk queries without exhausting the 12MB/6MB heap limit.',
-        'Usable in synchronous and asynchronous Apex transactions.',
-        'Slices can be fetched by index offset using cursor.fetch(startIndex, count).',
+        'Fetches records in small chunks so your code never runs out of memory.',
+        'Works smoothly in both quick screen actions and background jobs.',
+        'Much easier to set up and maintain than older heavy batch tools.',
       ],
       sourceName: 'Salesforce Official Docs – Apex Cursors',
       sourceUrl: 'https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_cursors.htm',
@@ -205,47 +201,47 @@ update batch;`,
       contentId: 'sf-practice-winter27-cursors',
       questionType: 'scenario_mcq',
       scenario:
-        "An enterprise Salesforce org runs a Queueable Apex worker nightly to process 180,000 Order Line Items. The existing SOQL for-loop intermittently crashes with 'System.LimitException: Apex heap size too large' when line items carry long JSON descriptions.",
+        "Your nightly job needs to update 100,000 order records. Currently, the job crashes with a 'Memory / Heap limit too large' error because it tries to read too many records at once.",
       question:
-        "Which modern Winter '27 architecture solves this heap exhaustion while keeping the processing inside Queueable Apex?",
+        "What is the recommended modern solution in Winter '27 to fix this memory crash?",
       options: [
         {
           id: 'A',
-          label: 'Use Database.getCursor() to maintain a server-side query pointer and fetch chunks of 200 records at a time',
+          label: 'Use Database.getCursor() to fetch small batches of 200 records at a time',
         },
         {
           id: 'B',
-          label: 'Increase the synchronous heap limit to 36MB using System.Limits.setHeapLimit()',
+          label: 'Increase memory limits in code using a secret command',
         },
         {
           id: 'C',
-          label: 'Replace the Queueable job with an @future(heap=maximum) method',
+          label: 'Put the query inside a try-catch block to ignore the crash',
         },
         {
           id: 'D',
-          label: 'Encase the SOQL query in a try-catch block and catch the LimitException',
+          label: 'Delete half the records before running the job',
         },
       ],
       correctAnswerId: 'A',
       explanation:
-        "Database.getCursor() maintains a server-side pointer and retrieves records in small, memory-safe chunks (e.g. 200 items), preventing heap exhaustion. Governor limits cannot be modified dynamically in Apex code, and LimitExceptions cannot be caught.",
+        "Database.getCursor() acts like a smart bookmark, reading small chunks of 200 records at a time so memory never fills up.",
       difficulty: 'medium',
     },
     revision: {
       id: 'sf-rev-soql-bulk',
       technology: 'salesforce',
       category: 'revision',
-      title: "SOQL 101 Governor Limit & Bulk Collection Patterns",
-      summary: "Prevent System.LimitException (SOQL 101) by aggregating IDs and querying outside loops.",
+      title: "SOQL 101 Query Limits & Clean Code",
+      summary: "Prevent query errors by querying outside of loops.",
       contentType: 'article',
       difficulty: 'easy',
       applicableRoles: ['salesforce_dev', 'salesforce_fresher'],
       estimatedMinutes: 1,
-      recallQuestion: "What is the single most critical rule to prevent SOQL 101 limit exceptions in Apex triggers?",
+      recallQuestion: "What is the single most important rule to prevent query limit crashes in Apex?",
       keyPoints: [
-        'Never place SOQL queries or DML statements inside for-loops or iteration blocks.',
-        'Collect related parent/child IDs in a Set<Id> and execute one bulk query outside the loop.',
-        'Store results in a Map<Id, sObject> for O(1) in-memory lookups when processing records.',
+        'Never put a database query (SOQL) inside a for-loop.',
+        'Collect all IDs first, then run a single query outside the loop.',
+        'Use Maps to quickly look up related data in memory.',
       ],
       verificationStatus: 'verified',
       contentStatus: 'active',
@@ -253,7 +249,7 @@ update batch;`,
   },
 
   // =========================================================================
-  // 3. WINTER '27 RELEASE: Data Cloud Zero-Copy Federation in Apex
+  // 3. WINTER '27 RELEASE: Data Cloud Zero-Copy Federation
   // =========================================================================
   {
     id: 'release-winter27-data-cloud-federation',
@@ -263,104 +259,100 @@ update batch;`,
       id: 'sf-rel-winter27-data-cloud-federation',
       technology: 'salesforce',
       category: 'update',
-      title: "Data Cloud Zero-Copy Federation: Querying Snowflake & BigQuery from Apex",
-      summary: "Access multi-terabyte external lakehouses directly in Apex and Flow with Zero-Copy data federation without costly ETL pipelines or local storage consumption.",
+      title: "Data Cloud: View Outside Data Without Copying It",
+      summary: "Connect directly to outside databases like Snowflake or Google BigQuery and see live data in Salesforce without duplicating it.",
       contentType: 'article',
-      difficulty: 'hard',
-      applicableRoles: ['salesforce_arch', 'salesforce_dev', 'salesforce_lead'],
+      difficulty: 'medium',
+      applicableRoles: ['salesforce_arch', 'salesforce_dev', 'salesforce_consult'],
       estimatedMinutes: 2,
       learningObjectives: [
-        'Query federated Data Model Objects (DMOs) natively in Apex using ConnectApi.CdpQuery',
-        'Eliminate legacy ETL copy pipelines from external cloud data warehouses',
-        'Enforce security permissions on external lakehouse tables within Salesforce',
+        'See live company data from outside warehouses inside Salesforce',
+        'Avoid paying extra money for duplicate storage',
+        'Keep customer profile information up to date automatically',
       ],
       explanation:
-        "In the Winter '27 Release, Data Cloud Zero-Copy data federation allows Salesforce applications to query live tables in Snowflake, Google BigQuery, and AWS Redshift directly. Rather than synchronizing gigabytes of data into Salesforce database tables, queries execute in place at the remote lakehouse, returning live answers directly to Apex and LWC.",
+        "Instead of paying to copy millions of data rows into Salesforce, you can now connect directly to your company's existing data warehouses (like Snowflake or BigQuery). Salesforce reads the data live whenever you view a page or run a report, without storing a duplicate copy.",
       realWorldExample:
-        "A customer support agent views 5 years of historical billing transactions stored in a 40TB Snowflake database. The LWC widget queries the federated DMO via ConnectApi.CdpQuery with sub-second response time and zero local storage cost.",
-      codeSnippet: `// Winter '27 Zero-Copy Federated Lakehouse Query
-ConnectApi.QuerySqlInput input = new ConnectApi.QuerySqlInput();
-input.sql = 'SELECT TransactionId__c, Amount__c, Timestamp__c ' +
-            'FROM Snowflake_Billing_DMO__dlm ' +
-            'WHERE CustomerId__c = \\'' + customerId + '\\' ' +
-            'ORDER BY Timestamp__c DESC LIMIT 10';
-
-ConnectApi.QuerySqlOutput output = ConnectApi.CdpQuery.querySql(input, 'default');
-for (Map<String, Object> row : output.data) {
-  System.debug('Transaction: ' + row.get('TransactionId__c') + ' Amount: $' + row.get('Amount__c'));
-}`,
+        "A sales rep opens a customer page. Salesforce instantly displays the customer's total spending and past 5 years of purchase history directly from the warehouse—without anyone having to run nightly sync jobs.",
+      codeSnippet: `// Query live warehouse data without storing it in Salesforce
+List<DataLakeObject__dl> livePurchases = [
+  SELECT OrderTotal__c, PurchaseDate__c, CustomerID__c
+  FROM CustomerPurchases_Live__dl
+  WHERE CustomerID__c = :currentAccount.External_ID__c
+  LIMIT 10
+];`,
       keyTakeaways: [
-        'Zero-Copy federation eliminates batch ETL pipelines and double-storage costs.',
-        'Data remains securely in Snowflake/BigQuery and is queried on demand.',
-        'Apex interacts through standard ConnectApi.CdpQuery and federated DMO schemas.',
+        'Zero duplicate storage—data stays safely in your main warehouse.',
+        'Sales reps see live, accurate numbers on screen instantly.',
+        'Saves money and removes the headache of fixing broken data syncs.',
       ],
-      sourceName: 'Salesforce Developer Docs – ConnectApi Data Cloud Query',
-      sourceUrl: 'https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_ConnectAPI_CdpQuery_static_methods.htm',
+      sourceName: 'Salesforce Help – Data Cloud Federation',
+      sourceUrl: 'https://help.salesforce.com/s/articleView?id=sf.c360_a_zero_copy_partner_network.htm',
       sourcePublishedAt: '2026-10-18',
-      lastVerifiedAt: '2026-11-02',
+      lastVerifiedAt: '2026-11-01',
       releaseVersion: "Winter '27",
       verificationStatus: 'verified',
       contentStatus: 'active',
     },
     practiceContent: {
-      id: 'sf-practice-winter27-federation',
+      id: 'sf-practice-winter27-datacloud',
       technology: 'salesforce',
       category: 'practice',
-      title: "Data Architecture: Zero-Copy Federation vs Batch ETL Synchronization",
-      summary: "Architect real-time visibility into 50M external customer transactions.",
+      title: "Data Cloud: Zero-Copy Architecture Design",
+      summary: "Evaluate zero-copy vs ETL replication for enterprise data warehouses.",
       contentType: 'article',
-      difficulty: 'hard',
+      difficulty: 'medium',
       applicableRoles: ['salesforce_arch', 'salesforce_dev'],
       estimatedMinutes: 2,
       verificationStatus: 'verified',
       contentStatus: 'active',
     },
     practice: {
-      id: 'quiz-winter27-federation',
-      contentId: 'sf-practice-winter27-federation',
+      id: 'quiz-winter27-datacloud',
+      contentId: 'sf-practice-winter27-datacloud',
       questionType: 'scenario_mcq',
       scenario:
-        "An enterprise bank has 40 million customer transaction records stored in an external Snowflake data warehouse. Support agents need real-time read access to these transactions on the Contact page, but the Salesforce database storage quota is limited.",
+        "Your company has 40 million past order records stored in Snowflake. The sales team wants to see these orders on account pages, but your Salesforce storage budget is already full.",
       question:
-        "What is the recommended Winter '27 architecture to display this external data with zero local data replication?",
+        "What is the best way to let users see this data without buying expensive Salesforce storage?",
       options: [
         {
           id: 'A',
-          label: 'Use Data Cloud Zero-Copy Federation to query Snowflake directly via ConnectApi.CdpQuery and federated DMOs',
+          label: 'Use Data Cloud Zero-Copy Federation to view the Snowflake data live without copying it',
         },
         {
           id: 'B',
-          label: 'Run a nightly Batch Apex ETL job to copy 40 million records into a custom Salesforce object',
+          label: 'Export CSV files every night and manually upload them into Custom Objects',
         },
         {
           id: 'C',
-          label: 'Implement an unindexed SOQL query with external IDs in a synchronous trigger',
+          label: 'Paste all 40 million records into a Long Text field on the Account',
         },
         {
           id: 'D',
-          label: 'Store transaction records in browser localStorage on the agent machine',
+          label: 'Ask customers to email their past orders whenever they call support',
         },
       ],
       correctAnswerId: 'A',
       explanation:
-        "Data Cloud Zero-Copy Federation queries external Snowflake tables live via ConnectApi.CdpQuery without copying or storing the data in Salesforce core storage, completely avoiding storage quota exhaustion and batch sync delays.",
-      difficulty: 'hard',
+        "Zero-Copy Federation lets Salesforce read and show outside data on demand, so you don't have to duplicate records or pay for extra storage.",
+      difficulty: 'medium',
     },
     revision: {
-      id: 'sf-rev-connect-api',
+      id: 'sf-rev-connectapi',
       technology: 'salesforce',
       category: 'revision',
-      title: "ConnectApi in Apex & Governor Limits",
-      summary: "Review how ConnectApi methods execute outside of standard SOQL query limit pools.",
+      title: "Salesforce External Data Basics",
+      summary: "Understand how Salesforce connects to outside systems safely.",
       contentType: 'article',
-      difficulty: 'medium',
+      difficulty: 'easy',
       applicableRoles: ['salesforce_dev', 'salesforce_arch'],
       estimatedMinutes: 1,
-      recallQuestion: "Do ConnectApi method invocations count against the synchronous 100 SOQL query limit?",
+      recallQuestion: "What is the biggest benefit of connecting to outside data live instead of copying it?",
       keyPoints: [
-        'ConnectApi methods do NOT count against the synchronous 100 SOQL query limit; they have distinct rate and callout quotas.',
-        'Most ConnectApi methods require Test.isRunningTest() mocks or SeeAllData=true in test classes.',
-        'ConnectApi methods execute in the context of the running user and respect object/field permissions.',
+        'You never have to deal with outdated copies of data.',
+        'You avoid paying for duplicate database storage.',
+        'Changes in the outside system show up immediately in Salesforce.',
       ],
       verificationStatus: 'verified',
       contentStatus: 'active',
@@ -368,7 +360,7 @@ for (Map<String, Object> row : output.data) {
   },
 
   // =========================================================================
-  // 4. WINTER '27 RELEASE: LWC Workspace API Multi-Monitor & Tab Control
+  // 4. WINTER '27 RELEASE: LWC Workspace API
   // =========================================================================
   {
     id: 'release-winter27-lwc-workspace-api',
@@ -378,43 +370,41 @@ for (Map<String, Object> row : output.data) {
       id: 'sf-rel-winter27-lwc-workspace-api',
       technology: 'salesforce',
       category: 'update',
-      title: "LWC Workspace API: Native Console Tab Navigation & Multi-Monitor Subtabs",
-      summary: "Directly open, focus, close, and refresh Lightning Console workspace tabs and pop-out subtabs directly from Lightning Web Components without Aura wrappers.",
+      title: "LWC Workspace API: Control Console Tabs with Code",
+      summary: "Open, close, rename, and refresh browser tabs directly from modern Lightning Web Components.",
       contentType: 'article',
       difficulty: 'medium',
       applicableRoles: ['salesforce_dev', 'salesforce_lead'],
       estimatedMinutes: 2,
       learningObjectives: [
-        'Import workspace adapters from lightning/platformWorkspaceApi',
-        'Open records in focused primary tabs or contextual subtabs',
-        'Eliminate legacy Aura wrapper components from Service Cloud implementations',
+        'Open new sub-tabs with one click inside service console apps',
+        'Rename tab labels dynamically when a customer record changes',
+        'Close completed case tabs automatically to keep screens tidy',
       ],
       explanation:
-        "In Winter '27, the LWC Workspace API gives Lightning Web Components full native control over Lightning Console navigation. Developers can open, focus, close, and dynamically refresh workspace tabs and subtabs directly using `lightning/platformWorkspaceApi` methods and wire adapters without needing legacy Aura wrapper components.",
+        "If your team uses Salesforce Console with multiple tabs open, you can now easily control those tabs with modern Lightning Web Components. You can open a new sub-tab, rename a tab with a customer's name, or close a tab once an issue is resolved—all with a single line of JavaScript.",
       realWorldExample:
-        "A Service Cloud agent viewing a Case clicks 'Open Customer 360'. The LWC directly calls openSubtab() passing the Contact ID and sets the subtab title to the customer's full name without page reloads.",
+        "When a support agent finishes resolving a customer's complaint, clicking 'Complete Case' automatically closes the case tab and brings the agent right back to their active queue.",
       codeSnippet: `import { LightningElement, wire } from 'lwc';
-import { EnclosingTabId, openSubtab, focusTab } from 'lightning/platformWorkspaceApi';
+import { openSubtab, getFocusedTabInfo } from 'lightning/platformWorkspaceApi';
 
-export default class CaseActionConsole extends LightningElement {
-  @wire(EnclosingTabId) tabId;
-
-  async openContactSubtab(contactId) {
-    if (!this.tabId) return;
-    
-    await openSubtab(this.tabId, {
-      recordId: contactId,
+export default class QuickCaseOpener extends LightningElement {
+  async openCustomerDetails(recordId) {
+    const parent = await getFocusedTabInfo();
+    // Open a new sub-tab next to the active customer tab
+    await openSubtab(parent.tabId, {
+      recordId: recordId,
       focus: true
     });
   }
 }`,
       keyTakeaways: [
-        'Native LWC workspace API completely eliminates the need for legacy Aura wrappers.',
-        'Use @wire(EnclosingTabId) to retrieve the active tab and subtab context.',
-        'Works seamlessly in Lightning Service Console and Sales Console applications.',
+        'Easily open, focus, or close tabs right from Lightning Web Components.',
+        'Keeps support agents organized and saves them dozens of clicks a day.',
+        'Faster and cleaner than older Aura components.',
       ],
-      sourceName: 'Salesforce Component Reference – Platform Workspace API',
-      sourceUrl: 'https://developer.salesforce.com/docs/component-library/bundle/lightning-platform-workspace-api/documentation',
+      sourceName: 'Salesforce Developer Docs – LWC Workspace API',
+      sourceUrl: 'https://developer.salesforce.com/docs/component-library/bundle/lightning-platform-workspace-api',
       sourcePublishedAt: '2026-10-12',
       lastVerifiedAt: '2026-11-01',
       releaseVersion: "Winter '27",
@@ -425,8 +415,8 @@ export default class CaseActionConsole extends LightningElement {
       id: 'sf-practice-winter27-workspace-api',
       technology: 'salesforce',
       category: 'practice',
-      title: "LWC Console Navigation: Opening Subtabs in Service Console",
-      summary: "Implement native console subtab opening for support agent workflows.",
+      title: "LWC Workspace API: Subtab Navigation Patterns",
+      summary: "Programmatically open and manage workspace tabs in Lightning Console.",
       contentType: 'article',
       difficulty: 'medium',
       applicableRoles: ['salesforce_dev'],
@@ -439,47 +429,47 @@ export default class CaseActionConsole extends LightningElement {
       contentId: 'sf-practice-winter27-workspace-api',
       questionType: 'scenario_mcq',
       scenario:
-        "A Service Console project requires an LWC on the Account page that allows support reps to click a button to open an associated Order in a new subtab under the current Account tab.",
+        "Your support agents want a button inside their Lightning component that automatically closes the current case tab after they click 'Resolve Ticket'.",
       question:
-        "What is the modern, recommended approach in Winter '27 to implement this requirement?",
+        "What is the modern Salesforce tool to control console tabs directly in LWC?",
       options: [
         {
           id: 'A',
-          label: 'Import openSubtab from lightning/platformWorkspaceApi and call it with the focused parent tab ID',
+          label: 'lightning/platformWorkspaceApi methods like closeTab() and getFocusedTabInfo()',
         },
         {
           id: 'B',
-          label: 'Wrap the LWC in an Aura component and use lightning:workspaceAPI',
+          label: 'Using window.close() inside regular JavaScript',
         },
         {
           id: 'C',
-          label: 'Use window.open() with target="_blank" to launch a new browser window',
+          label: 'Asking users to press Ctrl + W on their keyboard',
         },
         {
           id: 'D',
-          label: 'Use standard NavigationMixin.Navigate to navigate with target="_self"',
+          label: 'Reloading the whole browser page with window.location.reload()',
         },
       ],
       correctAnswerId: 'A',
       explanation:
-        "The native LWC Workspace API ('lightning/platformWorkspaceApi') allows calling openSubtab() directly from JavaScript without requiring legacy Aura components or disruptive window popups.",
+        "The lightning/platformWorkspaceApi module gives you built-in functions like closeTab() and openSubtab() to manage tabs smoothly inside Console apps.",
       difficulty: 'medium',
     },
     revision: {
       id: 'sf-rev-lwc-lifecycle',
       technology: 'salesforce',
       category: 'revision',
-      title: "LWC Component Lifecycle Hooks",
-      summary: "Master the sequence of constructor, connectedCallback, renderedCallback, and disconnectedCallback.",
+      title: "LWC Component Lifecycle",
+      summary: "Understand when components load and render on screen.",
       contentType: 'article',
       difficulty: 'easy',
       applicableRoles: ['salesforce_dev', 'salesforce_fresher'],
       estimatedMinutes: 1,
-      recallQuestion: "Which LWC lifecycle hook is best suited to perform DOM manipulation or attach third-party UI libraries?",
+      recallQuestion: "Which lifecycle hook runs automatically as soon as an LWC is added to the page?",
       keyPoints: [
-        'connectedCallback() fires when the component is inserted into the DOM (ideal for fetching initial data).',
-        'renderedCallback() fires after every render cycle; guard DOM manipulation with a boolean flag to avoid infinite loops.',
-        'disconnectedCallback() cleans up event listeners, timers, and message channel subscriptions.',
+        'connectedCallback() fires when the component is placed on the screen.',
+        'Use it to load initial data, subscribe to messages, or check tab info.',
+        'disconnectedCallback() runs when the component is removed to clean up listeners.',
       ],
       verificationStatus: 'verified',
       contentStatus: 'active',
@@ -487,7 +477,7 @@ export default class CaseActionConsole extends LightningElement {
   },
 
   // =========================================================================
-  // 5. SUMMER '26 RELEASE: Data Cloud Vector Search & Hybrid Search in Apex
+  // 5. SUMMER '26 RELEASE: Vector Search in Data Cloud
   // =========================================================================
   {
     id: 'release-summer26-vector-search',
@@ -497,50 +487,48 @@ export default class CaseActionConsole extends LightningElement {
       id: 'sf-rel-summer26-vector-search',
       technology: 'salesforce',
       category: 'update',
-      title: "Data Cloud Vector Search: Semantic & Hybrid Search in Apex",
-      summary: "Query unstructured PDF manuals, knowledge articles, and customer transcripts using semantic vector embeddings and BM25 lexical ranking directly in Apex.",
+      title: "Vector Search: Search by Meaning Instead of Exact Words",
+      summary: "Find the right documents, products, and answers even if the user makes typos or uses completely different words.",
       contentType: 'article',
-      difficulty: 'hard',
-      applicableRoles: ['salesforce_dev', 'salesforce_arch'],
+      difficulty: 'medium',
+      applicableRoles: ['salesforce_dev', 'salesforce_arch', 'salesforce_consult'],
       estimatedMinutes: 2,
       learningObjectives: [
-        'Understand semantic similarity vs exact keyword SOSL matching',
-        'Execute vector search queries via ConnectApi.CdpQuery using hybrid_search()',
-        'Combine structured metadata filters with semantic cosine similarity',
+        'Understand how search can find articles without exact word matches',
+        'Help customers find help articles even when they misspell terms',
+        'Feed accurate company knowledge to your AI assistants',
       ],
       explanation:
-        "In the Summer '26 Release, Data Cloud Vector Search enables semantic search directly from Apex using the hybrid_search() function in ConnectApi.CdpQuery. Unlike traditional SOSL which requires exact lexical keywords, semantic search converts text into multi-dimensional embeddings to match the underlying conceptual intent of user inquiries.",
+        "Standard search only looks for exact words. If a customer types 'broken screen', old search wouldn't find an article titled 'Cracked Glass Display'. Vector Search understands what words actually mean, so it easily connects 'broken screen' to 'cracked display' and shows the right solution right away.",
       realWorldExample:
-        "A technician queries: 'AC compressor vibrating with buzzing sound'. Semantic vector search matches a technical PDF manual titled 'Refrigerant Pump Resonance & Harmonic Damping' despite having zero keyword overlap.",
-      codeSnippet: `// Summer '26 Data Cloud Hybrid Search
-String sql = 'SELECT v.RecordId__c, v.hybrid_score__c, c.ChunkText__c ' +
-             'FROM hybrid_search(TABLE(Equipment_Index__dlm), \\'compressor buzzing\\', \\'\\', 5) v ' +
-             'INNER JOIN Equipment_Index_chunk__dlm c ON c.RecordId__c = v.RecordId__c';
-
-ConnectApi.QuerySqlInput input = new ConnectApi.QuerySqlInput();
-input.sql = sql;
-ConnectApi.QuerySqlOutput output = ConnectApi.CdpQuery.querySql(input, 'default');`,
+        "A user types 'How do I stop receiving promotional emails?' into your help portal. Vector Search instantly returns your article 'Managing Newsletter Subscription Preferences' even though the words are completely different.",
+      codeSnippet: `// Search knowledge articles by meaning rather than exact words
+List<KnowledgeArticleVersion> matches = Search.findSimilarArticles(
+  'My mobile phone screen has cracked glass',
+  'KnowledgeArticle__ka',
+  5 // top 5 most relevant answers
+);`,
       keyTakeaways: [
-        'Vector search allows semantic meaning retrieval rather than rigid keyword matching.',
-        'Powered by Data Cloud vector database and embedding models.',
-        'Enables enterprise RAG (Retrieval-Augmented Generation) architectures within Salesforce.',
+        'Understands meaning and intent rather than just exact keywords.',
+        'Finds the right answer even when users make typos or use different words.',
+        'Gives your AI assistants the exact context they need to answer customer questions.',
       ],
-      sourceName: 'Salesforce Developer Docs – ConnectApi Data Cloud Query',
-      sourceUrl: 'https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_ConnectAPI_CdpQuery_static_methods.htm',
+      sourceName: 'Salesforce Official Docs – Vector Search',
+      sourceUrl: 'https://help.salesforce.com/s/articleView?id=sf.c360_a_vector_database_search.htm',
       sourcePublishedAt: '2026-06-15',
-      lastVerifiedAt: '2026-07-01',
+      lastVerifiedAt: '2026-11-01',
       releaseVersion: "Summer '26",
       verificationStatus: 'verified',
       contentStatus: 'active',
     },
     practiceContent: {
-      id: 'sf-practice-summer26-vector-search',
+      id: 'sf-practice-summer26-vector',
       technology: 'salesforce',
       category: 'practice',
-      title: "Semantic Search: Matching Customer Intent vs Keyword Searches",
-      summary: "Select the optimal search architecture for complex customer service knowledge retrieval.",
+      title: "Vector Search: Semantic Search vs Keyword Indexing",
+      summary: "Compare semantic vector queries with traditional text search.",
       contentType: 'article',
-      difficulty: 'hard',
+      difficulty: 'medium',
       applicableRoles: ['salesforce_dev', 'salesforce_arch'],
       estimatedMinutes: 2,
       verificationStatus: 'verified',
@@ -548,50 +536,50 @@ ConnectApi.QuerySqlOutput output = ConnectApi.CdpQuery.querySql(input, 'default'
     },
     practice: {
       id: 'quiz-summer26-vector-search',
-      contentId: 'sf-practice-summer26-vector-search',
+      contentId: 'sf-practice-summer26-vector',
       questionType: 'scenario_mcq',
       scenario:
-        "A global telecommunications provider has 50,000 troubleshooting articles written in varying technical jargon. Customers describe issues using colloquial terms (e.g., 'my net is freezing'), while the articles use technical terms ('packet drop rate high'). SOSL queries frequently return zero matches.",
+        "Customers searching your help portal often complain they cannot find articles because they don't know the official technical terminology.",
       question:
-        "Which Salesforce capability bridges the gap between colloquial queries and technical terminology using semantic vector embeddings?",
+        "Why does Vector Search solve this problem better than traditional keyword search?",
       options: [
         {
           id: 'A',
-          label: 'Data Cloud Vector Search with semantic embeddings and hybrid search',
+          label: 'It matches questions based on meaning and context, not just exact word spelling',
         },
         {
           id: 'B',
-          label: 'Standard SOQL query with LIKE %net%',
+          label: 'It deletes all articles that contain typos',
         },
         {
           id: 'C',
-          label: 'Enabling Salesforce Classic search indexing on Article body fields',
+          label: 'It forces customers to pass a vocabulary test before searching',
         },
         {
           id: 'D',
-          label: 'Writing a trigger to copy all article text into a custom formula field',
+          label: 'It only returns articles written in the past 24 hours',
         },
       ],
       correctAnswerId: 'A',
       explanation:
-        "Data Cloud Vector Search converts both the unstructured articles and the user query into semantic vector embeddings. It calculates distance (cosine similarity) in concept space, successfully matching 'net is freezing' to 'packet drop' without requiring explicit keyword overlap.",
-      difficulty: 'hard',
+        "Vector Search understands the meaning behind phrases, allowing it to connect everyday customer wording with official technical documentation.",
+      difficulty: 'medium',
     },
     revision: {
-      id: 'sf-rev-soql-vs-sosl',
+      id: 'sf-rev-sosl',
       technology: 'salesforce',
       category: 'revision',
-      title: "SOQL vs SOSL: Search Architecture Comparison",
-      summary: "Review when to use SOQL queries vs multi-object text search (SOSL).",
+      title: "Salesforce Search Basics (SOSL)",
+      summary: "Quick review of text search across multiple objects.",
       contentType: 'article',
       difficulty: 'easy',
-      applicableRoles: ['salesforce_dev', 'salesforce_admin'],
+      applicableRoles: ['salesforce_dev', 'salesforce_fresher'],
       estimatedMinutes: 1,
-      recallQuestion: "When should an architect choose SOSL over SOQL?",
+      recallQuestion: "When should you use SOSL text search instead of SOQL database queries?",
       keyPoints: [
-        'Use SOSL when searching for text strings across multiple disparate objects simultaneously.',
-        'SOSL searches indexed text fields (Name, Phone, text fields) much faster than non-indexed SOQL LIKE wildcards.',
-        'Use SOQL when querying a single object or relationship tree with precise relational criteria.',
+        'Use SOSL when you need to search for text across multiple objects (like Leads and Contacts) at once.',
+        'Use SOQL when you know the exact object and fields you want to query.',
+        'Both tools help you find the right data quickly without slowing down Salesforce.',
       ],
       verificationStatus: 'verified',
       contentStatus: 'active',
@@ -599,7 +587,7 @@ ConnectApi.QuerySqlOutput output = ConnectApi.CdpQuery.querySql(input, 'default'
   },
 
   // =========================================================================
-  // 6. SUMMER '26 RELEASE: User Access Policies (UAP) GA
+  // 6. SUMMER '26 RELEASE: User Access Policies
   // =========================================================================
   {
     id: 'release-summer26-user-access-policies',
@@ -609,102 +597,98 @@ ConnectApi.QuerySqlOutput output = ConnectApi.CdpQuery.querySql(input, 'default'
       id: 'sf-rel-summer26-user-access-policies',
       technology: 'salesforce',
       category: 'update',
-      title: "User Access Policies: Automated Declarative Entitlement Provisioning",
-      summary: "Automatically grant and revoke Permission Sets, Permission Set Groups, and Managed Package licenses based on user criteria without custom trigger code.",
+      title: "User Access Policies: Give Permissions Automatically",
+      summary: "Automatically assign permission sets, licenses, and groups to employees based on their job role or department.",
       contentType: 'article',
-      difficulty: 'medium',
-      applicableRoles: ['salesforce_admin', 'salesforce_consult', 'salesforce_dev'],
+      difficulty: 'easy',
+      applicableRoles: ['salesforce_admin', 'salesforce_lead', 'salesforce_consult'],
       estimatedMinutes: 2,
       learningObjectives: [
-        'Configure criteria-based User Access Policies (UAP) in Setup',
-        'Automate Permission Set Group and package license assignments on user create/update',
-        'Deprecate brittle custom User triggers for access provisioning',
+        'Automate employee onboarding without manual clicking',
+        'Assign licenses and permission sets based on department rules',
+        'Remove permissions automatically when an employee changes roles',
       ],
       explanation:
-        "In Summer '26, User Access Policies provide a native, declarative engine to automate access entitlement provisioning. When a user record is created or updated, Salesforce evaluates policy criteria (e.g., Department = 'Finance' AND Country = 'UK') and automatically grants or revokes specified Permission Set Groups, Public Groups, and Package Licenses, completely avoiding MIXED_DML_OPERATION errors.",
+        "Instead of manually clicking around to assign permission sets whenever a new employee joins the company, Salesforce can now do it automatically. You create a simple rule (like 'Anyone with Role = Sales Rep gets the Sales License'), and Salesforce assigns everything on day one.",
       realWorldExample:
-        "An enterprise with 10,000 employees onboarded 200 sales reps. Rather than a custom User trigger that frequently threw mixed DML errors, User Access Policies automatically assign the Sales Cloud PSG and Tableau CRM license seamlessly.",
-      codeSnippet: `// Declarative Criteria Example (Configured in Setup > User Access Policies)
-Trigger Criteria:
-  User.Profile.Name EQUALS 'Standard Platform User'
-  AND User.Department EQUALS 'Customer Support'
-
-Actions to Apply:
-  GRANT Permission Set Group: 'Support_Tier_2_PSG'
-  GRANT Package License: 'OmniChannel_CTI_Toolkit'
-  REVOKE Permission Set Group: 'Trainee_Temporary_Access'`,
+        "When an employee transfers from Sales to Support, updating their department in Salesforce automatically removes their Sales permissions and grants them Support permissions in seconds.",
+      codeSnippet: `// User Access Policy Rule:
+// Criteria: User.Department EQUALS 'Customer Support'
+// Action 1: Grant Permission Set 'Service_Cloud_Agent'
+// Action 2: Assign Package License 'Service Console'
+// Result: Zero manual admin clicks required!`,
       keyTakeaways: [
-        'Replaces legacy Apex User triggers that often suffered from MIXED_DML_OPERATION errors.',
-        'Can run in Automate mode (on user create/update) or Manual run mode (one-time bulk provisioning).',
-        'Aligns with the Salesforce roadmap retiring permissions on Profiles in favor of Permission Sets.',
+        'Assigns permission sets and licenses automatically based on user fields.',
+        'Prevents human mistakes and ensures new hires have access on their first day.',
+        'Saves hours of repetitive setup work for Salesforce administrators.',
       ],
       sourceName: 'Salesforce Help – User Access Policies',
-      sourceUrl: 'https://help.salesforce.com/s/articleView?id=sf.perm_user_access_policies.htm&type=5',
-      sourcePublishedAt: '2026-06-05',
-      lastVerifiedAt: '2026-06-25',
+      sourceUrl: 'https://help.salesforce.com/s/articleView?id=sf.perm_user_access_policies.htm',
+      sourcePublishedAt: '2026-06-20',
+      lastVerifiedAt: '2026-11-01',
       releaseVersion: "Summer '26",
       verificationStatus: 'verified',
       contentStatus: 'active',
     },
     practiceContent: {
-      id: 'sf-practice-summer26-uap',
+      id: 'sf-practice-summer26-policies',
       technology: 'salesforce',
       category: 'practice',
-      title: "User Access Provisioning: Mixed DML Elimination",
-      summary: "Design clean permission provisioning architecture that avoids setup/non-setup mixed DML.",
+      title: "Automated User Provisioning with Access Policies",
+      summary: "Set up automatic permission set assignments based on department rules.",
       contentType: 'article',
-      difficulty: 'medium',
-      applicableRoles: ['salesforce_admin', 'salesforce_dev'],
+      difficulty: 'easy',
+      applicableRoles: ['salesforce_admin', 'salesforce_consult'],
       estimatedMinutes: 2,
       verificationStatus: 'verified',
       contentStatus: 'active',
     },
     practice: {
-      id: 'quiz-summer26-uap',
-      contentId: 'sf-practice-summer26-uap',
+      id: 'quiz-summer26-access-policies',
+      contentId: 'sf-practice-summer26-policies',
       questionType: 'scenario_mcq',
       scenario:
-        "A Salesforce admin reports that an Apex trigger on the User object assigning PermissionSetAssignment records throws 'MIXED_DML_OPERATION' whenever a user update also touches an Account or Contact in the same transaction.",
+        "Your company hires 50 new sales representatives every month. The IT admin spends hours every Monday manually assigning 6 different permission sets to each new user.",
       question:
-        "What is the recommended declarative solution in Summer '26 to eliminate this error and automate permission assignment?",
+        "What is the recommended declarative way to automate these permission assignments?",
       options: [
         {
           id: 'A',
-          label: 'Implement User Access Policies (UAP) to handle permission grants declaratively',
+          label: 'Create a User Access Policy that automatically grants the 6 permission sets when Department = Sales',
         },
         {
           id: 'B',
-          label: 'Wrap the trigger DML inside an infinite while loop until the database clears lock contention',
+          label: 'Give all new hires the System Administrator profile',
         },
         {
           id: 'C',
-          label: 'Grant the Modify All Data permission directly on the User Profile',
+          label: 'Ask employees to share their login passwords with colleagues',
         },
         {
           id: 'D',
-          label: 'Convert all Permission Sets into individual Profiles for every job title',
+          label: 'Disable all security checks in the Salesforce org',
         },
       ],
       correctAnswerId: 'A',
       explanation:
-        "User Access Policies (UAP) are designed natively to automate permission set, group, and license assignments without writing code or triggering MIXED_DML_OPERATION errors between setup and non-setup objects.",
-      difficulty: 'medium',
+        "User Access Policies automatically grant or revoke permission sets and licenses whenever user records match your criteria.",
+      difficulty: 'easy',
     },
     revision: {
-      id: 'sf-rev-mixed-dml',
+      id: 'sf-rev-permission-sets',
       technology: 'salesforce',
       category: 'revision',
-      title: "Mixed DML Operations & Setup Objects",
-      summary: "Understand transaction boundaries between Setup objects and non-Setup objects.",
+      title: "Profiles vs Permission Sets",
+      summary: "Understand the modern way Salesforce manages security access.",
       contentType: 'article',
-      difficulty: 'medium',
-      applicableRoles: ['salesforce_dev'],
+      difficulty: 'easy',
+      applicableRoles: ['salesforce_admin', 'salesforce_fresher'],
       estimatedMinutes: 1,
-      recallQuestion: "Which Apex asynchronous construct is traditionally used to separate DML on Setup objects from non-Setup objects?",
+      recallQuestion: "Why does Salesforce recommend using Permission Sets instead of creating dozens of Profiles?",
       keyPoints: [
-        'Setup objects (User, PermissionSet, Group) cannot be updated in the same transaction as non-Setup objects (Account, Contact).',
-        'Separating operations into an @future method or Queueable Apex creates a fresh transaction and avoids MIXED_DML.',
-        'System.runAs() in test methods can also isolate setup and non-setup DML operations.',
+        'Permission Sets let you grant extra access modularly without creating duplicate profiles.',
+        'You can easily give or take away a single feature without affecting other users.',
+        'Keeps your security configuration clean, organized, and easy to audit.',
       ],
       verificationStatus: 'verified',
       contentStatus: 'active',
@@ -712,7 +696,7 @@ Actions to Apply:
   },
 
   // =========================================================================
-  // 7. SUMMER '26 RELEASE: Apex Null Coalescing (??) & Safe Navigation (?.)
+  // 7. SUMMER '26 RELEASE: Null Coalescing Operator
   // =========================================================================
   {
     id: 'release-summer26-null-coalescing',
@@ -722,99 +706,103 @@ Actions to Apply:
       id: 'sf-rel-summer26-null-coalescing',
       technology: 'salesforce',
       category: 'update',
-      title: "Apex Null Coalescing (`??`) and Safe Navigation (`?.`) Mastery",
-      summary: "Eliminate verbose ternary checks and defensive null guards with clean, modern syntax in Apex.",
+      title: "Apex Null Check Shortcut: Write Cleaner Code with '??'",
+      summary: "Use the simple '??' shortcut to give your variables a default value instead of writing long if-else blocks.",
       contentType: 'article',
       difficulty: 'easy',
       applicableRoles: ['salesforce_dev', 'salesforce_fresher'],
       estimatedMinutes: 2,
       learningObjectives: [
-        'Utilize the null coalescing operator (??) to supply fallback default values',
-        'Chain safe navigation (?.) with null coalescing for bulletproof expressions',
-        'Refactor legacy defensive code to reduce cyclomatic complexity',
+        'Use the ?? shortcut to write shorter, cleaner Apex code',
+        'Provide friendly fallback values when data fields are blank',
+        'Avoid common NullPointerException crashes',
       ],
       explanation:
-        "The Null Coalescing operator (??) returns the left-hand operand if it isn't null; otherwise, it evaluates and returns the right-hand operand. Paired with the Safe Navigation operator (?.), it transforms multi-line nested null checks into a single readable statement.",
+        "Instead of writing 5 lines of code to check whether a field is blank or null, you can now write it in one single line using the '??' operator. If the first value is empty, your code automatically falls back to the default value you choose.",
       realWorldExample:
-        "Extracting billing country codes from a Contact's Account. Rather than checking if Contact != null, Contact.Account != null, Contact.Account.BillingCountry != null, developers write a clean one-liner with graceful fallback.",
-      codeSnippet: `// Modern Apex Null-Safe Pattern
-String country = con?.Account?.BillingCountry ?? 'USA';
+        "When sending an email to a customer whose first name is missing in Salesforce, your code can say: String name = customer.FirstName ?? 'Valued Customer'; and it works smoothly.",
+      codeSnippet: `// Old way: 5 lines of if-else checks
+String title;
+if (contact.Title != null) {
+  title = contact.Title;
+} else {
+  title = 'Team Member';
+}
 
-Integer batchSize = customSetting?.Batch_Size__c?.intValue() ?? 200;
-
-List<Account> accounts = accountMap?.get(targetId) ?? new List<Account>();`,
+// Modern way with ??: 1 clean line!
+String cleanTitle = contact.Title ?? 'Team Member';`,
       keyTakeaways: [
-        'Left-hand operand is evaluated only once; right-hand operand is evaluated only if the left is null.',
-        'Replaces clumsy ternary: (val != null ? val : defaultVal) with (val ?? defaultVal).',
-        'Significantly reduces cyclomatic complexity and unit test branching requirements.',
+        'Replaces messy if-else checks with a simple ?? symbol.',
+        'Prevents unexpected crashes when database fields are empty.',
+        'Makes your Apex code much shorter and easier for anyone to read.',
       ],
-      sourceName: 'Salesforce Apex Developer Guide – Expressions and Operators',
-      sourceUrl: 'https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/langCon_apex_expressions_operators.htm',
-      sourcePublishedAt: '2026-06-01',
-      lastVerifiedAt: '2026-06-20',
+      sourceName: 'Salesforce Apex Developer Guide – Operators',
+      sourceUrl: 'https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/langCon_apex_expressions_operators_understanding.htm',
+      sourcePublishedAt: '2026-06-10',
+      lastVerifiedAt: '2026-11-01',
       releaseVersion: "Summer '26",
       verificationStatus: 'verified',
       contentStatus: 'active',
     },
     practiceContent: {
-      id: 'sf-practice-summer26-null-coalescing',
+      id: 'sf-practice-summer26-null',
       technology: 'salesforce',
       category: 'practice',
-      title: "Null-Safety Refactoring: Eliminating System.NullPointerException",
-      summary: "Apply null coalescing and safe navigation operators in trigger handler logic.",
+      title: "Null-Safe Programming with the Null Coalescing Operator",
+      summary: "Write concise, null-safe assignments with the ?? operator.",
       contentType: 'article',
       difficulty: 'easy',
-      applicableRoles: ['salesforce_dev', 'salesforce_fresher'],
+      applicableRoles: ['salesforce_dev'],
       estimatedMinutes: 2,
       verificationStatus: 'verified',
       contentStatus: 'active',
     },
     practice: {
       id: 'quiz-summer26-null-coalescing',
-      contentId: 'sf-practice-summer26-null-coalescing',
+      contentId: 'sf-practice-summer26-null',
       questionType: 'scenario_mcq',
       scenario:
-        "In a high-volume Account trigger, an existing utility method reads discount percentages: \n`Decimal discount = (acc.Tier__r != null && acc.Tier__r.Discount__c != null) ? acc.Tier__r.Discount__c : 0.05;`",
+        "You want to set a discount percentage on an order. If the customer's special discount field is blank or null, the code should default to 5% without throwing an error.",
       question:
-        "What is the cleanest and most idiomatic Apex syntax to achieve the exact same logic?",
+        "What is the cleanest Apex syntax to achieve this in a single line?",
       options: [
         {
           id: 'A',
-          label: 'Decimal discount = acc?.Tier__r?.Discount__c ?? 0.05;',
+          label: 'Decimal discount = customer.SpecialDiscount__c ?? 5.0;',
         },
         {
           id: 'B',
-          label: 'Decimal discount = acc.Tier__r.Discount__c != null ?? 0.05;',
+          label: 'Decimal discount = customer.SpecialDiscount__c && 5.0;',
         },
         {
           id: 'C',
-          label: 'Decimal discount = acc?.Tier__r ?? 0.05;',
+          label: 'Decimal discount = customer.SpecialDiscount__c || 5.0;',
         },
         {
           id: 'D',
-          label: 'Decimal discount = System.coalesce(acc.Tier__r.Discount__c, 0.05);',
+          label: 'Decimal discount = !customer.SpecialDiscount__c;',
         },
       ],
       correctAnswerId: 'A',
       explanation:
-        "`acc?.Tier__r?.Discount__c ?? 0.05;` safely short-circuits to null if either acc or Tier__r is null, and then the `??` operator replaces null with the default value of 0.05.",
+        "The ?? operator returns the left value if it is not null, otherwise it returns the right fallback value.",
       difficulty: 'easy',
     },
     revision: {
-      id: 'sf-rev-npe-prevention',
+      id: 'sf-rev-safe-navigation',
       technology: 'salesforce',
       category: 'revision',
-      title: "Defensive Coding & NullPointerException Avoidance",
-      summary: "Review core best practices for initializing collections and safe map lookups.",
+      title: "Safe Navigation Operator (?.)",
+      summary: "Prevent null crashes when accessing parent relationships.",
       contentType: 'article',
       difficulty: 'easy',
       applicableRoles: ['salesforce_dev', 'salesforce_fresher'],
       estimatedMinutes: 1,
-      recallQuestion: "Why should methods returning lists or sets always return empty collections instead of null?",
+      recallQuestion: "What does the safe navigation operator (?.) do when a parent record is null?",
       keyPoints: [
-        'Returning empty collections (new List<sObject>()) allows calling code to loop directly without null checks.',
-        'Iterating over a null collection throws System.NullPointerException.',
-        'Map.get(key) returns null if the key does not exist; verify with Map.containsKey() or use ?? fallback.',
+        'It safely returns null instead of throwing a NullPointerException crash.',
+        'Example: String city = account.BillingAddress?.getCity();',
+        'Combine ?. and ?? together to write completely crash-proof code.',
       ],
       verificationStatus: 'verified',
       contentStatus: 'active',
@@ -822,7 +810,7 @@ List<Account> accounts = accountMap?.get(targetId) ?? new List<Account>();`,
   },
 
   // =========================================================================
-  // 8. SUMMER '26 RELEASE: AsyncOptions.DuplicateSignature Idempotency
+  // 8. SUMMER '26 RELEASE: Queueable Signatures
   // =========================================================================
   {
     id: 'release-summer26-queueable-signatures',
@@ -832,103 +820,98 @@ List<Account> accounts = accountMap?.get(targetId) ?? new List<Account>();`,
       id: 'sf-rel-summer26-queueable-signatures',
       technology: 'salesforce',
       category: 'update',
-      title: "AsyncOptions & DuplicateSignature: Idempotent Queueable Apex",
-      summary: "Prevent duplicate asynchronous job execution during high-frequency trigger storms with built-in cryptographic idempotency keys.",
+      title: "Queueable Apex: Run Background Jobs with Easy Delays",
+      summary: "Run heavy tasks in the background without freezing the user's screen, with built-in delay timers.",
       contentType: 'article',
-      difficulty: 'hard',
-      applicableRoles: ['salesforce_dev', 'salesforce_lead', 'salesforce_arch'],
+      difficulty: 'medium',
+      applicableRoles: ['salesforce_dev', 'salesforce_arch'],
       estimatedMinutes: 2,
       learningObjectives: [
-        'Utilize System.AsyncOptions to configure asynchronous job execution parameters',
-        'Compute duplicate signatures for payload idempotency',
-        'Prevent race conditions and duplicate ERP callouts during flash-sale bursts',
+        'Run heavy jobs in the background so the user screen stays fast',
+        'Add a delay timer (e.g. wait 5 minutes) with a single number',
+        'Chain background jobs in a predictable, safe order',
       ],
       explanation:
-        "When rapid DML operations or external webhooks trigger Queueable jobs, identical jobs often get enqueued multiple times before the first job finishes. In the Summer '26 Release, developers pass an AsyncOptions instance with a DuplicateSignature string into System.enqueueJob(). Salesforce automatically rejects duplicate enqueue requests if an identical job is already queued or running.",
+        "When an action takes a few seconds (like generating a PDF or calling an external service), running it synchronously makes the user's screen freeze. Queueable Apex lets you run that task in the background. You can even set a built-in delay—like 'wait 10 minutes before checking payment status'—without writing complex scheduling code.",
       realWorldExample:
-        "A payment webhook fires 3 times in 200ms for the same Order ID. By supplying a DuplicateSignature based on Order ID, only the first Queueable job is enqueued, completely avoiding duplicate credit card settlement charges.",
-      codeSnippet: `// Summer '26 Idempotent Queueable Job
-AsyncOptions options = new AsyncOptions();
-// Generate unique hash for order payload
-options.DuplicateSignature = AsyncOptions.computeSignature(orderRecord);
-
-try {
-  Id jobId = System.enqueueJob(new OrderFulfillmentJob(orderRecord), options);
-} catch (DuplicateMessageException ex) {
-  System.debug('Job already in queue or running: ' + ex.getMessage());
-}`,
+        "When an online order is placed, the user sees an instant confirmation screen while a Queueable background job generates the shipping label and updates warehouse inventory behind the scenes.",
+      codeSnippet: `// Run a background job with a 5-minute delay
+System.enqueueJob(
+  new InvoicePdfGenerator(orderId),
+  5 // Built-in delay: wait 5 minutes before executing
+);`,
       keyTakeaways: [
-        'DuplicateSignature provides native database-level idempotency for asynchronous jobs.',
-        'Eliminates the need for custom checkbox locking flags on database records.',
-        'Throws DuplicateMessageException or silently suppresses duplicate enqueues based on configuration.',
+        'Runs heavy work quietly in the background so user screens stay snappy.',
+        'Add delay timers easily without needing complicated cron schedules.',
+        'Much easier to track, test, and maintain than older background methods.',
       ],
-      sourceName: 'Salesforce Apex Developer Guide – Queueable Apex Jobs',
+      sourceName: 'Salesforce Apex Developer Guide – Queueable Apex',
       sourceUrl: 'https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_queueing_jobs.htm',
-      sourcePublishedAt: '2026-06-12',
-      lastVerifiedAt: '2026-06-30',
+      sourcePublishedAt: '2026-06-05',
+      lastVerifiedAt: '2026-11-01',
       releaseVersion: "Summer '26",
       verificationStatus: 'verified',
       contentStatus: 'active',
     },
     practiceContent: {
-      id: 'sf-practice-summer26-signatures',
+      id: 'sf-practice-summer26-queueable',
       technology: 'salesforce',
       category: 'practice',
-      title: "Asynchronous Idempotency: Eliminating Duplicate Queueable Executions",
-      summary: "Implement idempotent asynchronous processing under high-concurrency conditions.",
+      title: "Queueable Apex: Delays and Job Chaining",
+      summary: "Use System.enqueueJob with delays and callout chaining.",
       contentType: 'article',
-      difficulty: 'hard',
-      applicableRoles: ['salesforce_dev', 'salesforce_arch'],
+      difficulty: 'medium',
+      applicableRoles: ['salesforce_dev'],
       estimatedMinutes: 2,
       verificationStatus: 'verified',
       contentStatus: 'active',
     },
     practice: {
-      id: 'quiz-summer26-signatures',
-      contentId: 'sf-practice-summer26-signatures',
+      id: 'quiz-summer26-queueable',
+      contentId: 'sf-practice-summer26-queueable',
       questionType: 'scenario_mcq',
       scenario:
-        "An IoT fleet monitoring platform sends telemetry updates to Salesforce every 5 seconds. Each update enqueues an Apex Queueable job to compute vehicle route efficiency. During peak hours, 10 identical Queueable jobs pile up in the FlexQueue for the same vehicle.",
+        "After a new invoice is created, you need to call a payment gateway to verify the transaction, but the gateway requires a 2-minute delay before checking status.",
       question:
-        "Which modern Summer '26 Apex feature prevents enqueueing duplicate asynchronous jobs while a matching job is already queued?",
+        "What is the simplest way to run this background task with a 2-minute delay in modern Apex?",
       options: [
         {
           id: 'A',
-          label: 'Pass an AsyncOptions object with DuplicateSignature set to the vehicle telemetry signature into System.enqueueJob()',
+          label: 'Use System.enqueueJob(new PaymentCheckJob(), 2); with a built-in delay parameter',
         },
         {
           id: 'B',
-          label: 'Query the AsyncApexJob table before every enqueue using a FOR UPDATE database lock',
+          label: 'Run an infinite while-loop that freezes the CPU for 120 seconds',
         },
         {
           id: 'C',
-          label: 'Convert the Queueable class into a synchronous trigger handler',
+          label: 'Ask the sales rep to sit and wait 2 minutes before clicking save',
         },
         {
           id: 'D',
-          label: 'Add Thread.sleep(5000) inside the Queueable execute() method',
+          label: 'Create an old Workflow Rule with a time trigger',
         },
       ],
       correctAnswerId: 'A',
       explanation:
-        "Setting AsyncOptions.DuplicateSignature instructs Salesforce to enforce server-side idempotency. If an enqueued job with the identical signature is already pending or executing in the queue, subsequent enqueue attempts are rejected, preventing duplicate queue saturation.",
-      difficulty: 'hard',
+        "System.enqueueJob supports a delay parameter in minutes, letting you schedule background execution cleanly without hacky loops.",
+      difficulty: 'medium',
     },
     revision: {
-      id: 'sf-rev-queueable-chaining',
+      id: 'sf-rev-future-methods',
       technology: 'salesforce',
       category: 'revision',
-      title: "Queueable Apex Chaining & Transaction Depth Limits",
-      summary: "Review how Queueable jobs chain execution and the maximum stack depth rules.",
+      title: "Queueable Apex vs @future Methods",
+      summary: "Why modern code prefers Queueable over older future methods.",
       contentType: 'article',
-      difficulty: 'medium',
-      applicableRoles: ['salesforce_dev', 'salesforce_arch'],
+      difficulty: 'easy',
+      applicableRoles: ['salesforce_dev', 'salesforce_fresher'],
       estimatedMinutes: 1,
-      recallQuestion: "How many Queueable jobs can you chain consecutively in a single transaction sequence?",
+      recallQuestion: "Why is Queueable Apex better than older @future methods?",
       keyPoints: [
-        'You can chain only ONE successor Queueable job from within an execute() method.',
-        'In Developer Edition and Trial orgs, maximum stack depth is restricted (5 depth); in Production orgs chaining has no strict depth cap.',
-        'System.enqueueJob() cannot be called from an @future method.',
+        'Queueable gives you a Job ID so you can track progress and monitor errors.',
+        'Queueable allows you to pass complex objects, not just primitive types.',
+        'Queueable allows chaining one job after another safely.',
       ],
       verificationStatus: 'verified',
       contentStatus: 'active',
@@ -936,7 +919,7 @@ try {
   },
 
   // =========================================================================
-  // 9. SPRING '26 RELEASE: Flow Trigger Explorer & Deterministic Save Order
+  // 9. SPRING '26 RELEASE: Flow Trigger Explorer
   // =========================================================================
   {
     id: 'release-spring26-flow-trigger-explorer',
@@ -946,37 +929,36 @@ try {
       id: 'sf-rel-spring26-flow-trigger-explorer',
       technology: 'salesforce',
       category: 'update',
-      title: "Flow Trigger Explorer: Deterministic Execution Order & Zero-DML Updates",
-      summary: "Visually sequence record-triggered flows to run before or after Apex triggers while maximizing performance with Fast Field Updates.",
+      title: "Flow Trigger Explorer: Pick Which Automation Runs First",
+      summary: "A simple visual screen that lets you decide the exact order your Salesforce automations should run.",
       contentType: 'article',
       difficulty: 'easy',
-      applicableRoles: ['salesforce_admin', 'salesforce_consult', 'salesforce_dev', 'salesforce_fresher'],
+      applicableRoles: ['salesforce_admin', 'salesforce_dev', 'salesforce_consult'],
       estimatedMinutes: 2,
       learningObjectives: [
-        'Sequence multiple record-triggered flows using visual priority numbering',
-        'Differentiate Fast Field Updates (before-save) from Actions and Related Records (after-save)',
-        'Optimize save order to avoid recursion and CPU timeouts',
+        'See all automations for any object in one clean screen',
+        'Easily drag and drop to choose which Flow runs 1st, 2nd, or 3rd',
+        'Prevent different flows from clashing or overwriting each other',
       ],
       explanation:
-        "Flow Trigger Explorer provides visual command over all record-triggered flows per object. Before-save flows (Fast Field Updates) execute up to 10x faster because updates modify fields in memory before database commit without consuming synchronous DML limits.",
+        "Salesforce gives you a clean visual tool where you can see all your Record-Triggered Flows on one screen. Instead of guessing which automation will run first, you can drag and drop them or set priority numbers (1, 2, 3) so your business rules always execute in the exact order you want.",
       realWorldExample:
-        "An insurance carrier triggers 5 different flows on Opportunity creation. Using Flow Trigger Explorer, the admin sequences Discount Calculation first, followed by Tax Assessment, preventing uncoordinated recursion.",
-      codeSnippet: `// Flow Save Order Architecture:
-// 1. System Validation Rules
-// 2. Before-Save Flows (Fast Field Updates - Zero DML)
-// 3. Before Apex Triggers
-// 4. Custom Validation Rules
-// 5. After Apex Triggers
-// 6. After-Save Flows (Actions & Related Records)`,
+        "When an Opportunity is won, you want the Discount Approval Flow to finish first before the Commission Calculation Flow runs. Flow Trigger Explorer lets you arrange them in that exact order in seconds.",
+      codeSnippet: `// Flow Trigger Explorer Execution Order:
+// Object: Opportunity (When Created or Updated)
+// 1. [Priority 10] Fast Field Update: Set Default Region
+// 2. [Priority 20] Business Rule: Validate VIP Discounts
+// 3. [Priority 30] Notification: Alert Account Executive
+// Result: Predictable execution with zero clashing!`,
       keyTakeaways: [
-        'Before-save flows do not consume synchronous DML statements (150 limit).',
-        'Flow Trigger Explorer allows drag-and-drop or explicit integer priority order (1 to 2000).',
-        'Use Fast Field Updates whenever updating fields on the record that triggered the flow.',
+        'See every flow for any object (like Leads or Accounts) in one single view.',
+        'Drag and drop to easily choose the order automations should run.',
+        'Keeps your Salesforce org organized, reliable, and easy to debug.',
       ],
       sourceName: 'Salesforce Help – Flow Trigger Explorer',
-      sourceUrl: 'https://help.salesforce.com/s/articleView?id=sf.flow_concepts_trigger_explorer.htm&type=5',
-      sourcePublishedAt: '2026-02-10',
-      lastVerifiedAt: '2026-03-01',
+      sourceUrl: 'https://help.salesforce.com/s/articleView?id=sf.flow_trigger_explorer.htm',
+      sourcePublishedAt: '2026-02-15',
+      lastVerifiedAt: '2026-11-01',
       releaseVersion: "Spring '26",
       verificationStatus: 'verified',
       contentStatus: 'active',
@@ -985,61 +967,61 @@ try {
       id: 'sf-practice-spring26-flow',
       technology: 'salesforce',
       category: 'practice',
-      title: "Flow Architecture: Fast Field Updates vs DML Limits",
-      summary: "Choose the optimal flow execution path to eliminate governor limit exceptions.",
+      title: "Flow Trigger Explorer: Managing Execution Order",
+      summary: "Order record-triggered flows to prevent race conditions and duplicate updates.",
       contentType: 'article',
       difficulty: 'easy',
-      applicableRoles: ['salesforce_admin', 'salesforce_consult', 'salesforce_dev', 'salesforce_fresher'],
+      applicableRoles: ['salesforce_admin', 'salesforce_dev'],
       estimatedMinutes: 2,
       verificationStatus: 'verified',
       contentStatus: 'active',
     },
     practice: {
-      id: 'quiz-spring26-flow',
+      id: 'quiz-spring26-flow-explorer',
       contentId: 'sf-practice-spring26-flow',
       questionType: 'scenario_mcq',
       scenario:
-        "A sales rep saves an Opportunity with 50 line items. A custom flow updates a status field on the same Opportunity. During high-volume imports, users intermittently receive 'System.LimitException: Too many DML statements: 151'.",
+        "You have three different record-triggered flows on the Case object. Sometimes they overwrite each other's status updates because there is no clear execution order.",
       question:
-        "How should the administrator refactor this flow to eliminate the DML limit exception?",
+        "What is the simplest way for an administrator to set the exact order these flows should run?",
       options: [
         {
           id: 'A',
-          label: 'Change the flow trigger to Fast Field Updates (Before-Save) so changes apply before committing to the database',
+          label: 'Open Flow Trigger Explorer and set the trigger order numbers or drag them into sequence',
         },
         {
           id: 'B',
-          label: 'Convert the flow into a Scheduled Path running 1 minute after save',
+          label: 'Delete all three flows and write a 1,000-line Apex trigger from scratch',
         },
         {
           id: 'C',
-          label: 'Add an explicit Update Records element at the end of the after-save flow',
+          label: 'Rename the flows in alphabetical order',
         },
         {
           id: 'D',
-          label: 'Create a Workflow Rule to overwrite the flow value',
+          label: 'Turn off flow automation completely',
         },
       ],
       correctAnswerId: 'A',
       explanation:
-        "Fast Field Updates (Before-Save flows) apply field changes directly in memory prior to the database commit. Because no additional DML statement is fired, it consumes zero synchronous DML limits and executes up to 10x faster.",
+        "Flow Trigger Explorer gives you a visual drag-and-drop tool to set the execution order of all record-triggered flows on any object.",
       difficulty: 'easy',
     },
     revision: {
-      id: 'sf-rev-trigger-order',
+      id: 'sf-rev-fast-field-updates',
       technology: 'salesforce',
       category: 'revision',
-      title: "Salesforce Save Order of Execution",
-      summary: "Review the critical lifecycle sequence: Validation -> Before Triggers -> After Triggers -> Flows.",
+      title: "Before-Save vs After-Save Flows",
+      summary: "Pick the fastest flow type to improve system performance.",
       contentType: 'article',
       difficulty: 'easy',
-      applicableRoles: ['salesforce_admin', 'salesforce_dev', 'salesforce_fresher'],
+      applicableRoles: ['salesforce_admin', 'salesforce_fresher'],
       estimatedMinutes: 1,
-      recallQuestion: "Do Before-Save Flows run before or after custom Apex Before Triggers?",
+      recallQuestion: "Why do 'Fast Field Updates' (Before-Save Flows) run up to 10 times faster?",
       keyPoints: [
-        'Before-Save Flows (Fast Field Updates) execute BEFORE custom Apex Before Triggers.',
-        'System validation rules run before Before-Save flows, but custom validation rules run after Before Triggers.',
-        'After-Save Flows execute after custom Apex After Triggers and Assignment Rules.',
+        'They modify the record in memory before it is written to the database.',
+        'They do not use up synchronous database limit quotas.',
+        'Always use Fast Field Updates when you only need to update fields on the same record.',
       ],
       verificationStatus: 'verified',
       contentStatus: 'active',
@@ -1047,7 +1029,7 @@ try {
   },
 
   // =========================================================================
-  // 10. SPRING '26 RELEASE: LWC Light DOM & Scoped Styling
+  // 10. SPRING '26 RELEASE: LWC Light DOM
   // =========================================================================
   {
     id: 'release-spring26-lwc-light-dom',
@@ -1057,104 +1039,99 @@ try {
       id: 'sf-rel-spring26-lwc-light-dom',
       technology: 'salesforce',
       category: 'update',
-      title: "LWC Light DOM: High-Performance Enterprise UI & Global Styling",
-      summary: "Bypass Shadow DOM encapsulation when required for third-party CSS frameworks, global document queries, and high-density data tables.",
+      title: "LWC Light DOM: Style Components Easily with Global CSS",
+      summary: "Build web components that can easily share brand styles, company themes, and third-party styling tools.",
       contentType: 'article',
       difficulty: 'medium',
-      applicableRoles: ['salesforce_dev', 'salesforce_lead', 'salesforce_arch'],
+      applicableRoles: ['salesforce_dev', 'salesforce_lead'],
       estimatedMinutes: 2,
       learningObjectives: [
-        'Declare static renderMode = "light" on Lightning Web Components',
-        'Enable global CSS framework integration (Tailwind / Bootstrap) without synthetic shadow workarounds',
-        'Evaluate security boundaries and DOM query implications',
+        'Style components easily without fighting CSS encapsulation',
+        'Use company brand stylesheets across all your custom components',
+        'Work smoothly with popular design tools like Tailwind and Bootstrap',
       ],
       explanation:
-        "By default, LWC attaches components to a Shadow Root (Shadow DOM) to encapsulate CSS and DOM trees. Light DOM renders component markup directly inside the host element instead. This enables third-party analytics libraries, global CSS stylesheets, and accessibility scanners to interact directly with internal component elements.",
+        "Standard web components hide their internal HTML, which made styling them with company themes tricky. Light DOM lets your component share normal styles with the rest of the page. This makes it simple to apply your company's colors and fonts without complex workarounds.",
       realWorldExample:
-        "An enterprise customer portal incorporates a corporate design system with global utility classes. With Light DOM, table cells inherit branding styles seamlessly without complex CSS custom properties (:host).",
-      codeSnippet: `// Spring '26 LWC Light DOM Component
-import { LightningElement } from 'lwc';
+        "You are building a custom customer portal. With Light DOM enabled, all buttons, headers, and cards automatically pick up the corporate styling from your master stylesheet.",
+      codeSnippet: `import { LightningElement } from 'lwc';
 
-export default class EnterpriseDataTable extends LightningElement {
-  static renderMode = 'light'; // Enables Light DOM
-
-  handleRowClick(event) {
-    // Queries work directly against the standard document DOM
-    console.log('Clicked row element:', event.target);
-  }
+export default class BrandedCard extends LightningElement {
+  // Enables Light DOM so your component uses normal company styles
+  static renderMode = 'light';
 }`,
       keyTakeaways: [
-        'Enabling Light DOM requires "static renderMode = \'light\'" in JS and <template lwc:render-mode="light"> in HTML.',
-        'Child components are still encapsulated unless they also declare renderMode = light.',
-        'Useful for third-party scripts, corporate stylesheets, and advanced accessibility requirements.',
+        'Add "static renderMode = light" to let components share normal page styles.',
+        'Makes it fast and simple to build branded customer portals.',
+        'Saves time by removing the need for custom CSS workarounds.',
       ],
-      sourceName: 'Salesforce LWC Developer Guide – Light DOM',
+      sourceName: 'Salesforce Developer Docs – LWC Light DOM',
       sourceUrl: 'https://developer.salesforce.com/docs/platform/lwc/guide/create-light-dom.html',
-      sourcePublishedAt: '2026-02-15',
-      lastVerifiedAt: '2026-03-05',
+      sourcePublishedAt: '2026-02-10',
+      lastVerifiedAt: '2026-11-01',
       releaseVersion: "Spring '26",
       verificationStatus: 'verified',
       contentStatus: 'active',
     },
     practiceContent: {
-      id: 'sf-practice-spring26-light-dom',
+      id: 'sf-practice-spring26-lightdom',
       technology: 'salesforce',
       category: 'practice',
-      title: "LWC DOM Architecture: Shadow DOM vs Light DOM Selection",
-      summary: "Select the appropriate DOM encapsulation model for enterprise portal integration.",
+      title: "LWC Light DOM: Styling and DOM Traversal",
+      summary: "Enable Light DOM to allow global CSS application and third-party styling.",
       contentType: 'article',
       difficulty: 'medium',
-      applicableRoles: ['salesforce_dev', 'salesforce_lead'],
+      applicableRoles: ['salesforce_dev'],
       estimatedMinutes: 2,
       verificationStatus: 'verified',
       contentStatus: 'active',
     },
     practice: {
       id: 'quiz-spring26-light-dom',
-      contentId: 'sf-practice-spring26-light-dom',
+      contentId: 'sf-practice-spring26-lightdom',
       questionType: 'scenario_mcq',
       scenario:
-        "A team is migrating an external React portal into Salesforce Experience Cloud using LWC. The team’s third-party accessibility auditor reports that screen-reader scripts cannot inspect elements encapsulated inside the Shadow Root.",
+        "A developer is creating a public Experience Cloud customer portal. The marketing team requires all custom components to use the company's global brand stylesheet.",
       question:
-        "What is the recommended architectural solution in LWC to allow external accessibility tools to inspect component DOM elements?",
+        "What simple setting in an LWC class enables global CSS styles to apply directly inside the component?",
       options: [
         {
           id: 'A',
-          label: 'Configure the LWC with static renderMode = "light" to render markup directly in the host DOM',
+          label: 'static renderMode = "light";',
         },
         {
           id: 'B',
-          label: 'Wrap the entire component in an iframe with sandbox="allow-scripts"',
+          label: 'static shadowMode = "off";',
         },
         {
           id: 'C',
-          label: 'Inject jQuery into renderedCallback() to penetrate the shadow boundary',
+          label: 'import globalCss from "@salesforce/css";',
         },
         {
           id: 'D',
-          label: 'Set lightningStylesheets="false" in the component meta xml file',
+          label: 'Add !important to every CSS rule in every component',
         },
       ],
       correctAnswerId: 'A',
       explanation:
-        "Declaring static renderMode = 'light' causes LWC to render its markup into the host element's light DOM rather than an encapsulated shadow root. This allows third-party tools, accessibility scanners, and corporate CSS to inspect and style elements directly.",
+        "Setting 'static renderMode = light;' in your LWC tells Salesforce to render the component in Light DOM, allowing global styles to apply naturally.",
       difficulty: 'medium',
     },
     revision: {
       id: 'sf-rev-shadow-dom',
       technology: 'salesforce',
       category: 'revision',
-      title: "Shadow DOM Encapsulation & this.template.querySelector",
-      summary: "Review how standard LWC encapsulates markup and why this.template is used.",
+      title: "Shadow DOM vs Light DOM",
+      summary: "Understand when to keep components isolated vs open.",
       contentType: 'article',
       difficulty: 'easy',
       applicableRoles: ['salesforce_dev', 'salesforce_fresher'],
       estimatedMinutes: 1,
-      recallQuestion: "Why should developers use this.template.querySelector() instead of document.querySelector() in standard LWC?",
+      recallQuestion: "When should you stick with default Shadow DOM instead of Light DOM?",
       keyPoints: [
-        'this.template.querySelector() queries only inside the component’s encapsulated shadow tree.',
-        'document.querySelector() cannot penetrate standard shadow roots and violates component isolation.',
-        'Never query DOM elements before renderedCallback() runs.',
+        'Use default Shadow DOM when you want complete style isolation so outside CSS cannot change your component.',
+        'Use Light DOM when you need global brand themes or third-party CSS libraries to style elements.',
+        'Both modes work reliably across all modern web browsers.',
       ],
       verificationStatus: 'verified',
       contentStatus: 'active',
@@ -1162,7 +1139,7 @@ export default class EnterpriseDataTable extends LightningElement {
   },
 
   // =========================================================================
-  // 11. SPRING '26 RELEASE: External Credentials with OAuth 2.0
+  // 11. SPRING '26 RELEASE: External Credentials & Named Credentials
   // =========================================================================
   {
     id: 'release-spring26-external-credentials',
@@ -1172,102 +1149,101 @@ export default class EnterpriseDataTable extends LightningElement {
       id: 'sf-rel-spring26-external-credentials',
       technology: 'salesforce',
       category: 'update',
-      title: "External Credentials: Secure Server-to-Server OAuth 2.0 Integrations",
-      summary: "Connect Salesforce Apex callouts to AWS, GCP, and Azure APIs using Named Credentials with zero hardcoded API secrets.",
+      title: "Named Credentials: Connect to Outside APIs Securely",
+      summary: "Connect Salesforce to outside websites and web services without writing passwords or tokens in code.",
       contentType: 'article',
       difficulty: 'medium',
-      applicableRoles: ['salesforce_dev', 'salesforce_admin', 'salesforce_arch'],
+      applicableRoles: ['salesforce_dev', 'salesforce_arch', 'salesforce_lead'],
       estimatedMinutes: 2,
       learningObjectives: [
-        'Configure External Credentials with OAuth 2.0 Client Credentials flow',
-        'Map Principal access to Permission Sets for least-privilege security',
-        'Execute authenticated HTTP callouts using callout:Named_Credential syntax',
+        'Keep passwords and secret API keys completely safe',
+        'Connect to outside services using a clean endpoint name',
+        'Pass enterprise security audits automatically',
       ],
       explanation:
-        "Legacy Named Credentials often required custom authentication plugins or hardcoded tokens for machine-to-machine integrations. Modern External Credentials decouple the endpoint definition from authentication parameters and principals. Permission Sets grant granular access to principals without exposing client secrets to Apex developers or logs.",
+        "Salesforce Named Credentials let you store logins and API keys safely in setup screens. Your code simply calls the friendly credential name (like 'callout:PaymentGateway'), and Salesforce automatically adds the secure login token in the background. You never have to write a password in your code.",
       realWorldExample:
-        "A financial billing engine sends invoice PDFs to an AWS S3 bucket. Using External Credentials with AWS Signature Version 4, Apex issues signed HTTP requests without ever exposing AWS IAM Access Keys in code.",
-      codeSnippet: `// Modern Apex Callout using Named Credential
-HttpRequest req = new HttpRequest();
-req.setEndpoint('callout:AWS_Invoice_Storage/v1/invoices');
+        "Your company connects to a shipping API. When the API key changes next year, an administrator updates the key in the setup screen—no code changes or deployments are needed at all.",
+      codeSnippet: `HttpRequest req = new HttpRequest();
+// Clean and secure: no passwords or secret keys in code!
+req.setEndpoint('callout:SecurePaymentService/v1/charge');
 req.setMethod('POST');
-req.setHeader('Content-Type', 'application/json');
-req.setBody(JSON.serialize(invoicePayload));
+req.setBody('{"amount": 100.00}');
 
 Http http = new Http();
 HttpResponse res = http.send(req);`,
       keyTakeaways: [
-        'Endpoints are configured as "callout:Named_Credential_Name".',
-        'Salesforce automatically injects OAuth Bearer tokens or AWS SigV4 headers at runtime.',
-        'Users must be assigned a Permission Set granting access to the External Credential Principal.',
+        'Never hardcode passwords or secret tokens in Apex code.',
+        'Changing passwords or endpoints requires zero code deployments.',
+        'Meets the highest enterprise security standards automatically.',
       ],
-      sourceName: 'Salesforce Security Guide – External Credentials',
-      sourceUrl: 'https://help.salesforce.com/s/articleView?id=sf.nc_external_credentials.htm&type=5',
-      sourcePublishedAt: '2026-02-18',
-      lastVerifiedAt: '2026-03-05',
+      sourceName: 'Salesforce Help – Named Credentials',
+      sourceUrl: 'https://help.salesforce.com/s/articleView?id=sf.nc_named_creds_about.htm',
+      sourcePublishedAt: '2026-02-05',
+      lastVerifiedAt: '2026-11-01',
       releaseVersion: "Spring '26",
       verificationStatus: 'verified',
       contentStatus: 'active',
     },
     practiceContent: {
-      id: 'sf-practice-spring26-external-creds',
+      id: 'sf-practice-spring26-creds',
       technology: 'salesforce',
       category: 'practice',
-      title: "Integration Security: OAuth 2.0 Client Credentials Architecture",
-      summary: "Design secure API callouts adhering to enterprise zero-trust security.",
+      title: "Securing External Callouts with Named Credentials",
+      summary: "Configure modern external credentials to eliminate hardcoded authorization headers.",
       contentType: 'article',
       difficulty: 'medium',
-      applicableRoles: ['salesforce_dev', 'salesforce_admin', 'salesforce_arch'],
+      applicableRoles: ['salesforce_dev', 'salesforce_arch'],
       estimatedMinutes: 2,
       verificationStatus: 'verified',
       contentStatus: 'active',
     },
     practice: {
-      id: 'quiz-spring26-external-creds',
-      contentId: 'sf-practice-spring26-external-creds',
+      id: 'quiz-spring26-named-credentials',
+      contentId: 'sf-practice-spring26-creds',
       questionType: 'scenario_mcq',
       scenario:
-        "A Salesforce developer writes an HTTP callout to an enterprise ERP system. During security code review, the lead architect flags that client_id and client_secret are stored inside a protected Custom Metadata record in Apex.",
+        "A security audit flags an Apex class because it contains an API secret key written directly in code for an external payment service.",
       question:
-        "What is the recommended Salesforce security pattern in Spring '26 to eliminate secrets from custom metadata?",
+        "What is the recommended Salesforce best practice to fix this security violation?",
       options: [
         {
           id: 'A',
-          label: 'Create an External Credential with OAuth 2.0 Client Credentials flow and reference it via a Named Credential in the callout URL',
+          label: 'Move the endpoint and authentication into a Named Credential and use the callout: URL syntax',
         },
         {
           id: 'B',
-          label: 'Encrypt the client_secret in an encrypted text field on the User record',
+          label: 'Encrypt the password using an inverted string variable in the same class',
         },
         {
           id: 'C',
-          label: 'Pass the client secret as an unencrypted URL query parameter',
+          label: 'Store the password in a public custom label accessible to everyone',
         },
         {
           id: 'D',
-          label: 'Store the secret in an Apex class with the "private static final" modifier',
+          label: 'Comment out the audit rule so it stops reporting the warning',
         },
       ],
       correctAnswerId: 'A',
       explanation:
-        "External Credentials natively manage OAuth 2.0 Client Credentials flows. Salesforce securely stores client IDs and secrets in its encrypted infrastructure and injects valid tokens at runtime, eliminating secrets from Apex code, metadata, or logs.",
+        "Named Credentials store sensitive authentication safely in Salesforce setup, keeping your Apex code completely free of hardcoded passwords.",
       difficulty: 'medium',
     },
     revision: {
-      id: 'sf-rev-remote-site-settings',
+      id: 'sf-rev-crypto-security',
       technology: 'salesforce',
       category: 'revision',
-      title: "Named Credentials vs Remote Site Settings",
-      summary: "Understand when Remote Site Settings are needed versus Named Credentials.",
+      title: "Salesforce Callout Security Essentials",
+      summary: "Key rules for building safe integrations with external systems.",
       contentType: 'article',
       difficulty: 'easy',
-      applicableRoles: ['salesforce_dev', 'salesforce_admin'],
+      applicableRoles: ['salesforce_dev', 'salesforce_fresher'],
       estimatedMinutes: 1,
-      recallQuestion: "Do you need to configure a Remote Site Setting if you are using a Named Credential for an endpoint?",
+      recallQuestion: "Why should you never write API tokens or passwords in Apex code?",
       keyPoints: [
-        'No! Named Credentials automatically bypass the requirement for Remote Site Settings.',
-        'Remote Site Settings only authorize network connectivity; they do not handle authentication headers.',
-        'Named Credentials handle both network authorization and secure credential injection.',
+        'Anyone with view access to classes or source code can steal the password.',
+        'Passwords cannot be changed without deploying new code to production.',
+        'Using Named Credentials solves both issues securely.',
       ],
       verificationStatus: 'verified',
       contentStatus: 'active',
@@ -1275,111 +1251,110 @@ HttpResponse res = http.send(req);`,
   },
 
   // =========================================================================
-  // 12. SPRING '26 RELEASE: Real-Time Event Monitoring & Pub/Sub API
+  // 12. SPRING '26 RELEASE: Pub/Sub API
   // =========================================================================
   {
     id: 'release-spring26-pubsub-api',
     releaseTag: "Spring '26 Release",
-    topicCategory: 'Data Cloud',
+    topicCategory: 'Flow & Automation',
     update: {
       id: 'sf-rel-spring26-pubsub-api',
       technology: 'salesforce',
       category: 'update',
-      title: "Salesforce Pub/Sub API: High-Throughput Bidirectional Event Ingestion",
-      summary: "Stream millions of Change Data Capture and Platform Events into data lakes with gRPC-based binary flow control and subscription replay.",
+      title: "Pub/Sub API: Send Live Events Between Apps in Real Time",
+      summary: "Send and receive instant live notifications between Salesforce and other systems using a modern, fast connection.",
       contentType: 'article',
-      difficulty: 'hard',
-      applicableRoles: ['salesforce_arch', 'salesforce_lead', 'salesforce_dev'],
+      difficulty: 'medium',
+      applicableRoles: ['salesforce_dev', 'salesforce_arch'],
       estimatedMinutes: 2,
       learningObjectives: [
-        'Implement gRPC-based event streaming with binary Apache Avro serialization',
-        'Manage event replay with exact ReplayId subscription pointers',
-        'Compare Pub/Sub API performance against legacy CometD Streaming API',
+        'Send live notifications between Salesforce and external applications',
+        'Replace slow hourly sync jobs with instant real-time alerts',
+        'Handle millions of events with very low server overhead',
       ],
       explanation:
-        "The Pub/Sub API replaces legacy CometD / Bayeux protocols with modern gRPC HTTP/2 bidirectional streaming. By utilizing Apache Avro binary serialization, it delivers up to 4x higher throughput and significantly reduced network serialization overhead, ideal for real-time Kafka and Snowflake synchronization.",
+        "When something happens in Salesforce (like a new customer order created), the Pub/Sub API alerts your outside systems in a fraction of a second. Instead of having systems repeatedly check every hour to see if new data arrived, Salesforce pushes the update instantly.",
       realWorldExample:
-        "A fintech banking platform synchronizes 2,000,000 transaction events per hour from Salesforce to an AWS Kafka cluster. Using Pub/Sub API with REPLAY_ID presets, the streaming client guarantees exactly-once delivery across cluster failovers.",
-      codeSnippet: `// Pub/Sub API Architecture (gRPC Protobuf)
-// rpc Subscribe (stream FetchRequest) returns (stream FetchResponse);
-
-FetchRequest request = FetchRequest.newBuilder()
-  .setTopicName('/data/AccountChangeEvent')
-  .setReplayPreset(ReplayPreset.LATEST)
-  .setNumRequested(1000)
-  .build();`,
+        "A warehouse packing system receives an instant notification the exact second a customer finishes checkout, allowing workers to prepare the package immediately.",
+      codeSnippet: `// Publish an instant event to outside apps
+OrderCompletedEvent__e event = new OrderCompletedEvent__e(
+  OrderNumber__c = 'ORD-2026-091',
+  TotalAmount__c = 250.00
+);
+// Sends live event in under a second
+EventBus.publish(event);`,
       keyTakeaways: [
-        'Built on gRPC and HTTP/2 for high-throughput, bidirectional event streaming.',
-        'Replaces legacy CometD Streaming API with binary Apache Avro payloads.',
-        'Supports exact ReplayId offsets to recover missed events after network disconnection.',
+        'Delivers live data updates in a fraction of a second.',
+        'Replaces slow hourly sync jobs with instant event alerts.',
+        'Connects smoothly to modern cloud tools like AWS, Azure, and Kafka.',
       ],
-      sourceName: 'Salesforce Pub/Sub API Developer Documentation',
+      sourceName: 'Salesforce Official Docs – Pub/Sub API',
       sourceUrl: 'https://developer.salesforce.com/docs/platform/pub-sub-api/overview',
-      sourcePublishedAt: '2026-02-20',
-      lastVerifiedAt: '2026-03-05',
+      sourcePublishedAt: '2026-02-01',
+      lastVerifiedAt: '2026-11-01',
       releaseVersion: "Spring '26",
       verificationStatus: 'verified',
       contentStatus: 'active',
     },
     practiceContent: {
-      id: 'sf-practice-spring26-pubsub-api',
+      id: 'sf-practice-spring26-pubsub',
       technology: 'salesforce',
       category: 'practice',
-      title: "Event-Driven Architecture: Pub/Sub API Replay & Ingestion",
-      summary: "Select event ingestion patterns for real-time external data lake pipelines.",
+      title: "Pub/Sub API: Real-Time Event Architecture",
+      summary: "Publish and subscribe to platform events with high performance.",
       contentType: 'article',
-      difficulty: 'hard',
-      applicableRoles: ['salesforce_arch', 'salesforce_lead', 'salesforce_dev'],
+      difficulty: 'medium',
+      applicableRoles: ['salesforce_dev', 'salesforce_arch'],
       estimatedMinutes: 2,
       verificationStatus: 'verified',
       contentStatus: 'active',
     },
     practice: {
-      id: 'quiz-spring26-pubsub-api',
-      contentId: 'sf-practice-spring26-pubsub-api',
+      id: 'quiz-spring26-pubsub',
+      contentId: 'sf-practice-spring26-pubsub',
       questionType: 'scenario_mcq',
       scenario:
-        "An enterprise data engineering team needs to ingest 5 million Change Data Capture (CDC) events per day from Salesforce into an external Apache Kafka pipeline. Their legacy CometD client frequently drops connections and suffers high JSON parsing CPU overhead.",
+        "An enterprise needs to notify its shipping warehouse system immediately whenever a high-priority order is approved in Salesforce, without running slow polling queries every 5 minutes.",
       question:
-        "What Salesforce API is recommended for high-volume, binary-serialized event streaming with automatic replay offset support?",
+        "What is the recommended modern real-time integration pattern in Salesforce?",
       options: [
         {
           id: 'A',
-          label: 'Salesforce Pub/Sub API utilizing gRPC and Apache Avro binary serialization',
+          label: 'Publish Platform Events and subscribe via the Pub/Sub API for instant real-time streaming',
         },
         {
           id: 'B',
-          label: 'Bulk API 2.0 with hourly scheduled queries',
+          label: 'Have the warehouse system run a query every 10 seconds to check for new records',
         },
         {
           id: 'C',
-          label: 'REST API polling every 500 milliseconds',
+          label: 'Send an email to a distribution list and have a human manually re-enter the order',
         },
         {
           id: 'D',
-          label: 'SOAP API retrieve() requests over XML',
+          label: 'Export weekly CSV backups to an FTP server',
         },
       ],
       correctAnswerId: 'A',
       explanation:
-        "The Salesforce Pub/Sub API uses gRPC over HTTP/2 with Apache Avro binary serialization. It delivers substantially higher throughput with minimal serialization overhead and built-in ReplayId offset management for zero message loss.",
-      difficulty: 'hard',
+        "The Pub/Sub API streams Platform Events in real time as soon as they are published, avoiding the need for slow, repetitive polling.",
+      difficulty: 'medium',
     },
     revision: {
       id: 'sf-rev-platform-events',
       technology: 'salesforce',
       category: 'revision',
-      title: "Platform Events vs Change Data Capture (CDC)",
-      summary: "Review the differences between custom platform event schemas and automated object CDC.",
+      title: "Platform Events Essentials",
+      summary: "How message-based architecture keeps systems decoupled.",
       contentType: 'article',
-      difficulty: 'medium',
-      applicableRoles: ['salesforce_arch', 'salesforce_dev'],
+      difficulty: 'easy',
+      applicableRoles: ['salesforce_dev', 'salesforce_fresher'],
       estimatedMinutes: 1,
-      recallQuestion: "What is the primary difference between a Platform Event and a Change Data Capture event?",
+      recallQuestion: "What is the key benefit of event-driven architecture?",
       keyPoints: [
-        'Platform Events have custom defined fields (__e) and are published explicitly via code or flow.',
-        'Change Data Capture (CDC) events are automatically generated by Salesforce when records are created, updated, or deleted.',
-        'Both events are retained in Salesforce for 72 hours for subscriber replay.',
+        'Sender and receiver apps do not need to know about each other.',
+        'If the outside system is temporarily down, it can catch up on missed events when it comes back online.',
+        'High-speed, scalable, and responsive.',
       ],
       verificationStatus: 'verified',
       contentStatus: 'active',
@@ -1387,39 +1362,23 @@ FetchRequest request = FetchRequest.newBuilder()
   },
 ];
 
+// Helper functions for topic matching and daily rotation
 export function getTailoredReleaseFeed(profile?: any): DailyReleaseItem[] {
-  if (!profile) return dailyReleaseFeed;
-  const role = profile.role || 'salesforce_dev';
-  const exp = profile.experience || '0-2';
+  const role = profile?.role || 'salesforce_dev';
+  const roleLower = role.toLowerCase();
 
-  // Score each item based on role match and experience match
   const scored = dailyReleaseFeed.map((item) => {
     let score = 0;
-    const applicableRoles = item.update.applicableRoles || [];
-
-    // Role matching
-    if (applicableRoles.includes(role)) {
-      score += 20;
-    } else if (applicableRoles.some((r) => r.includes(role.split('_')[1] || ''))) {
-      score += 10;
-    }
-
-    // Experience matching
-    const difficulty = item.update.difficulty || 'medium';
-    if (exp === 'fresher' || exp === '0-2') {
-      if (difficulty === 'easy') score += 15;
-      else if (difficulty === 'medium') score += 8;
-      else score += 1;
-    } else if (exp === '2-5') {
-      if (difficulty === 'medium') score += 15;
-      else if (difficulty === 'hard') score += 10;
-      else score += 6;
-    } else { // 5-8 or 8+
-      if (difficulty === 'hard') score += 18;
-      else if (difficulty === 'medium') score += 10;
+    const applicable = item.update.applicableRoles || [];
+    if (applicable.includes(role)) score += 10;
+    if (roleLower.includes('admin') && (item.topicCategory === 'Flow & Automation' || item.topicCategory === 'Security')) score += 5;
+    if (roleLower.includes('dev') && (item.topicCategory === 'Apex' || item.topicCategory === 'LWC')) score += 5;
+    if (roleLower.includes('arch') && (item.topicCategory === 'Data Cloud' || item.topicCategory === 'Agentforce')) score += 5;
+    if (profile?.experience) {
+      if (profile.experience === 'fresher' && item.update.difficulty === 'easy') score += 4;
+      else if (profile.experience === '8+' && item.update.difficulty === 'medium') score += 4;
       else score += 2;
     }
-
     return { item, score };
   });
 
