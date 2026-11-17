@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfileStore, Technology, Role, Experience, Duration, Goal } from '@/store/profileStore';
 import { repositories } from '@/repositories';
+import { userRegistryService } from '@/services/userRegistryService';
 import {
   Sparkles,
   Mail,
@@ -83,7 +84,13 @@ export default function AuthScreen() {
         if (password.length < 6) {
           throw new Error('Password must be at least 6 characters long.');
         }
-        await signUp(email, password, fullName || email.split('@')[0]);
+        const newUser = await signUp(email, password, fullName || email.split('@')[0]);
+        userRegistryService.registerOrUpdateCandidate({
+          uid: newUser.uid,
+          email: newUser.email,
+          name: fullName || newUser.displayName,
+          emailVerified: false,
+        });
         // Transition to Email Verification
         setStep('verify');
       } else {
@@ -118,6 +125,13 @@ export default function AuthScreen() {
       const ok = await verifyEmail(code);
       if (!ok) {
         throw new Error('Invalid verification code. Please try again.');
+      }
+      if (user) {
+        userRegistryService.registerOrUpdateCandidate({
+          uid: user.uid,
+          email: user.email,
+          emailVerified: true,
+        });
       }
       // Move to candidate profile details form
       setStep('profile');
@@ -164,6 +178,16 @@ export default function AuthScreen() {
     if (user) {
       try {
         await repositories.user.saveProfile(user.uid, patch);
+        userRegistryService.registerOrUpdateCandidate({
+          uid: user.uid,
+          email: user.email,
+          name: displayName,
+          technology: selectedTech,
+          role: selectedRole,
+          experience: selectedExp,
+          dailyDuration: selectedDuration,
+          emailVerified: true,
+        });
       } catch {
         // ignore offline storage errors
       }

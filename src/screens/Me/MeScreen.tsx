@@ -36,6 +36,7 @@ import {
   RotateCcw,
   Bot,
   Sparkles,
+  ShieldCheck,
 } from 'lucide-react';
 
 export default function MeScreen() {
@@ -450,39 +451,53 @@ export default function MeScreen() {
           </div>
         </div>
 
-        {/* Mock Admin Console Links */}
-        <div className="card p-4 space-y-2">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-secondary">
-            Mock Admin Console
-          </h2>
+        {/* Administrator Portal */}
+        <div className="card p-4 space-y-3 bg-gradient-to-br from-emerald-50/50 to-teal-50/30 dark:from-emerald-950/20 dark:to-teal-950/20 border border-emerald-200/60 dark:border-emerald-800/40">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                ⚡
+              </div>
+              <div>
+                <h2 className="text-xs font-bold uppercase tracking-wider text-emerald-900 dark:text-emerald-300">
+                  Admin Command Center
+                </h2>
+                <p className="text-2xs text-secondary">Candidate Registrations, Telemetry & Controls</p>
+              </div>
+            </div>
+            <span className="text-2xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300 font-bold">
+              Restricted
+            </span>
+          </div>
+
           <div className="flex flex-col gap-2 pt-1 text-xs">
             <Link
-              to="/admin/analytics"
-              className="flex items-center justify-between p-2.5 rounded-xl border border-border-light dark:border-border-dark hover:bg-gray-50 dark:hover:bg-gray-800/50 text-primary font-medium"
+              to="/admin"
+              className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-gray-900 border border-emerald-300 dark:border-emerald-700/60 hover:shadow-xs text-primary font-semibold transition"
             >
-              <span className="flex items-center gap-2">
-                <BarChart3 size={15} className="text-brand-500" />
-                Product Analytics & Feedback Dashboard
+              <span className="flex items-center gap-2.5">
+                <ShieldCheck size={16} className="text-emerald-600 dark:text-emerald-400" />
+                <span>Open Master Admin Dashboard</span>
               </span>
-              <ChevronRight size={14} className="text-muted" />
+              <ChevronRight size={15} className="text-emerald-600 dark:text-emerald-400" />
             </Link>
             <Link
               to="/admin/analytics"
-              className="flex items-center justify-between p-2.5 rounded-xl border border-border-light dark:border-border-dark hover:bg-gray-50 dark:hover:bg-gray-800/50 text-primary font-medium"
+              className="flex items-center justify-between p-2.5 rounded-xl border border-border-light dark:border-border-dark hover:bg-white/60 dark:hover:bg-gray-800/50 text-primary font-medium"
             >
               <span className="flex items-center gap-2">
-                <Award size={15} className="text-indigo-500" />
-                Content Quality & Knowledge Coverage Audit
+                <BarChart3 size={15} className="text-brand-500" />
+                User Engagement & Retention Analytics
               </span>
               <ChevronRight size={14} className="text-muted" />
             </Link>
             <Link
               to="/admin/generation"
-              className="flex items-center justify-between p-2.5 rounded-xl border border-border-light dark:border-border-dark hover:bg-gray-50 dark:hover:bg-gray-800/50 text-primary font-medium"
+              className="flex items-center justify-between p-2.5 rounded-xl border border-border-light dark:border-border-dark hover:bg-white/60 dark:hover:bg-gray-800/50 text-primary font-medium"
             >
               <span className="flex items-center gap-2">
                 <FileText size={15} className="text-brand-500" />
-                AI Content Generation & Publishing
+                AI Content Studio (Gemini 1.5 Flash)
               </span>
               <ChevronRight size={14} className="text-muted" />
             </Link>

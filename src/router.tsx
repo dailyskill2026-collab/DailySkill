@@ -62,7 +62,8 @@ function MainRoute() {
 }
 
 export default function AppRouter() {
-  // Lazy load admin screen (only in dev or when enabled)
+  // Lazy load admin screens (protected for admin authorization)
+  const AdminDashboardScreen = lazy(() => import('@/screens/Admin/AdminDashboardScreen'));
   const GenerationScreen = lazy(() => import('@/screens/Admin/GenerationScreen'));
   const AdminAnalyticsScreen = lazy(() => import('@/screens/Admin/AdminAnalyticsScreen'));
 
@@ -72,6 +73,22 @@ export default function AppRouter() {
         <Suspense fallback={<ScreenLoader />}>
           <Routes>
             {/* Protected Admin routes */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminDashboardScreen />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/dashboard"
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminDashboardScreen />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/admin/generation"
               element={

@@ -1,6 +1,7 @@
 // src/services/analyticsService.ts
 import { repositories } from '@/repositories';
 import type { AnalyticsEvent, AnalyticsEventType } from '@/types/analytics';
+import { userRegistryService } from '@/services/userRegistryService';
 
 const SESSION_KEY = 'ds_analytics_session_id';
 
@@ -53,6 +54,8 @@ export class AnalyticsService {
   }
 
   async trackAppOpened(screen = 'today'): Promise<AnalyticsEvent | null> {
+    const user = repositories.auth.getCurrentUser();
+    userRegistryService.recordAppOpen(user?.uid);
     return this.trackEvent('app_opened', { screen });
   }
 
@@ -69,6 +72,10 @@ export class AnalyticsService {
   }
 
   async trackLessonCompleted(contentId: string, screen = 'today'): Promise<AnalyticsEvent | null> {
+    const user = repositories.auth.getCurrentUser();
+    if (user?.uid) {
+      userRegistryService.recordLessonCompleted(user.uid);
+    }
     return this.trackEvent('lesson_completed', { screen, relatedContentId: contentId });
   }
 
