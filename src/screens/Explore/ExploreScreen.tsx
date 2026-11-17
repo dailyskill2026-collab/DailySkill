@@ -216,17 +216,17 @@ export const ExploreScreen: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-4">
-          {feed.map((item) => {
+          {feed.map((item, idx) => {
             const recommendation = scoredFeed.find((s) => s.content.id === item.id);
             return (
               <div key={item.id} className="space-y-1">
                 {activeTab === 'for-you' && recommendation && (
-                  <p className="text-xs text-emerald-800 dark:text-emerald-300 font-semibold px-2 flex items-center gap-1.5">
-                    <Sparkles size={12} className="text-emerald-600" />
-                    <span>Recommended because it {recommendation.explanation}</span>
+                  <p className="text-2xs sm:text-xs text-emerald-800 dark:text-emerald-300 font-semibold px-2 flex items-center gap-1.5">
+                    <Sparkles size={11} className="text-emerald-600" />
+                    <span>{recommendation.explanation}</span>
                   </p>
                 )}
-                <ExploreCard content={item} />
+                <ExploreCard content={item} defaultExpanded={idx === 0} />
               </div>
             );
           })}
