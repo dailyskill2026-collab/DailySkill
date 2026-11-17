@@ -286,10 +286,10 @@ export const SkillAssessmentDashboard: React.FC<SkillAssessmentDashboardProps> =
         </div>
 
         {/* Skill Check */}
-        <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col justify-between space-y-4 hover:border-purple-400 transition-all">
+        <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col justify-between space-y-4 hover:border-emerald-400 transition-all">
           <div className="space-y-2.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300">
+              <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
                 20 Questions
               </span>
               <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 font-medium">
@@ -310,7 +310,7 @@ export const SkillAssessmentDashboard: React.FC<SkillAssessmentDashboardProps> =
 
           <button
             onClick={() => handleStart('skill_check')}
-            className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-700 active:scale-[0.99] text-white font-semibold text-xs shadow-sm flex items-center justify-center gap-2 transition-all"
+            className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-semibold text-xs shadow-sm flex items-center justify-center gap-2 transition-all"
           >
             Start Comprehensive Check <ArrowRight className="w-4 h-4" />
           </button>

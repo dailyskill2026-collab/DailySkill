@@ -70,13 +70,13 @@ const QuizCard: React.FC<Props> = ({ contentId }) => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <span className="text-2xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+          <span className="text-2xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
             Step 2 • Real-World Challenge
           </span>
           <h3 className="text-lg font-bold text-primary">Practice</h3>
         </div>
-        <span className="px-2.5 py-0.5 rounded-full text-2xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 flex items-center gap-1">
-          <Sparkles size={11} /> +10 XP
+        <span className="px-2.5 py-0.5 rounded-full text-2xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
+          <Sparkles size={11} className="text-emerald-600 dark:text-emerald-400" /> +10 XP
         </span>
       </div>
 

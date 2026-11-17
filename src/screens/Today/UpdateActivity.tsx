@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { LearningContent } from '@/types/learning';
 import Badge from '@/components/common/Badge';
 import { useProgressStore } from '@/store/progressStore';
-import ContentFeedbackBar from '@/components/feedback/ContentFeedbackBar';
 import LearningAssistantModal from '@/components/assistant/LearningAssistantModal';
 import { analytics } from '@/services/analyticsService';
 import {
@@ -17,6 +16,7 @@ import {
   Sparkles,
   Clock,
   BookOpen,
+  ChevronRight,
 } from 'lucide-react';
 
 interface Props {
@@ -26,12 +26,17 @@ interface Props {
   };
 }
 
+type TabType = 'whats_new' | 'why_matters' | 'code' | 'takeaways';
+
 const UpdateActivity: React.FC<Props> = ({ content }) => {
   const isVerified = content.verificationStatus === 'verified';
   const { dailyProgress, setProgress } = useProgressStore();
   const progressed = dailyProgress[content.id];
   const [isCompleted, setIsCompleted] = useState<boolean>(!!(progressed?.status === 'completed'));
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
+  
+  // Interactive tab state: user clicks a minimal button to reveal that specific section
+  const [activeTab, setActiveTab] = useState<TabType>('whats_new');
 
   const handleToggle = () => {
     const newState = !isCompleted;
@@ -54,19 +59,19 @@ const UpdateActivity: React.FC<Props> = ({ content }) => {
       onClick={handleToggle}
       className={`card p-5 space-y-4 transition-all duration-200 border text-left cursor-pointer ${
         isCompleted
-          ? 'border-emerald-300 dark:border-emerald-800/80 bg-emerald-50/20 dark:bg-emerald-950/10'
-          : 'border-slate-200 dark:border-slate-800 hover:border-brand-400 dark:hover:border-brand-700 shadow-sm'
+          ? 'border-emerald-300 dark:border-emerald-800 bg-emerald-50/30 dark:bg-emerald-950/20'
+          : 'border-slate-200/90 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-700 shadow-sm'
       }`}
     >
       {/* Top Meta Bar */}
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2">
-          <span className="text-2xs font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/60 px-2.5 py-0.5 rounded-full border border-brand-200 dark:border-brand-800">
+          <span className="text-2xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300 bg-emerald-100/80 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
             Stay Updated
           </span>
           {content.releaseVersion && (
-            <span className="text-2xs font-semibold px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 flex items-center gap-1">
-              <Sparkles size={10} />
+            <span className="text-2xs font-semibold px-2 py-0.5 rounded-md bg-sky-100 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800 flex items-center gap-1">
+              <Sparkles size={10} className="text-sky-600 dark:text-sky-400" />
               {content.releaseVersion}
             </span>
           )}
@@ -80,7 +85,7 @@ const UpdateActivity: React.FC<Props> = ({ content }) => {
         </div>
       </div>
 
-      {/* Main Title & Summary */}
+      {/* Main Title & Concise Lead */}
       <div className="space-y-1.5">
         <h3 className="text-lg sm:text-xl font-bold text-primary leading-tight">
           {content.title}
@@ -90,69 +95,128 @@ const UpdateActivity: React.FC<Props> = ({ content }) => {
         </p>
       </div>
 
-      {/* Structured Content Blocks (Snackable Microlearning) */}
+      {/* Minimal Buttons: Click button to display content dynamically on demand */}
       <div className="space-y-3 pt-1" onClick={(e) => e.stopPropagation()}>
-        {/* 1. What's New / Innovation Callout */}
-        {content.explanation && (
-          <div className="p-3.5 bg-gradient-to-r from-blue-50/80 to-indigo-50/80 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-200/80 dark:border-blue-900/60 rounded-xl space-y-1">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-blue-900 dark:text-blue-300">
-              <Lightbulb size={14} className="text-blue-600 dark:text-blue-400 shrink-0" />
-              <span>What's New in this Release?</span>
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+          <button
+            type="button"
+            onClick={() => setActiveTab('whats_new')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shrink-0 ${
+              activeTab === 'whats_new'
+                ? 'bg-emerald-600 text-white shadow-xs scale-[1.02]'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+            }`}
+          >
+            <Lightbulb size={13} className={activeTab === 'whats_new' ? 'text-amber-200' : 'text-amber-500'} />
+            <span>What's New</span>
+          </button>
+
+          {content.realWorldExample && (
+            <button
+              type="button"
+              onClick={() => setActiveTab('why_matters')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shrink-0 ${
+                activeTab === 'why_matters'
+                  ? 'bg-emerald-600 text-white shadow-xs scale-[1.02]'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
+            >
+              <Target size={13} className={activeTab === 'why_matters' ? 'text-teal-200' : 'text-teal-500'} />
+              <span>Why It Matters</span>
+            </button>
+          )}
+
+          {content.codeSnippet && (
+            <button
+              type="button"
+              onClick={() => setActiveTab('code')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shrink-0 ${
+                activeTab === 'code'
+                  ? 'bg-emerald-600 text-white shadow-xs scale-[1.02]'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
+            >
+              <Code2 size={13} className={activeTab === 'code' ? 'text-sky-200' : 'text-sky-500'} />
+              <span>Code Pattern</span>
+            </button>
+          )}
+
+          {content.keyTakeaways && content.keyTakeaways.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setActiveTab('takeaways')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shrink-0 ${
+                activeTab === 'takeaways'
+                  ? 'bg-emerald-600 text-white shadow-xs scale-[1.02]'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
+            >
+              <BookOpen size={13} className={activeTab === 'takeaways' ? 'text-emerald-200' : 'text-emerald-500'} />
+              <span>Key Takeaways</span>
+            </button>
+          )}
+        </div>
+
+        {/* Dynamic Content Display based on clicked button */}
+        <div className="animate-fade-in transition-all">
+          {activeTab === 'whats_new' && content.explanation && (
+            <div className="p-4 bg-gradient-to-r from-emerald-50/90 via-teal-50/80 to-sky-50/80 dark:from-emerald-950/30 dark:via-teal-950/30 dark:to-sky-950/30 border border-emerald-200/80 dark:border-emerald-900/60 rounded-2xl space-y-1.5">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-900 dark:text-emerald-300">
+                <Lightbulb size={14} className="text-amber-500 shrink-0" />
+                <span>What's New in this Release?</span>
+              </div>
+              <p className="text-xs sm:text-sm text-emerald-950/90 dark:text-emerald-100/90 leading-relaxed">
+                {content.explanation}
+              </p>
             </div>
-            <p className="text-xs text-blue-950/90 dark:text-blue-100/90 leading-relaxed">
-              {content.explanation}
-            </p>
-          </div>
-        )}
+          )}
 
-        {/* 2. Production Impact / Why It Matters */}
-        {content.realWorldExample && (
-          <div className="p-3.5 bg-gradient-to-r from-emerald-50/80 to-teal-50/80 dark:from-emerald-950/30 dark:to-teal-950/30 border border-emerald-200/80 dark:border-emerald-900/60 rounded-xl space-y-1">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-900 dark:text-emerald-300">
-              <Target size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
-              <span>Why It Matters in Production</span>
+          {activeTab === 'why_matters' && content.realWorldExample && (
+            <div className="p-4 bg-gradient-to-r from-teal-50/90 to-sky-50/80 dark:from-teal-950/30 dark:to-sky-950/30 border border-teal-200/80 dark:border-teal-900/60 rounded-2xl space-y-1.5">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-teal-900 dark:text-teal-300">
+                <Target size={14} className="text-teal-600 dark:text-teal-400 shrink-0" />
+                <span>Production Impact & Architecture</span>
+              </div>
+              <p className="text-xs sm:text-sm text-teal-950/90 dark:text-teal-100/90 leading-relaxed">
+                {content.realWorldExample}
+              </p>
             </div>
-            <p className="text-xs text-emerald-950/90 dark:text-emerald-100/90 leading-relaxed">
-              {content.realWorldExample}
-            </p>
-          </div>
-        )}
+          )}
 
-        {/* 3. Code Pattern / Architecture Snippet */}
-        {content.codeSnippet && (
-          <div className="rounded-xl overflow-hidden border border-slate-800 bg-slate-950 shadow-inner">
-            <div className="px-3.5 py-1.5 bg-slate-900 border-b border-slate-800 flex items-center justify-between text-2xs text-slate-400 font-mono">
-              <span className="flex items-center gap-1.5">
-                <Code2 size={13} className="text-indigo-400" />
-                Modern Implementation Pattern
-              </span>
-              <span className="text-[10px] text-slate-500 uppercase">Salesforce Apex</span>
+          {activeTab === 'code' && content.codeSnippet && (
+            <div className="rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 shadow-inner">
+              <div className="px-3.5 py-1.5 bg-slate-900 border-b border-slate-800 flex items-center justify-between text-2xs text-slate-400 font-mono">
+                <span className="flex items-center gap-1.5 text-emerald-400">
+                  <Code2 size={13} />
+                  Modern Implementation Pattern
+                </span>
+                <span className="text-[10px] text-slate-500 uppercase">Salesforce Apex</span>
+              </div>
+              <pre className="p-3 text-[11px] font-mono leading-relaxed text-slate-200 overflow-x-auto whitespace-pre">
+                <code>{content.codeSnippet}</code>
+              </pre>
             </div>
-            <pre className="p-3 text-[11px] font-mono leading-relaxed text-slate-200 overflow-x-auto whitespace-pre">
-              <code>{content.codeSnippet}</code>
-            </pre>
-          </div>
-        )}
+          )}
 
-        {/* 4. Key Takeaways */}
-        {content.keyTakeaways && content.keyTakeaways.length > 0 && (
-          <div className="p-3 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl space-y-2">
-            <p className="text-xs font-bold text-primary flex items-center gap-1.5">
-              <BookOpen size={13} className="text-brand-600 dark:text-brand-400" />
-              Key Technical Takeaways
-            </p>
-            <ul className="space-y-1.5">
-              {content.keyTakeaways.map((point, idx) => (
-                <li key={idx} className="text-xs text-secondary flex items-start gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-brand-500 mt-1.5 shrink-0" />
-                  <span>{point}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+          {activeTab === 'takeaways' && content.keyTakeaways && content.keyTakeaways.length > 0 && (
+            <div className="p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-2">
+              <p className="text-xs font-bold text-primary flex items-center gap-1.5">
+                <BookOpen size={14} className="text-emerald-600 dark:text-emerald-400" />
+                Key Technical Takeaways
+              </p>
+              <ul className="space-y-1.5">
+                {content.keyTakeaways.map((point, idx) => (
+                  <li key={idx} className="text-xs text-secondary flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
 
-        {/* 5. Official Source Documentation Link */}
+        {/* Official Source Link */}
         {content.sourceUrl && (
           <div className="pt-1 flex items-center justify-between flex-wrap gap-2 text-xs">
             <span className="text-muted text-2xs">Verified Documentation:</span>
@@ -160,7 +224,7 @@ const UpdateActivity: React.FC<Props> = ({ content }) => {
               href={content.sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-2xs font-semibold text-brand-600 dark:text-brand-400 hover:underline"
+              className="inline-flex items-center gap-1 text-2xs font-semibold text-emerald-700 dark:text-emerald-400 hover:underline"
             >
               <span>{content.sourceName || 'Salesforce Official Docs'}</span>
               <ExternalLink size={11} />
@@ -169,21 +233,22 @@ const UpdateActivity: React.FC<Props> = ({ content }) => {
         )}
       </div>
 
-      {/* Completion & Assistant Footer */}
-      <div onClick={(e) => e.stopPropagation()} className="pt-2 border-t border-slate-100 dark:border-slate-800/80 space-y-2.5">
+      {/* Completion & Assistant Actions Footer */}
+      <div onClick={(e) => e.stopPropagation()} className="pt-2 border-t border-slate-100 dark:border-slate-800/80">
         <div className="flex items-center justify-between gap-3">
           <button
+            type="button"
             onClick={handleToggle}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition ${
+            className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all ${
               isCompleted
                 ? 'bg-emerald-600 text-white shadow-xs'
-                : 'bg-brand-50 dark:bg-brand-950/60 text-brand-700 dark:text-brand-300 border border-brand-200 dark:border-brand-800 hover:bg-brand-100'
+                : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100'
             }`}
           >
             {isCompleted ? (
               <>
                 <CheckCircle size={14} />
-                <span>Marked as Understood</span>
+                <span>Marked as Understood ✓</span>
               </>
             ) : (
               <>
@@ -194,15 +259,14 @@ const UpdateActivity: React.FC<Props> = ({ content }) => {
           </button>
 
           <button
+            type="button"
             onClick={() => setIsAssistantOpen(true)}
-            className="text-xs font-semibold text-brand-600 dark:text-brand-400 flex items-center gap-1.5 hover:underline py-1 px-2 rounded-md hover:bg-brand-50/50 dark:hover:bg-brand-950/30"
+            className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5 hover:underline py-1.5 px-3 rounded-xl hover:bg-emerald-50/70 dark:hover:bg-emerald-950/40 transition"
           >
             <Bot size={14} />
-            <span>Ask Assistant</span>
+            <span>Ask AI Assistant ✦</span>
           </button>
         </div>
-
-        <ContentFeedbackBar contentId={content.id} />
       </div>
 
       {/* Learning Assistant Modal */}

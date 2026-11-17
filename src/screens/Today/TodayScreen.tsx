@@ -123,8 +123,8 @@ export default function TodayScreen() {
 
         {/* Personalized Candidate Track Pill */}
         <div className="flex items-center gap-2 flex-wrap pt-2 text-xs">
-          <span className="px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-bold border border-indigo-200/80 dark:border-indigo-800/80 flex items-center gap-1.5 shadow-2xs">
-            <Sparkles size={13} className="text-indigo-500" />
+          <span className="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 font-bold border border-emerald-200/80 dark:border-emerald-800/80 flex items-center gap-1.5 shadow-2xs">
+            <Sparkles size={13} className="text-emerald-600 dark:text-emerald-400" />
             <span>{technology} {roleFormatted.toUpperCase()}</span>
           </span>
           <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 font-medium text-2xs text-secondary">
@@ -144,7 +144,7 @@ export default function TodayScreen() {
           <div className="flex items-center justify-between relative">
             <div className="flex-1 pr-2">
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-2xs font-bold tracking-wider text-brand-200 uppercase">
+                <span className="text-2xs font-bold tracking-wider text-emerald-100 uppercase">
                   Today's Goal
                 </span>
                 {completed === total && total > 0 && (
@@ -154,7 +154,7 @@ export default function TodayScreen() {
                 )}
               </div>
               <h2 className="text-lg sm:text-xl font-bold mb-1">Your {dailyDuration}-Minute Sprint</h2>
-              <p className="text-xs sm:text-sm text-brand-200 mb-3">
+              <p className="text-xs sm:text-sm text-emerald-100 mb-3">
                 {completed === total && total > 0
                   ? '🎉 All activities finished! Streak updated.'
                   : `${total - completed} of ${total} ${total === 1 ? 'step' : 'steps'} remaining today`}
@@ -187,22 +187,22 @@ export default function TodayScreen() {
           </div>
         </div>
 
-        {/* ---- Tailored Salesforce Release Feed Switcher ---- */}
-        <div className="p-3 bg-gradient-to-r from-purple-50 via-indigo-50 to-blue-50 dark:from-purple-950/30 dark:via-indigo-950/30 dark:to-blue-950/30 border border-purple-200/80 dark:border-purple-800/60 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
+        {/* ---- Tailored Salesforce Release Feed Switcher (Pista Green & Sky Blue Theme) ---- */}
+        <div className="p-3 bg-gradient-to-r from-emerald-50/90 via-teal-50/80 to-sky-50/80 dark:from-emerald-950/30 dark:via-teal-950/30 dark:to-sky-950/30 border border-emerald-200/80 dark:border-emerald-800/60 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-lg bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
               <Sparkles size={16} />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold text-purple-900 dark:text-purple-200 truncate">
+                <span className="text-xs font-bold text-emerald-950 dark:text-emerald-200 truncate">
                   Latest Releases (Winter '27 • Summer '26 • Spring '26)
                 </span>
-                <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-purple-200/80 dark:bg-purple-900/60 text-purple-800 dark:text-purple-300">
+                <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-sky-100 dark:bg-sky-900/60 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
                   {releaseInfo.item.releaseTag}
                 </span>
               </div>
-              <p className="text-2xs text-purple-700/90 dark:text-purple-300/90 truncate">
+              <p className="text-2xs text-emerald-800/90 dark:text-emerald-300/90 truncate">
                 Topic {releaseInfo.currentIndex} of {releaseInfo.totalTopics}: {releaseInfo.item.update.title}
               </p>
             </div>
@@ -210,7 +210,7 @@ export default function TodayScreen() {
           <button
             onClick={handleNextReleaseTopic}
             title="Rotate to next tailored Salesforce release topic"
-            className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-purple-900/50 hover:bg-purple-100 dark:hover:bg-purple-800/60 text-purple-700 dark:text-purple-200 text-xs font-semibold shrink-0 border border-purple-200 dark:border-purple-700 flex items-center gap-1.5 shadow-2xs transition"
+            className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-emerald-900/50 hover:bg-emerald-50 dark:hover:bg-emerald-800/60 text-emerald-800 dark:text-emerald-200 text-xs font-semibold shrink-0 border border-emerald-200 dark:border-emerald-700 flex items-center gap-1.5 shadow-2xs transition"
           >
             <RotateCw size={12} />
             <span>Next Topic</span>
