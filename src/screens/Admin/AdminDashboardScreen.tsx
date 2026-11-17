@@ -1,12 +1,11 @@
 // src/screens/Admin/AdminDashboardScreen.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ShieldCheck,
   Users,
   Eye,
   TrendingUp,
-  Download,
   Search,
   Plus,
   Trash2,
@@ -14,26 +13,51 @@ import {
   Clock,
   Sparkles,
   BookOpen,
-  Filter,
   BarChart3,
   Flame,
   FileSpreadsheet,
-  AlertCircle,
   ExternalLink,
   RotateCw,
   LogOut,
-  ChevronRight,
   UserCheck,
 } from 'lucide-react';
 import { userRegistryService, RegisteredCandidate } from '@/services/userRegistryService';
 import { dailyReleaseFeed } from '@/data/dailyReleaseFeed';
-import { metricsService } from '@/services/metricsService';
 import { repositories } from '@/repositories';
 import { useAuth } from '@/contexts/AuthContext';
-import GenerationScreen from '@/screens/Admin/GenerationScreen';
+
+// Lazy-load AI Generation Screen so its bundle is loaded on demand
+const GenerationScreen = lazy(() => import('@/screens/Admin/GenerationScreen'));
+
+// Safe date and time formatters that never throw RangeError
+const formatDate = (isoString?: string): string => {
+  if (!isoString) return 'Recent';
+  try {
+    const d = new Date(isoString);
+    if (isNaN(d.getTime())) return 'Recent';
+    return d.toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+  } catch {
+    return 'Recent';
+  }
+};
+
+const formatTime = (isoString?: string): string => {
+  if (!isoString) return '';
+  try {
+    const d = new Date(isoString);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  } catch {
+    return '';
+  }
+};
 
 export default function AdminDashboardScreen() {
-  const { user, signOut } = useAuth();
+  const { signOut } = useAuth();
   const [activeTab, setActiveTab] = useState<'users' | 'analytics' | 'releases' | 'ai_studio'>('users');
 
   // Candidate Registry state
@@ -66,15 +90,42 @@ export default function AdminDashboardScreen() {
   }, []);
 
   const loadData = () => {
-    const list = userRegistryService.getAllCandidates();
-    setCandidates(list);
-    const regStats = userRegistryService.getRegistryStats();
-    setStats(regStats);
+    try {
+      const list = userRegistryService.getAllCandidates();
+      setCandidates(Array.isArray(list) ? list : []);
+      const regStats = userRegistryService.getRegistryStats();
+      if (regStats) {
+        setStats({
+          totalUsers: regStats.totalUsers || 0,
+          verifiedUsers: regStats.verifiedUsers || 0,
+          activeToday: regStats.activeToday || 1,
+          totalOpens: regStats.totalOpens || regStats.totalAppOpens || 0,
+        });
+      }
+    } catch (err) {
+      console.error('Failed to load candidate registry:', err);
+    }
 
-    // Fetch recent analytics events for live activity stream
-    repositories.analytics.getRecentEvents(30).then((evts) => {
-      setRecentEvents(evts);
-    });
+    // Safely fetch analytics events
+    try {
+      if (repositories && repositories.analytics && typeof repositories.analytics.getEvents === 'function') {
+        repositories.analytics
+          .getEvents()
+          .then((evts) => {
+            if (Array.isArray(evts)) {
+              const sorted = [...evts].sort(
+                (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+              );
+              setRecentEvents(sorted.slice(0, 30));
+            }
+          })
+          .catch((err) => {
+            console.warn('Analytics events load error:', err);
+          });
+      }
+    } catch (err) {
+      console.warn('Analytics unavailable:', err);
+    }
   };
 
   const showNotice = (msg: string) => {
@@ -83,38 +134,46 @@ export default function AdminDashboardScreen() {
   };
 
   const handleExportCSV = () => {
-    const csvContent = userRegistryService.exportCandidatesToCSV();
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `registered_candidates_${new Date().toISOString().split('T')[0]}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    showNotice('Exported candidates to CSV successfully!');
+    try {
+      const csvContent = userRegistryService.exportCandidatesToCSV();
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `registered_candidates_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showNotice('Exported candidates to CSV successfully!');
+    } catch {
+      showNotice('Could not generate CSV export.');
+    }
   };
 
   const handleAddCandidate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newUserEmail.trim()) return;
 
-    userRegistryService.registerOrUpdateCandidate({
-      uid: `user-admin-add-${Date.now()}`,
-      name: newUserName.trim() || newUserEmail.split('@')[0],
-      email: newUserEmail.trim(),
-      technology: 'SALESFORCE',
-      role: newUserRole,
-      experience: newUserExp,
-      dailyDuration: 5,
-      emailVerified: true,
-    });
+    try {
+      userRegistryService.registerOrUpdateCandidate({
+        uid: `user-admin-add-${Date.now()}`,
+        name: newUserName.trim() || newUserEmail.split('@')[0],
+        email: newUserEmail.trim(),
+        technology: 'SALESFORCE',
+        role: newUserRole,
+        experience: newUserExp,
+        dailyDuration: 5,
+        emailVerified: true,
+      });
 
-    setIsAddUserModalOpen(false);
-    setNewUserName('');
-    setNewUserEmail('');
-    loadData();
-    showNotice(`Candidate ${newUserEmail} registered successfully!`);
+      setIsAddUserModalOpen(false);
+      setNewUserName('');
+      setNewUserEmail('');
+      loadData();
+      showNotice(`Candidate ${newUserEmail} registered successfully!`);
+    } catch (err: any) {
+      showNotice(err.message || 'Error registering candidate.');
+    }
   };
 
   const handleDeleteCandidate = (uid: string, name: string) => {
@@ -127,19 +186,25 @@ export default function AdminDashboardScreen() {
 
   // Filtered candidate list
   const filteredCandidates = candidates.filter((c) => {
-    const query = searchQuery.toLowerCase();
+    if (!c) return false;
+    const query = (searchQuery || '').toLowerCase();
+    const name = (c.name || '').toLowerCase();
+    const email = (c.email || '').toLowerCase();
+    const role = (c.role || '').toLowerCase();
+    const exp = (c.experience || '').toLowerCase();
+
     const matchesSearch =
-      c.name.toLowerCase().includes(query) ||
-      c.email.toLowerCase().includes(query) ||
-      c.role.toLowerCase().includes(query) ||
-      c.experience.toLowerCase().includes(query);
+      name.includes(query) ||
+      email.includes(query) ||
+      role.includes(query) ||
+      exp.includes(query);
 
     const matchesRole =
-      selectedRole === 'All' || c.role.toLowerCase().includes(selectedRole.toLowerCase());
+      selectedRole === 'All' || role.includes(selectedRole.toLowerCase());
 
     const matchesVerification =
       selectedVerification === 'All' ||
-      (selectedVerification === 'Verified' ? c.emailVerified : !c.emailVerified);
+      (selectedVerification === 'Verified' ? Boolean(c.emailVerified) : !c.emailVerified);
 
     return matchesSearch && matchesRole && matchesVerification;
   });
@@ -179,6 +244,7 @@ export default function AdminDashboardScreen() {
 
             <button
               onClick={() => {
+                sessionStorage.removeItem('it_daily_admin_unlocked');
                 signOut();
                 window.location.href = '/auth';
               }}
@@ -344,7 +410,7 @@ export default function AdminDashboardScreen() {
                 </div>
 
                 {/* Role Filter */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <select
                     value={selectedRole}
                     onChange={(e) => setSelectedRole(e.target.value)}
@@ -355,6 +421,16 @@ export default function AdminDashboardScreen() {
                     <option value="Administrator">Administrator</option>
                     <option value="Architect">Architect</option>
                     <option value="Consultant">Consultant</option>
+                  </select>
+
+                  <select
+                    value={selectedVerification}
+                    onChange={(e) => setSelectedVerification(e.target.value)}
+                    className="px-3 py-2.5 rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm font-semibold text-primary outline-none focus:ring-2 focus:ring-emerald-500"
+                  >
+                    <option value="All">All Status</option>
+                    <option value="Verified">Verified Only</option>
+                    <option value="Unverified">Pending OTP</option>
                   </select>
 
                   <button
@@ -401,31 +477,31 @@ export default function AdminDashboardScreen() {
                       </tr>
                     ) : (
                       filteredCandidates.map((c) => (
-                        <tr key={c.uid} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition">
+                        <tr key={c.uid || c.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition">
                           {/* Name & Email */}
                           <td className="py-3.5 px-4 sm:px-6">
                             <div className="flex items-center gap-3">
                               <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-200 dark:from-emerald-950 dark:to-teal-900 text-emerald-800 dark:text-emerald-300 flex items-center justify-center font-bold text-sm shrink-0 shadow-2xs">
-                                {c.name.charAt(0).toUpperCase()}
+                                {(c.name || 'U').charAt(0).toUpperCase()}
                               </div>
                               <div className="min-w-0">
                                 <div className="font-bold text-primary flex items-center gap-1.5">
-                                  <span>{c.name}</span>
+                                  <span>{c.name || 'Candidate'}</span>
                                   {c.isAdmin && (
                                     <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 font-bold">
                                       Admin
                                     </span>
                                   )}
                                 </div>
-                                <div className="text-secondary text-2xs truncate">{c.email}</div>
+                                <div className="text-secondary text-2xs truncate">{c.email || 'No email'}</div>
                               </div>
                             </div>
                           </td>
 
                           {/* Role & Experience */}
                           <td className="py-3.5 px-4">
-                            <div className="font-semibold text-primary">{c.role}</div>
-                            <div className="text-2xs text-muted">{c.experience}</div>
+                            <div className="font-semibold text-primary">{c.role || 'Developer'}</div>
+                            <div className="text-2xs text-muted">{c.experience || 'All Levels'}</div>
                           </td>
 
                           {/* Verification */}
@@ -459,17 +535,13 @@ export default function AdminDashboardScreen() {
 
                           {/* Signup Date */}
                           <td className="py-3.5 px-4 text-2xs text-secondary">
-                            {new Date(c.createdAt).toLocaleDateString('en-IN', {
-                              day: 'numeric',
-                              month: 'short',
-                              year: 'numeric',
-                            })}
+                            {formatDate(c.createdAt)}
                           </td>
 
                           {/* Actions */}
                           <td className="py-3.5 px-4 text-right">
                             <button
-                              onClick={() => handleDeleteCandidate(c.uid, c.name)}
+                              onClick={() => handleDeleteCandidate(c.uid || (c.id as string), c.name)}
                               className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/60 transition"
                               title="Delete Candidate Record"
                             >
@@ -510,26 +582,26 @@ export default function AdminDashboardScreen() {
                 {recentEvents.length === 0 ? (
                   <p className="text-center py-8 text-xs text-muted">No telemetry events recorded yet.</p>
                 ) : (
-                  recentEvents.slice(0, 15).map((evt, idx) => (
+                  recentEvents.slice(0, 20).map((evt, idx) => (
                     <div
                       key={idx}
                       className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between text-xs"
                     >
                       <div className="flex items-center gap-2.5">
                         <div className="w-7 h-7 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 flex items-center justify-center font-bold">
-                          {evt.eventType === 'app_opened' ? <Eye size={13} /> : <CheckCircle2 size={13} />}
+                          {evt?.eventType === 'app_opened' ? <Eye size={13} /> : <CheckCircle2 size={13} />}
                         </div>
                         <div>
                           <div className="font-semibold text-primary capitalize">
-                            {evt.eventType.replace('_', ' ')}
+                            {(evt?.eventType || 'activity').replace(/_/g, ' ')}
                           </div>
                           <div className="text-2xs text-muted">
-                            Screen: <strong>{evt.screen || 'today'}</strong> • User ID: {evt.mockUserId}
+                            Screen: <strong>{evt?.screen || 'today'}</strong> • User: {evt?.mockUserId || 'visitor'}
                           </div>
                         </div>
                       </div>
                       <span className="text-2xs text-muted">
-                        {new Date(evt.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {formatTime(evt?.timestamp)}
                       </span>
                     </div>
                   ))
@@ -560,23 +632,25 @@ export default function AdminDashboardScreen() {
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-2xs font-bold px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300 border border-sky-200">
-                        {item.releaseTag}
+                        {item.releaseTag || "Winter '27"}
                       </span>
                       <span className="text-2xs text-muted font-mono">#{idx + 1}</span>
                     </div>
-                    <h4 className="font-bold text-sm text-primary">{item.update.title}</h4>
-                    <p className="text-xs text-secondary line-clamp-2">{item.update.summary}</p>
+                    <h4 className="font-bold text-sm text-primary">{item.update?.title || 'Topic'}</h4>
+                    <p className="text-xs text-secondary line-clamp-2">{item.update?.summary || ''}</p>
                     <div className="pt-1 flex items-center justify-between text-2xs text-muted">
-                      <span>Category: {item.topicCategory}</span>
-                      <a
-                        href={item.update.sourceUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-emerald-600 hover:underline flex items-center gap-1 font-semibold"
-                      >
-                        <span>Official Docs</span>
-                        <ExternalLink size={10} />
-                      </a>
+                      <span>Category: {item.topicCategory || 'Salesforce'}</span>
+                      {item.update?.sourceUrl && (
+                        <a
+                          href={item.update.sourceUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-emerald-600 hover:underline flex items-center gap-1 font-semibold"
+                        >
+                          <span>Official Docs</span>
+                          <ExternalLink size={10} />
+                        </a>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -590,14 +664,22 @@ export default function AdminDashboardScreen() {
         {/* ============================================================== */}
         {activeTab === 'ai_studio' && (
           <div className="animate-fade-in">
-            <GenerationScreen />
+            <Suspense
+              fallback={
+                <div className="p-8 text-center text-xs text-muted">
+                  Loading AI Content Generator...
+                </div>
+              }
+            >
+              <GenerationScreen />
+            </Suspense>
           </div>
         )}
       </main>
 
       {/* Modal: Add Candidate */}
       {isAddUserModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
           <div className="card max-w-md w-full p-6 space-y-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl">
             <h3 className="text-lg font-bold text-primary">Register New Candidate</h3>
             <form onSubmit={handleAddCandidate} className="space-y-3 text-xs sm:text-sm">

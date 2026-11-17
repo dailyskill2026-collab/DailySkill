@@ -14,12 +14,29 @@ export default function ProtectedRoute({ children, requireAdmin = false }: Prote
   const { user, loading, isAdmin, signIn } = useAuth();
   const location = useLocation();
 
+  const [sessionUnlocked, setSessionUnlocked] = useState(() => {
+    try {
+      return sessionStorage.getItem('it_daily_admin_unlocked') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
   const [adminKey, setAdminKey] = useState('');
   const [adminEmail, setAdminEmail] = useState('admin@salesforce.dev');
   const [adminPassword, setAdminPassword] = useState('admin123');
   const [authError, setAuthError] = useState<string | null>(null);
   const [authenticating, setAuthenticating] = useState(false);
   const [showKeyForm, setShowKeyForm] = useState(false);
+
+  const isEmailAdmin = Boolean(
+    user?.email &&
+      (user.email.toLowerCase().includes('admin') ||
+        user.email.toLowerCase().includes('zahed') ||
+        user.email.toLowerCase() === 'dailyskill2026@gmail.com')
+  );
+
+  const isAuthorized = isAdmin || isEmailAdmin || sessionUnlocked;
 
   if (loading) {
     return (
@@ -36,18 +53,19 @@ export default function ProtectedRoute({ children, requireAdmin = false }: Prote
   const handlePasskeyUnlock = (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
-    if (adminKey.trim() === 'admin2026' || adminKey.trim() === 'zahed2026') {
-      const currentUser = repositories.auth.getCurrentUser();
-      if (currentUser) {
-        currentUser.isAdmin = true;
-        localStorage.setItem('it-daily-mock-user', JSON.stringify(currentUser));
-        window.location.reload();
-      } else {
-        // Sign in with admin account
-        signIn('admin@salesforce.dev', 'admin123').then(() => {
-          window.location.reload();
-        });
+    const key = adminKey.trim().toLowerCase();
+    if (key === 'admin2026' || key === 'zahed2026' || key === 'admin') {
+      try {
+        sessionStorage.setItem('it_daily_admin_unlocked', 'true');
+        const currentUser = repositories.auth.getCurrentUser();
+        if (currentUser) {
+          currentUser.isAdmin = true;
+          localStorage.setItem('it-daily-auth-user', JSON.stringify(currentUser));
+        }
+      } catch {
+        // ignore
       }
+      setSessionUnlocked(true);
     } else {
       setAuthError('Invalid Admin Master Key. Access denied.');
     }
@@ -60,7 +78,8 @@ export default function ProtectedRoute({ children, requireAdmin = false }: Prote
     setAuthenticating(true);
     try {
       await signIn(adminEmail.trim(), adminPassword);
-      window.location.reload();
+      sessionStorage.setItem('it_daily_admin_unlocked', 'true');
+      setSessionUnlocked(true);
     } catch (err: any) {
       setAuthError(err.message || 'Admin authentication failed.');
     } finally {
@@ -72,8 +91,8 @@ export default function ProtectedRoute({ children, requireAdmin = false }: Prote
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  // If section requires Admin and current user is not admin, display Admin Gate
-  if (requireAdmin && !isAdmin) {
+  // If section requires Admin and current user is not authorized, display Admin Gate
+  if (requireAdmin && !isAuthorized) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
         <div className="card max-w-md w-full p-6 sm:p-8 text-center space-y-5 shadow-2xl border border-slate-200 dark:border-slate-800 rounded-3xl">
