@@ -31,18 +31,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [pendingGuestMigration, setPendingGuestMigration] = useState<GuestSnapshot | null>(null);
 
   useEffect(() => {
+    let mounted = true;
+    const fallbackTimer = setTimeout(() => {
+      if (mounted) setLoading(false);
+    }, 500);
+
     const unsubscribe = repositories.auth.onAuthStateChanged(async (currentUser) => {
+      if (!mounted) return;
       setUser(currentUser);
       if (currentUser) {
-        const adminStatus = await repositories.auth.checkIsAdmin();
-        setIsAdmin(adminStatus);
+        try {
+          const adminStatus = await repositories.auth.checkIsAdmin();
+          if (mounted) setIsAdmin(adminStatus);
+        } catch {
+          if (mounted) setIsAdmin(false);
+        }
       } else {
-        setIsAdmin(false);
+        if (mounted) setIsAdmin(false);
       }
-      setLoading(false);
+      if (mounted) setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      mounted = false;
+      clearTimeout(fallbackTimer);
+      unsubscribe();
+    };
   }, []);
 
   const checkForGuestData = (): GuestSnapshot | null => {

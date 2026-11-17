@@ -24,6 +24,11 @@ const InterestsScreen      = lazy(() => import('@/screens/Onboarding/InterestsSc
 const PreferenceScreen     = lazy(() => import('@/screens/Onboarding/PreferenceScreen'));
 const SummaryScreen        = lazy(() => import('@/screens/Onboarding/SummaryScreen'));
 
+// Lazy-loaded Admin screens
+const AdminDashboardScreen = lazy(() => import('@/screens/Admin/AdminDashboardScreen'));
+const GenerationScreen      = lazy(() => import('@/screens/Admin/GenerationScreen'));
+const AdminAnalyticsScreen  = lazy(() => import('@/screens/Admin/AdminAnalyticsScreen'));
+
 // Simple loading fallback
 function ScreenLoader() {
   return (
@@ -62,11 +67,6 @@ function MainRoute() {
 }
 
 export default function AppRouter() {
-  // Lazy load admin screens (protected for admin authorization)
-  const AdminDashboardScreen = lazy(() => import('@/screens/Admin/AdminDashboardScreen'));
-  const GenerationScreen = lazy(() => import('@/screens/Admin/GenerationScreen'));
-  const AdminAnalyticsScreen = lazy(() => import('@/screens/Admin/AdminAnalyticsScreen'));
-
   return (
     <ErrorBoundary>
       <AppShell>
